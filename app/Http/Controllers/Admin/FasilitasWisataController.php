@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ObjekWisata;
+use App\Models\Foto;
 use App\Models\FasilitasWisata;
 use App\Repositories\Eloquent\FasilitasWisataRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Intervention\Image\Laravel\Facades\Image;
 
 class FasilitasWisataController extends Controller
 {
@@ -56,9 +60,29 @@ class FasilitasWisataController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'icon' => 'nullable|string|max:50',
+            'fotos' => 'nullable|array',
+            'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $this->fasilitasRepo->create($validated);
+        $fasilitas = $this->fasilitasRepo->create($validated);
+
+        // Handle File Uploads
+        if ($request->hasFile('fotos')) {
+            foreach ($request->file('fotos') as $index => $file) {
+                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $path = 'fotos/fasilitas/' . $filename;
+
+                // Resize and Save
+                $image = Image::read($file);
+                $image->scale(width: 800);
+                Storage::disk('public')->put($path, $image->encode());
+
+                $fasilitas->fotos()->create([
+                    'path' => $path,
+                    'is_primary' => $index === 0,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.fasilitas-wisata.index')
             ->with('message', 'Fasilitas berhasil ditambahkan.');
@@ -70,6 +94,7 @@ class FasilitasWisataController extends Controller
     public function edit(string $id)
     {
         $fasilitas = $this->fasilitasRepo->find($id);
+        $fasilitas->load('fotos');
 
         return Inertia::render('Admin/FasilitasWisata/Edit', [
             'fasilitas' => $fasilitas,
@@ -89,9 +114,29 @@ class FasilitasWisataController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'icon' => 'nullable|string|max:50',
+            'new_fotos' => 'nullable|array',
+            'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $this->fasilitasRepo->update($id, $validated);
+        $fasilitas = $this->fasilitasRepo->find($id);
+
+        // Handle New File Uploads
+        if ($request->hasFile('new_fotos')) {
+            foreach ($request->file('new_fotos') as $file) {
+                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $path = 'fotos/fasilitas/' . $filename;
+
+                $image = Image::read($file);
+                $image->scale(width: 800);
+                Storage::disk('public')->put($path, $image->encode());
+
+                $fasilitas->fotos()->create([
+                    'path' => $path,
+                    'is_primary' => false,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.fasilitas-wisata.index')
             ->with('message', 'Fasilitas berhasil diupdate.');
@@ -102,9 +147,29 @@ class FasilitasWisataController extends Controller
      */
     public function destroy(string $id)
     {
-        $this->fasilitasRepo->delete($id);
+        $fasilitas = FasilitasWisata::with('fotos')->findOrFail($id);
+
+        // Delete physical photos
+        foreach ($fasilitas->fotos as $foto) {
+            Storage::disk('public')->delete($foto->path);
+            $foto->delete();
+        }
+
+        $fasilitas->delete();
 
         return redirect()->route('admin.fasilitas-wisata.index')
             ->with('message', 'Fasilitas berhasil dihapus.');
+    }
+
+    /**
+     * Delete a specific photo.
+     */
+    public function deletePhoto(string $id)
+    {
+        $foto = Foto::findOrFail($id);
+        Storage::disk('public')->delete($foto->path);
+        $foto->delete();
+
+        return back()->with('message', 'Foto berhasil dihapus.');
     }
 }

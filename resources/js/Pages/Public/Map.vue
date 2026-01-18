@@ -106,6 +106,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 const props = defineProps({
     objekWisatas: Array,
+    fasilitas: Array,
 });
 
 const searchQuery = ref('');
@@ -192,6 +193,51 @@ onMounted(() => {
             marker: marker
         });
     });
+
+    // Create Facilities Markers
+    if (props.fasilitas) {
+        props.fasilitas.forEach(item => {
+            const icon = L.divIcon({
+                className: 'custom-fasilitas-marker',
+                html: `
+                    <div class="relative group cursor-pointer hover:z-50">
+                        <div class="w-8 h-8 rounded-full bg-white border-2 border-emerald-500 shadow-md flex items-center justify-center transition-all group-hover:scale-125">
+                            <span class="text-sm">${item.icon || '📍'}</span>
+                        </div>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+
+            const marker = L.marker([item.latitude, item.longitude], { icon });
+            
+            const popupContent = `
+                <div class="p-3 font-sans min-w-[200px]">
+                    <div class="flex items-center gap-2 mb-2">
+                         <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">${item.icon || '📍'}</div>
+                         <div>
+                            <div class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Fasilitas</div>
+                            <h3 class="font-bold text-gray-900 leading-tight">${item.nama_fasilitas}</h3>
+                         </div>
+                    </div>
+                    ${item.fotos && item.fotos.length > 0 ? `
+                        <div class="w-full h-24 rounded-lg overflow-hidden mb-2">
+                            <img src="/storage/${item.fotos[0].path}" class="w-full h-full object-cover">
+                        </div>
+                    ` : ''}
+                    <p class="text-xs text-gray-600 mb-2">${item.deskripsi || 'Fasilitas umum tersedia.'}</p>
+                    <div class="text-[9px] font-bold text-gray-400">Lokasi: ${item.objek_wisata?.nama_objek}</div>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                className: 'custom-popup-box'
+            });
+
+            map.value.addLayer(marker);
+        });
+    }
 
     map.value.addLayer(clusterGroup.value);
 

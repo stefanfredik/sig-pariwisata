@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\ObjekWisata;
 use App\Models\Kecamatan;
+use App\Models\FasilitasWisata;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -51,8 +52,11 @@ class ObjekWisataController extends Controller
             ->withAvg('reviews as rating_avg', 'rating')
             ->get();
 
+        $fasilitas = FasilitasWisata::with(['fotos', 'objekWisata'])->get();
+
         return Inertia::render('Public/Map', [
             'objekWisatas' => $objekWisatas,
+            'fasilitas' => $fasilitas,
         ]);
     }
 }

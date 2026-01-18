@@ -56,6 +56,44 @@
                                         type="text"
                                         class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
                                     />
+                                    <p class="mt-1 text-[10px] text-gray-400 font-medium uppercase tracking-wider italic">Gunakan emoji untuk ikon yang menarik</p>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-700 mb-2">Foto Fasilitas</label>
+                                    
+                                    <!-- Existing Photos -->
+                                    <div v-if="fasilitas.fotos && fasilitas.fotos.length > 0" class="flex flex-wrap gap-4 mb-4">
+                                        <div v-for="foto in fasilitas.fotos" :key="foto.id" class="relative group w-24 h-24">
+                                            <img :src="'/storage/' + foto.path" class="w-full h-full object-cover rounded-lg border border-gray-200">
+                                            <button 
+                                                @click.prevent="deleteExistingPhoto(foto.id)" 
+                                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity transform hover:scale-110"
+                                                title="Hapus foto"
+                                            >
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Upload New -->
+                                    <input
+                                        type="file"
+                                        multiple
+                                        @change="handleFileUpload"
+                                        class="w-full rounded-xl border border-gray-200 shadow-sm text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+                                        accept="image/*"
+                                    />
+                                    
+                                    <!-- Preview New -->
+                                    <div v-if="previewUrls.length" class="grid grid-cols-4 gap-2 mt-4">
+                                        <div v-for="(url, index) in previewUrls" :key="index" class="relative group">
+                                            <img :src="url" class="w-full h-20 object-cover rounded-lg border border-gray-200">
+                                            <button @click.prevent="removePhoto(index)" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div>
@@ -124,8 +162,8 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { onMounted, ref } from 'vue';
+import { useForm, router } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -142,8 +180,37 @@ const form = useForm({
     latitude: props.fasilitas.latitude,
     longitude: props.fasilitas.longitude,
     icon: props.fasilitas.icon,
+    new_fotos: [],
     _method: 'PUT',
 });
+
+const previewUrls = ref([]);
+
+const handleFileUpload = (event) => {
+    const files = Array.from(event.target.files);
+    form.new_fotos = [...form.new_fotos, ...files];
+
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewUrls.value.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+    });
+};
+
+const removePhoto = (index) => {
+    form.new_fotos.splice(index, 1);
+    previewUrls.value.splice(index, 1);
+};
+
+const deleteExistingPhoto = (id) => {
+    if (confirm('Yakin ingin menghapus foto ini?')) {
+        router.delete(route('admin.fasilitas-wisata.delete-photo', id), {
+            preserveScroll: true,
+        });
+    }
+};
 
 let map;
 let marker;

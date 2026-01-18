@@ -95,6 +95,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         'update' => 'admin.fasilitas-wisata.update',
         'destroy' => 'admin.fasilitas-wisata.destroy',
     ]);
+    Route::delete('fasilitas-wisata/foto/{id}', [FasilitasWisataController::class, 'deletePhoto'])->name('admin.fasilitas-wisata.delete-photo');
 
     // Review Moderation
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');

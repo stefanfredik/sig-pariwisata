@@ -30,4 +30,12 @@ class FasilitasWisata extends Model
     {
         return $this->belongsTo(ObjekWisata::class, 'id_objek');
     }
+
+    /**
+     * Get the fotos for the fasilitas.
+     */
+    public function fotos()
+    {
+        return $this->morphMany(Foto::class, 'fotoable');
+    }
 }
