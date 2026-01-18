@@ -1,5 +1,9 @@
 <template>
     <PublicLayout>
+        <Head>
+            <title>Destinasi Wisata - Manggarai Barat</title>
+            <meta name="description" content="Temukan berbagai destinasi wisata menarik di Kabupaten Manggarai Barat. Alam, Budaya, dan Petualangan menanti Anda." />
+        </Head>
         <!-- Page Header -->
         <section class="relative pt-32 pb-20 bg-gray-900 overflow-hidden">
             <div class="absolute inset-0 z-0">
@@ -130,7 +134,7 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, Head } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 

@@ -1,5 +1,9 @@
 <template>
     <PublicLayout>
+        <Head>
+            <title>Agenda & Event - Manggarai Barat</title>
+            <meta name="description" content="Kalender event dan festival di Manggarai Barat. Jangan lewatkan kemeriahan budaya dan acara spesial kami." />
+        </Head>
         <!-- Page Header -->
         <section class="relative pt-32 pb-20 bg-gray-900 overflow-hidden">
             <div class="absolute inset-0 z-0">
@@ -139,7 +143,7 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, Head } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import Pagination from '@/Components/Pagination.vue';
 

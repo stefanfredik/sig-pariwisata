@@ -1,5 +1,11 @@
 <template>
     <PublicLayout>
+        <Head title="Beranda">
+            <meta name="description" content="Jelajahi keindahan Manggarai Barat, Nusa Tenggara Timur. Temukan destinasi wisata terbaik, event budaya, dan petualangan seru di Labuan Bajo dan sekitarnya." />
+            <meta property="og:title" content="SIG Wisata Manggarai Barat - Jelajahi Pesona Labuan Bajo" />
+            <meta property="og:description" content="Portal informasi pariwisata resmi Kabupaten Manggarai Barat. Panduan lengkap destinasi, akomodasi, dan event." />
+            <meta property="og:image" content="https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" />
+        </Head>
         <!-- Hero Section -->
         <section class="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden bg-gray-900">
             <!-- Hero Background -->
@@ -219,7 +225,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { router, Head } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 
 const props = defineProps({

@@ -1,5 +1,9 @@
 <template>
     <PublicLayout :transparent="false">
+        <Head>
+            <title>Peta Interaktif - SIG Wisata Manggarai Barat</title>
+            <meta name="description" content="Peta interaktif sebaran objek wisata dan fasilitas di Kabupaten Manggarai Barat." />
+        </Head>
         <div class="h-20 bg-gray-900"></div>
         <div class="relative h-[calc(100vh-5rem)] w-full overflow-hidden">
             <!-- Sidebar for Search/Filtering -->
@@ -95,6 +99,7 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
+import { Head } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';

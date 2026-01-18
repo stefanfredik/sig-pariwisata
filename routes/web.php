@@ -15,6 +15,7 @@ use App\Http\Controllers\Public\EventController as PublicEventController;
 use App\Http\Controllers\Public\ReviewController as PublicReviewController;
 use App\Http\Controllers\Public\ProfileController as PublicProfileController;
 use App\Http\Controllers\Public\SearchController as PublicSearchController;
+use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 // Public routes
@@ -25,6 +26,7 @@ Route::get('/events', [PublicEventController::class, 'index'])->name('public.eve
 Route::get('/events/{slug}', [PublicEventController::class, 'show'])->name('public.events.show');
 Route::get('/peta', [PublicObjekWisataController::class, 'map'])->name('public.map');
 Route::get('/api/search-suggest', [PublicSearchController::class, 'suggest'])->name('public.search.suggest');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Authenticated public routes
 Route::middleware('auth')->group(function () {
