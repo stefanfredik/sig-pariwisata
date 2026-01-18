@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mariadb:10.5.8
+    container_name: sig_wisata_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sig_wisata
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: sig_wisata_user
+      MYSQL_PASSWORD: sig_wisata_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - sig_wisata_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  sig_wisata_network:
+    driver: bridge
