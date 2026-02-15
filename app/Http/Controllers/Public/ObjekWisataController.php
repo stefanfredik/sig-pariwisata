@@ -61,13 +61,11 @@ class ObjekWisataController extends Controller
                 'objekWisatas' => ObjekWisata::with(['fotos', 'kecamatan'])
                     ->withAvg('reviews as rating_avg', 'rating')
                     ->get(),
-                'fasilitas' => FasilitasWisata::with(['fotos', 'objekWisata'])->get(),
             ];
         });
 
         return Inertia::render('Public/Map', [
             'objekWisatas' => $data['objekWisatas'],
-            'fasilitas' => $data['fasilitas'],
         ]);
     }
 }

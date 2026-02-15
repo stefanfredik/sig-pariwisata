@@ -259,7 +259,6 @@ import {
 
 const props = defineProps({
     objekWisatas: Array,
-    fasilitas: Array,
 });
 
 const searchQuery = ref('');
@@ -302,8 +301,8 @@ const filteredObjekWisatas = computed(() => {
     
     if (searchQuery.value) {
         filtered = filtered.filter(objek => 
-            objek.nama_objek.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-            objek.kecamatan.nama_kecamatan.toLowerCase().includes(searchQuery.value.toLowerCase())
+            objek.nama_objek?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            objek.kecamatan?.nama_kecamatan?.toLowerCase().includes(searchQuery.value.toLowerCase())
         );
     }
     
@@ -374,15 +373,16 @@ onMounted(() => {
     });
 
     // Create markers
-    props.objekWisatas.forEach(objek => {
+    if (props.objekWisatas) {
+        props.objekWisatas.forEach(objek => {
         const icon = L.divIcon({
             className: 'custom-marker',
             html: `
-                <div class="relative group cursor-pointer marker-pulse">
-                    <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border-4 border-primary shadow-2xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-110">
+                <div class="relative group cursor-pointer">
+                    <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border-4 border-primary shadow-2xl flex items-center justify-center overflow-hidden transition-all group-hover:scale-110 group-hover:shadow-primary/30">
                         <img src="${objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'}" class="w-full h-full object-cover">
                     </div>
-                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45 transform shadow-lg"></div>
+                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45 transform shadow-lg group-hover:scale-110 transition-transform"></div>
                 </div>
             `,
             iconSize: [48, 48],
@@ -447,57 +447,7 @@ onMounted(() => {
             marker: marker
         });
     });
-
-    // Create Facilities Markers (Polished)
-    if (props.fasilitas) {
-        props.fasilitas.forEach(item => {
-            const icon = L.divIcon({
-                className: 'custom-fasilitas-marker',
-                html: `
-                    <div class="relative group cursor-pointer hover:z-50">
-                        <div class="w-10 h-10 rounded-2xl bg-white dark:bg-slate-900 border-2 border-emerald-500 shadow-xl flex items-center justify-center transition-all group-hover:scale-125 group-hover:rotate-12 group-hover:bg-emerald-500 group-hover:text-white">
-                            <span class="text-lg">${item.icon || '📍'}</span>
-                        </div>
-                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-emerald-500 rotate-45 transform"></div>
-                    </div>
-                `,
-                iconSize: [40, 40],
-                iconAnchor: [20, 20]
-            });
-
-            const marker = L.marker([item.latitude, item.longitude], { icon });
-            
-            const popupContent = `
-                <div class="p-5 font-sans min-w-[240px] bg-white dark:bg-slate-950">
-                    <div class="flex items-center gap-4 mb-4">
-                         <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl shadow-inner">${item.icon || '📍'}</div>
-                         <div>
-                            <div class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">Fasilitas</div>
-                            <h3 class="font-black text-slate-900 dark:text-white leading-tight text-sm">${item.nama_fasilitas}</h3>
-                         </div>
-                    </div>
-                    ${item.fotos && item.fotos.length > 0 ? `
-                        <div class="w-full h-28 rounded-2xl overflow-hidden mb-4 shadow-lg">
-                            <img src="/storage/${item.fotos[0].path}" class="w-full h-full object-cover">
-                        </div>
-                    ` : ''}
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed font-medium">${item.deskripsi || 'Fasilitas umum tersedia untuk mendukung kenyamanan Anda.'}</p>
-                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2"/></svg>
-                        </div>
-                        <div class="text-[10px] font-black text-slate-400 uppercase">Lokasi: <span class="text-slate-900 dark:text-slate-200">${item.objek_wisata?.nama_objek || 'Sekitar'}</span></div>
-                    </div>
-                </div>
-            `;
-
-            marker.bindPopup(popupContent, {
-                className: 'custom-popup-box'
-            });
-
-            clusterGroup.value.addLayer(marker);
-        });
-    }
+}
 
     map.value.addLayer(clusterGroup.value);
 
@@ -607,10 +557,10 @@ const focusToMarker = (objek) => {
 }
 
 .custom-marker {
-    @apply transition-all duration-300;
+    @apply transition-transform duration-300;
 }
 .custom-marker:hover {
-    @apply z-[1000] scale-110;
+    @apply z-[1000];
 }
 
 /* Routing Machine Improvements */

@@ -24,13 +24,28 @@ const page = usePage()
 const user = computed(() => page.props.auth.user)
 const { toast } = useToast()
 
-const navItems = [
-  { label: 'Dashboard', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
-  { label: 'Data Kecamatan', route: 'admin.kecamatan.index', icon: MapIcon, pattern: 'admin.kecamatan.*' },
-  { label: 'Objek Wisata', route: 'admin.objek-wisata.index', icon: Mountain, pattern: 'admin.objek-wisata.*' },
-  { label: 'Events', route: 'admin.events.index', icon: Calendar, pattern: 'admin.events.*' },
-  { label: 'Fasilitas', route: 'admin.fasilitas-wisata.index', icon: Coffee, pattern: 'admin.fasilitas-wisata.*' },
-  { label: 'Moderasi Review', route: 'admin.reviews.index', icon: MessageSquare, pattern: 'admin.reviews.*' },
+const navSections = [
+  {
+    title: 'General',
+    items: [
+      { label: 'Dashboard', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
+    ]
+  },
+  {
+    title: 'Tourism Management',
+    items: [
+      { label: 'Objek Wisata', route: 'admin.objek-wisata.index', icon: Mountain, pattern: 'admin.objek-wisata.*' },
+      { label: 'Fasilitas Wisata', route: 'admin.fasilitas-wisata.index', icon: Coffee, pattern: 'admin.fasilitas-wisata.*' },
+      { label: 'Events & Agenda', route: 'admin.events.index', icon: Calendar, pattern: 'admin.events.*' },
+      { label: 'Data Kecamatan', route: 'admin.kecamatan.index', icon: MapIcon, pattern: 'admin.kecamatan.*' },
+    ]
+  },
+  {
+    title: 'Community',
+    items: [
+      { label: 'Moderasi Review', route: 'admin.reviews.index', icon: MessageSquare, pattern: 'admin.reviews.*' },
+    ]
+  }
 ]
 
 const isUrl = (pattern: string) => {
@@ -65,40 +80,47 @@ watch(() => page.props.flash, (flash: any) => {
 <template>
   <div class="flex min-h-screen w-full bg-muted/40">
     <!-- Desktop Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background sm:flex">
+    <aside class="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background sm:flex font-sans">
       <div class="flex h-16 items-center gap-2 border-b px-6">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/20">
           <Mountain class="h-5 w-5" />
         </div>
-        <span class="text-lg font-bold tracking-tight">SIG Wisata</span>
+        <span class="text-lg font-black tracking-tight uppercase">SIG <span class="text-primary italic">Wisata</span></span>
       </div>
       
-      <nav class="grid gap-1 px-4 py-4">
-        <div class="px-2 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Main Menu</div>
-        
-        <Link 
-            v-for="item in navItems" 
-            :key="item.route" 
-            :href="route(item.route)"
-            :class="cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary',
-                isUrl(item.pattern) ? 'bg-muted text-primary' : 'text-muted-foreground'
-            )"
-        >
-            <component :is="item.icon" class="h-4 w-4" />
-            {{ item.label }}
-        </Link>
+      <nav class="grid gap-6 px-4 py-6 overflow-y-auto">
+        <div v-for="section in navSections" :key="section.title" class="space-y-2">
+            <div class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">{{ section.title }}</div>
+            
+            <div class="grid gap-1">
+                <Link 
+                    v-for="item in section.items" 
+                    :key="item.route" 
+                    :href="route(item.route)"
+                    :class="cn(
+                        'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all group relative',
+                        isUrl(item.pattern) 
+                            ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold' 
+                            : 'text-slate-500 hover:text-primary hover:bg-slate-50 font-medium'
+                    )"
+                >
+                    <component :is="item.icon" class="h-4 w-4" :class="isUrl(item.pattern) ? 'text-white' : 'group-hover:text-primary transition-colors'" />
+                    <span class="text-sm tracking-tight">{{ item.label }}</span>
+                    <div v-if="isUrl(item.pattern)" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-white rounded-r-full"></div>
+                </Link>
+            </div>
+        </div>
       </nav>
 
-      <div class="mt-auto p-4 border-t">
+      <div class="mt-auto p-4 border-t bg-slate-50/50">
          <div class="flex items-center gap-3 px-2">
-            <Avatar>
+            <Avatar class="border-2 border-white shadow-sm">
                 <AvatarImage :src="user.avatar_url || ''" />
-                <AvatarFallback>{{ user.name.charAt(0) }}</AvatarFallback>
+                <AvatarFallback class="bg-primary text-white font-bold">{{ user.name.charAt(0) }}</AvatarFallback>
             </Avatar>
             <div class="grid gap-0.5 text-xs">
-                <span class="font-semibold">{{ user.name }}</span>
-                <span class="text-muted-foreground capitalize">{{ user.role }}</span>
+                <span class="font-bold text-slate-900">{{ user.name }}</span>
+                <span class="text-slate-500 capitalize text-[10px] font-medium tracking-wider">{{ user.role }}</span>
             </div>
          </div>
       </div>
@@ -108,36 +130,38 @@ watch(() => page.props.flash, (flash: any) => {
       <header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
         <Sheet>
           <SheetTrigger as-child>
-            <Button size="icon" variant="outline" class="sm:hidden">
+            <Button size="icon" variant="outline" class="sm:hidden rounded-xl border-slate-200">
               <Menu class="h-5 w-5" />
               <span class="sr-only">Toggle Menu</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" class="sm:max-w-xs">
-            <SheetHeader class="text-left mb-4">
+            <SheetHeader class="text-left mb-8">
                 <SheetTitle class="flex items-center gap-2">
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                         <Mountain class="h-5 w-5" />
                     </div>
-                    SIG Wisata
+                    <span class="font-black tracking-tight uppercase">SIG <span class="text-primary italic">Wisata</span></span>
                 </SheetTitle>
-                <SheetDescription>
-                    Admin Panel Dashboard
-                </SheetDescription>
             </SheetHeader>
-            <nav class="grid gap-2 text-lg font-medium">
-               <Link 
-                    v-for="item in navItems" 
-                    :key="item.route" 
-                    :href="route(item.route)"
-                    :class="cn(
-                        'flex items-center gap-4 px-2.5 py-2 hover:text-foreground',
-                        isUrl(item.pattern) ? 'text-foreground font-semibold' : 'text-muted-foreground'
-                    )"
-                >
-                    <component :is="item.icon" class="h-5 w-5" />
-                    {{ item.label }}
-                </Link>
+            <nav class="grid gap-6">
+                <div v-for="section in navSections" :key="section.title" class="space-y-3">
+                    <div class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ section.title }}</div>
+                    <div class="grid gap-1">
+                        <Link 
+                            v-for="item in section.items" 
+                            :key="item.route" 
+                            :href="route(item.route)"
+                            :class="cn(
+                                'flex items-center gap-4 px-3 py-3 rounded-xl transition-all',
+                                isUrl(item.pattern) ? 'bg-primary text-white font-bold' : 'text-slate-600 font-medium'
+                            )"
+                        >
+                            <component :is="item.icon" class="h-5 w-5" />
+                            {{ item.label }}
+                        </Link>
+                    </div>
+                </div>
             </nav>
           </SheetContent>
         </Sheet>

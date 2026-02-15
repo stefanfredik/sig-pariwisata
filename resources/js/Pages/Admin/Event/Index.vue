@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, reactive, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
 import { MoreVertical, Plus, Pencil, Trash2, Calendar, MapPin, Eye } from 'lucide-vue-next'
 import { debounce } from 'lodash'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -84,11 +85,37 @@ const resetFilters = () => {
     updateParams()
 }
 
-const confirmDelete = (event: any) => {
-    if (confirm(`Yakin ingin menghapus event "${event.nama_event}"?`)) {
-        router.delete(route('admin.events.destroy', event.id))
-    }
-}
+const deleteForm = useForm({});
+const confirmModal = reactive({
+    show: false,
+    id: null as number | null,
+    title: '',
+    description: '',
+    loading: false
+});
+
+const confirmDelete = (id: number) => {
+    confirmModal.id = id;
+    confirmModal.title = 'Hapus Event';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus event ini? Data ini tidak dapat dikembalikan.';
+    confirmModal.show = true;
+};
+
+const handleDelete = () => {
+    if (!confirmModal.id) return;
+    
+    confirmModal.loading = true;
+    deleteForm.delete(route('admin.events.destroy', confirmModal.id), {
+        onSuccess: () => {
+            confirmModal.show = false;
+            confirmModal.id = null;
+            confirmModal.loading = false;
+        },
+        onError: () => {
+            confirmModal.loading = false;
+        }
+    });
+};
 
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
@@ -218,7 +245,7 @@ const formatDate = (dateString: string) => {
                                                 </Link>
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
-                                            <DropdownMenuItem @click="confirmDelete(event)" class="text-destructive cursor-pointer">
+                                            <DropdownMenuItem @click="confirmDelete(event.id)" class="text-destructive cursor-pointer">
                                                 <Trash2 class="mr-2 h-4 w-4" /> Delete
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
@@ -239,5 +266,13 @@ const formatDate = (dateString: string) => {
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleDelete"
+        />
     </AdminLayout>
 </template>

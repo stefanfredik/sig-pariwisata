@@ -14,6 +14,8 @@ import {
     Calendar,
     MessageSquare
 } from 'lucide-vue-next'
+import { reactive } from 'vue'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
 
 const props = defineProps<{
     review: any
@@ -29,17 +31,59 @@ const formatDate = (dateString: string) => {
     })
 }
 
+const confirmModal = reactive({
+    show: false,
+    title: '',
+    description: '',
+    confirmText: 'Lanjutkan',
+    variant: 'destructive' as 'destructive' | 'primary',
+    loading: false,
+    action: '' as 'delete' | 'approve'
+});
+
 const approveReview = () => {
-    if (confirm('Approve this review? It will be visible to the public.')) {
-        router.post(route('admin.reviews.approve', props.review.id))
-    }
-}
+    confirmModal.title = 'Setujui Ulasan';
+    confirmModal.description = 'Apakah Anda yakin ingin menyetujui ulasan ini? Ulasan yang disetujui akan tampil di halaman publik.';
+    confirmModal.confirmText = 'Setujui';
+    confirmModal.variant = 'primary';
+    confirmModal.action = 'approve';
+    confirmModal.show = true;
+};
 
 const deleteReview = () => {
-    if (confirm('Are you sure you want to delete this review?')) {
-        router.delete(route('admin.reviews.destroy', props.review.id))
+    confirmModal.title = 'Hapus Ulasan';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus ulasan ini? Data ini tidak dapat dikembalikan.';
+    confirmModal.confirmText = 'Hapus';
+    confirmModal.variant = 'destructive';
+    confirmModal.action = 'delete';
+    confirmModal.show = true;
+};
+
+const handleConfirm = () => {
+    confirmModal.loading = true;
+    
+    if (confirmModal.action === 'approve') {
+        router.post(route('admin.reviews.approve', props.review.id), {}, {
+            onSuccess: () => {
+                confirmModal.show = false;
+                confirmModal.loading = false;
+            },
+            onError: () => {
+                confirmModal.loading = false;
+            }
+        });
+    } else {
+        router.delete(route('admin.reviews.destroy', props.review.id), {
+            onSuccess: () => {
+                confirmModal.show = false;
+                confirmModal.loading = false;
+            },
+            onError: () => {
+                confirmModal.loading = false;
+            }
+        });
     }
-}
+};
 </script>
 
 <template>
@@ -159,5 +203,15 @@ const deleteReview = () => {
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :confirm-text="confirmModal.confirmText"
+            :variant="confirmModal.variant"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirm"
+        />
     </AdminLayout>
 </template>

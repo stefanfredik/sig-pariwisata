@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, reactive, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
-import { MoreVertical, Plus, Pencil, Trash2, MapPin, Eye } from 'lucide-vue-next'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+import { MoreVertical, Plus, Pencil, Trash2, MapPin, Eye, Search } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ const props = defineProps<{
     filters: {
         search?: string
         id_objek?: string
+        kategori_fasilitas?: string
         sort_field?: string
         sort_direction?: string
     }
@@ -37,6 +39,7 @@ const props = defineProps<{
 const params = reactive({
     search: props.filters.search || '',
     id_objek: props.filters.id_objek || '',
+    kategori_fasilitas: props.filters.kategori_fasilitas || '',
     sort_field: props.filters.sort_field || 'created_at',
     sort_direction: props.filters.sort_direction || 'desc',
 })
@@ -75,16 +78,43 @@ const handleSort = (value: string) => {
 const resetFilters = () => {
     params.search = ''
     params.id_objek = ''
+    params.kategori_fasilitas = ''
     params.sort_field = 'created_at'
     params.sort_direction = 'desc'
     updateParams()
 }
 
-const confirmDelete = (item: any) => {
-    if (confirm(`Yakin ingin menghapus fasilitas "${item.nama_fasilitas}"?`)) {
-        router.delete(route('admin.fasilitas-wisata.destroy', item.id))
-    }
-}
+const deleteForm = useForm({});
+const confirmModal = reactive({
+    show: false,
+    id: null as number | null,
+    title: '',
+    description: '',
+    loading: false
+});
+
+const confirmDelete = (id: number) => {
+    confirmModal.id = id;
+    confirmModal.title = 'Hapus Fasilitas Wisata';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus fasilitas wisata ini? Data ini tidak dapat dikembalikan.';
+    confirmModal.show = true;
+};
+
+const handleDelete = () => {
+    if (!confirmModal.id) return;
+    
+    confirmModal.loading = true;
+    deleteForm.delete(route('admin.fasilitas-wisata.destroy', confirmModal.id), {
+        onSuccess: () => {
+            confirmModal.show = false;
+            confirmModal.id = null;
+            confirmModal.loading = false;
+        },
+        onError: () => {
+            confirmModal.loading = false;
+        }
+    });
+};
 </script>
 
 <template>
@@ -121,18 +151,35 @@ const confirmDelete = (item: any) => {
                     placeholder="Search facilities..."
                 >
                     <template #filters>
-                        <div class="grid gap-2">
-                            <label class="text-xs font-medium text-slate-500">Location</label>
-                            <select
-                                v-model="params.id_objek"
-                                @change="updateParams"
-                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All Locations</option>
-                                <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
-                                    {{ objek.nama_objek }}
-                                </option>
-                            </select>
+                        <div class="grid gap-4 md:grid-cols-2">
+                            <div class="grid gap-2">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Destination</label>
+                                <select
+                                    v-model="params.id_objek"
+                                    @change="updateParams"
+                                    class="h-10 w-full px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+                                >
+                                    <option value="">All Locations</option>
+                                    <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
+                                        {{ objek.nama_objek }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="grid gap-2">
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Category</label>
+                                <select
+                                    v-model="params.kategori_fasilitas"
+                                    @change="updateParams"
+                                    class="h-10 w-full px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
+                                >
+                                    <option value="">All Categories</option>
+                                    <option value="Akomodasi">Akomodasi</option>
+                                    <option value="Kuliner">Kuliner</option>
+                                    <option value="Transportasi">Transportasi</option>
+                                    <option value="Umum">Umum</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
                         </div>
                     </template>
                 </DataTableToolbar>
@@ -151,13 +198,13 @@ const confirmDelete = (item: any) => {
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
                              <tr v-for="item in fasilitas.data" :key="item.id" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
                                 <td class="px-6 py-4">
-                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary text-lg">
+                                     <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-primary text-2xl shadow-sm group-hover:scale-110 transition-transform">
                                             {{ item.icon || '📍' }}
                                         </div>
                                         <div>
-                                            <div class="font-semibold text-slate-900 dark:text-white text-sm">{{ item.nama_fasilitas }}</div>
-                                            <div class="text-[10px] text-slate-400 truncate max-w-[200px]">{{ item.deskripsi || 'No description' }}</div>
+                                            <div class="font-black text-slate-900 dark:text-white text-sm tracking-tight">{{ item.nama_fasilitas }}</div>
+                                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{{ item.kategori_fasilitas || 'Umum' }}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -212,5 +259,13 @@ const confirmDelete = (item: any) => {
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleDelete"
+        />
     </AdminLayout>
 </template>

@@ -184,6 +184,14 @@
                 </div>
             </form>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirmDelete"
+        />
     </AdminLayout>
 </template>
 
@@ -200,6 +208,9 @@ const props = defineProps({
     event: Object,
     objekWisatas: Array,
 });
+
+import { reactive } from 'vue';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 
 const form = useForm({
     id_objek: props.event.id_objek,
@@ -232,12 +243,35 @@ const removeNewPhoto = (index) => {
     photoPreviews.value.splice(index, 1);
 };
 
+const confirmModal = reactive({
+    show: false,
+    id: null,
+    title: '',
+    description: '',
+    loading: false
+});
+
 const deleteExistingPhoto = (id) => {
-    if (confirm('Yakin ingin menghapus foto ini?')) {
-        router.delete(route('admin.events.delete-photo', id), {
-            preserveScroll: true,
-        });
-    }
+    confirmModal.id = id;
+    confirmModal.title = 'Hapus Foto';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus foto ini secara permanen?';
+    confirmModal.show = true;
+};
+
+const handleConfirmDelete = () => {
+    if (!confirmModal.id) return;
+    
+    confirmModal.loading = true;
+    router.delete(route('admin.events.delete-photo', confirmModal.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            confirmModal.show = false;
+            confirmModal.loading = false;
+        },
+        onError: () => {
+            confirmModal.loading = false;
+        }
+    });
 };
 
 const setPrimary = (fotoId) => {

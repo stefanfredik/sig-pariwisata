@@ -204,7 +204,7 @@ const form = useForm({
     nama_fasilitas: '',
     kategori_fasilitas: '',
     deskripsi: '',
-    id_objek: null,
+    id_objek: new URLSearchParams(window.location.search).get('objek_id') ? parseInt(new URLSearchParams(window.location.search).get('objek_id')) : null,
     latitude: -8.5,
     longitude: 119.88,
     fotos: [],

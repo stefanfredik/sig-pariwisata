@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, reactive, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
 import { Check, X, Trash2, Star, User, Eye } from 'lucide-vue-next'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
 import { debounce } from 'lodash'
 import { cn } from '@/lib/utils'
 
@@ -78,17 +79,65 @@ const resetFilters = () => {
     updateParams()
 }
 
+const deleteForm = useForm({});
+const confirmModal = reactive({
+    show: false,
+    id: null as number | null,
+    title: '',
+    description: '',
+    confirmText: 'Lanjutkan',
+    variant: 'destructive' as 'destructive' | 'primary',
+    loading: false,
+    action: '' as 'delete' | 'approve'
+});
+
 const approveReview = (id: number) => {
-    if (confirm('Approve this review? It will be visible to the public.')) {
-        router.post(route('admin.reviews.approve', id))
-    }
-}
+    confirmModal.id = id;
+    confirmModal.title = 'Setujui Ulasan';
+    confirmModal.description = 'Apakah Anda yakin ingin menyetujui ulasan ini? Ulasan yang disetujui akan tampil di halaman publik.';
+    confirmModal.confirmText = 'Setujui';
+    confirmModal.variant = 'primary';
+    confirmModal.action = 'approve';
+    confirmModal.show = true;
+};
 
 const confirmDelete = (id: number) => {
-    if (confirm('Are you sure you want to delete this review?')) {
-        router.delete(route('admin.reviews.destroy', id))
+    confirmModal.id = id;
+    confirmModal.title = 'Hapus Ulasan';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus ulasan ini? Data ini tidak dapat dikembalikan.';
+    confirmModal.confirmText = 'Hapus';
+    confirmModal.variant = 'destructive';
+    confirmModal.action = 'delete';
+    confirmModal.show = true;
+};
+
+const handleConfirm = () => {
+    if (!confirmModal.id) return;
+    
+    confirmModal.loading = true;
+    
+    if (confirmModal.action === 'approve') {
+        router.post(route('admin.reviews.approve', confirmModal.id), {}, {
+            onSuccess: () => {
+                confirmModal.show = false;
+                confirmModal.loading = false;
+            },
+            onError: () => {
+                confirmModal.loading = false;
+            }
+        });
+    } else {
+        deleteForm.delete(route('admin.reviews.destroy', confirmModal.id), {
+            onSuccess: () => {
+                confirmModal.show = false;
+                confirmModal.loading = false;
+            },
+            onError: () => {
+                confirmModal.loading = false;
+            }
+        });
     }
-}
+};
 </script>
 
 <template>
@@ -230,5 +279,15 @@ const confirmDelete = (id: number) => {
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :confirm-text="confirmModal.confirmText"
+            :variant="confirmModal.variant"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirm"
+        />
     </AdminLayout>
 </template>

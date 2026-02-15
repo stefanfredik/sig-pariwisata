@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref, watch, reactive, computed } from 'vue'
-import { Head, Link, router } from '@inertiajs/vue3'
+import { Head, Link, router, useForm } from '@inertiajs/vue3'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
-import { MoreVertical, Plus, Pencil, Trash2, MapPin, Eye } from 'lucide-vue-next'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
+import {
+    Search,
+    Plus,
+Pencil, Trash2, MapPin, Eye, MoreVertical } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import {
   DropdownMenu,
@@ -82,11 +86,37 @@ const resetFilters = () => {
     updateParams()
 }
 
-const confirmDelete = (objek: any) => {
-    if (confirm(`Yakin ingin menghapus objek wisata "${objek.nama_objek}"?`)) {
-        router.delete(route('admin.objek-wisata.destroy', objek.id))
-    }
-}
+const deleteForm = useForm({});
+const confirmModal = reactive({
+    show: false,
+    id: null as number | null,
+    title: '',
+    description: '',
+    loading: false
+});
+
+const confirmDelete = (id: number) => {
+    confirmModal.id = id;
+    confirmModal.title = 'Hapus Objek Wisata';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus objek wisata ini? Semua data terkait termasuk foto dan ulasan akan ikut terhapus.';
+    confirmModal.show = true;
+};
+
+const handleDelete = () => {
+    if (!confirmModal.id) return;
+
+    confirmModal.loading = true;
+    deleteForm.delete(route('admin.objek-wisata.destroy', confirmModal.id), {
+        onSuccess: () => {
+            confirmModal.show = false;
+            confirmModal.id = null;
+            confirmModal.loading = false;
+        },
+        onError: () => {
+            confirmModal.loading = false;
+        }
+    });
+};
 </script>
 
 <template>
@@ -112,12 +142,12 @@ const confirmDelete = (objek: any) => {
 
             <!-- Main Card Container -->
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                
-                <DataTableToolbar 
-                    :search="params.search" 
+
+                <DataTableToolbar
+                    :search="params.search"
                     :sort-options="sortOptions"
                     :current-sort="currentSort"
-                    @update:search="params.search = $event" 
+                    @update:search="params.search = $event"
                     @update:sort="handleSort"
                     @reset="resetFilters"
                     placeholder="Search objects..."
@@ -166,9 +196,9 @@ const confirmDelete = (objek: any) => {
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
-                                        <img 
-                                            v-if="objek.primary_foto" 
-                                            :src="'/storage/' + objek.primary_foto.path" 
+                                        <img
+                                            v-if="objek.primary_foto"
+                                            :src="'/storage/' + objek.primary_foto.path"
                                             class="w-6 h-6 rounded-full object-cover"
                                             alt="Thumbnail"
                                         />
@@ -224,5 +254,13 @@ const confirmDelete = (objek: any) => {
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleDelete"
+        />
     </AdminLayout>
 </template>

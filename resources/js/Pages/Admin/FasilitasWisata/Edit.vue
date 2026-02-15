@@ -195,6 +195,14 @@
                 </div>
             </form>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirmDelete"
+        />
     </AdminLayout>
 </template>
 
@@ -205,6 +213,8 @@ import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { ArrowLeft, UploadCloud, X, Loader2, Trash2 } from 'lucide-vue-next';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import { reactive } from 'vue';
 import L from 'leaflet';
 
 const props = defineProps({
@@ -279,12 +289,35 @@ const removePhoto = (index) => {
 };
 
 
+const confirmModal = reactive({
+    show: false,
+    id: null,
+    title: '',
+    description: '',
+    loading: false
+});
+
 const deleteExistingPhoto = (id) => {
-    if (confirm('Yakin ingin menghapus foto ini?')) {
-        router.delete(route('admin.fasilitas-wisata.delete-photo', id), {
-            preserveScroll: true,
-        });
-    }
+    confirmModal.id = id;
+    confirmModal.title = 'Hapus Foto';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus foto ini secara permanen?';
+    confirmModal.show = true;
+};
+
+const handleConfirmDelete = () => {
+    if (!confirmModal.id) return;
+    
+    confirmModal.loading = true;
+    router.delete(route('admin.fasilitas-wisata.delete-photo', confirmModal.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            confirmModal.show = false;
+            confirmModal.loading = false;
+        },
+        onError: () => {
+            confirmModal.loading = false;
+        }
+    });
 };
 
 const photoPreviews = ref([]);

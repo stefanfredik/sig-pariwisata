@@ -204,6 +204,14 @@
                 </div>
             </form>
         </div>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirmDelete"
+        />
     </AdminLayout>
 </template>
 
@@ -215,6 +223,8 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import Textarea from '@/Components/ui/textarea/Textarea.vue';
 import { Save, ArrowLeft, Image as ImageIcon, Star, Trash2, UploadCloud, X } from 'lucide-vue-next';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import { reactive } from 'vue';
 import L from 'leaflet';
 
 const props = defineProps({
@@ -236,6 +246,13 @@ const form = useForm({
 });
 
 const previews = ref([]);
+const confirmModal = reactive({
+    show: false,
+    id: null,
+    title: '',
+    description: '',
+    loading: false
+});
 let map = null;
 let marker = null;
 
@@ -278,9 +295,25 @@ const setPrimary = (fotoId) => {
 };
 
 const deletePhoto = (fotoId) => {
-    if (confirm('Hapus foto ini permanently?')) {
-        router.delete(route('admin.objek-wisata.delete-photo', fotoId));
-    }
+    confirmModal.id = fotoId;
+    confirmModal.title = 'Hapus Foto';
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus foto ini secara permanen?';
+    confirmModal.show = true;
+};
+
+const handleConfirmDelete = () => {
+    if (!confirmModal.id) return;
+    
+    confirmModal.loading = true;
+    router.delete(route('admin.objek-wisata.delete-photo', confirmModal.id), {
+        onSuccess: () => {
+            confirmModal.show = false;
+            confirmModal.loading = false;
+        },
+        onError: () => {
+            confirmModal.loading = false;
+        }
+    });
 };
 
 const submit = () => {

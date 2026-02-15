@@ -110,20 +110,44 @@ const formatDate = (dateString: string) => {
 
                     <!-- Facilities -->
                     <Card>
-                        <CardHeader>
-                            <CardTitle>Facilities & Amenities</CardTitle>
+                        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-4">
+                            <div>
+                                <CardTitle>Facilities & Amenities</CardTitle>
+                                <CardDescription>Manage things available at this location.</CardDescription>
+                            </div>
+                            <Button size="sm" class="h-8 gap-1" as-child>
+                                <Link :href="route('admin.fasilitas-wisata.create', { objek_id: objekWisata.id })">
+                                    <Plus class="h-3.5 w-3.5" />
+                                    <span>Add Facility</span>
+                                </Link>
+                            </Button>
                         </CardHeader>
                         <CardContent>
-                            <div v-if="objekWisata.fasilitas?.length" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div v-for="facility in objekWisata.fasilitas" :key="facility.id" class="flex items-center gap-3 p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20">
-                                    <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary text-lg">
-                                        {{ facility.icon || '📍' }}
+                            <div v-if="objekWisata.fasilitas?.length" class="grid grid-cols-1 gap-3">
+                                <div v-for="facility in objekWisata.fasilitas" :key="facility.id" class="flex items-center justify-between p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 group hover:border-primary/30 transition-all">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-primary text-xl border border-slate-100 dark:border-slate-700">
+                                            {{ facility.icon || '📍' }}
+                                        </div>
+                                        <div>
+                                            <span class="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{{ facility.nama_fasilitas }}</span>
+                                            <p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{{ facility.kategori_fasilitas || 'Umum' }}</p>
+                                        </div>
                                     </div>
-                                    <span class="text-sm font-medium">{{ facility.nama_fasilitas }}</span>
+                                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Button variant="ghost" size="icon" class="h-8 w-8 text-slate-400 hover:text-primary" as-child>
+                                            <Link :href="route('admin.fasilitas-wisata.edit', facility.id)">
+                                                <Pencil class="h-3.5 w-3.5" />
+                                            </Link>
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                            <div v-else class="text-center py-6 text-slate-500 text-sm italic">
-                                No specific facilities listed.
+                            <div v-else class="text-center py-12 bg-slate-50/50 dark:bg-slate-900/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                                <p class="text-sm text-slate-500 font-medium italic">No facilities listed yet.</p>
+                                <Button variant="link" class="mt-2 text-primary text-xs" as-child>
+                                    <Link :href="route('admin.fasilitas-wisata.create', { objek_id: objekWisata.id })">Create the first one</Link>
+                                </Button>
                             </div>
                         </CardContent>
                     </Card>
