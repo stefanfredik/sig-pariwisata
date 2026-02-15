@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\ObjekWisata;
 use App\Models\Event;
+use App\Models\ObjekWisata;
+use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    /**
-     * Provide suggestions for global search.
-     */
     public function suggest(Request $request)
     {
         $query = $request->get('q');
@@ -20,24 +17,35 @@ class SearchController extends Controller
             return response()->json([]);
         }
 
-        $objects = ObjekWisata::where('nama_objek', 'LIKE', "%{$query}%")
+        $results = collect();
+
+        // Search Objek Wisata
+        $objekWisatas = ObjekWisata::where('nama_objek', 'like', "%{$query}%")
+            ->orWhere('alamat', 'like', "%{$query}%")
             ->take(5)
-            ->get(['id', 'nama_objek as title', 'slug', 'id_kecamatan'])
+            ->get()
             ->map(function ($item) {
-                $item->type = 'Destinasi';
-                $item->url = route('public.objek-wisata.show', $item->slug);
-                return $item;
+                return [
+                    'title' => $item->nama_objek,
+                    'type' => 'Destinasi',
+                    'url' => route('public.objek-wisata.show', $item->slug),
+                ];
             });
 
-        $events = Event::where('nama_event', 'LIKE', "%{$query}%")
+        // Search Events
+        $events = Event::where('nama_event', 'like', "%{$query}%")
             ->take(3)
-            ->get(['id', 'nama_event as title', 'slug'])
+            ->get()
             ->map(function ($item) {
-                $item->type = 'Event';
-                $item->url = route('public.events.show', $item->slug);
-                return $item;
+                return [
+                    'title' => $item->nama_event,
+                    'type' => 'Event',
+                    'url' => route('public.events.show', $item->slug),
+                ];
             });
 
-        return response()->json($objects->merge($events));
+        $results = $results->merge($objekWisatas)->merge($events);
+
+        return response()->json($results);
     }
 }

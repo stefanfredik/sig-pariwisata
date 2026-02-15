@@ -6,6 +6,9 @@
             <meta property="og:title" :content="event.nama_event + ' - Agenda Wisata Manggarai Barat'" />
             <meta property="og:description" :content="event.keterangan ? event.keterangan.substring(0, 160) : 'Informasi detail event ' + event.nama_event" />
             <meta property="og:image" :content="mainPhoto" />
+            <component :is="'script'" type="application/ld+json">
+                {{ jsonLd }}
+            </component>
         </Head>
         <!-- Sticky Header Background -->
         <div class="h-20 bg-gray-900"></div>
@@ -152,6 +155,30 @@ const activePhoto = ref(props.event.fotos.length > 0 ? props.event.fotos[0].path
 
 const mainPhoto = computed(() => {
     return activePhoto.value ? '/storage/' + activePhoto.value : 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1000';
+});
+
+const jsonLd = computed(() => {
+    return JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": props.event.nama_event,
+        "description": props.event.keterangan,
+        "image": [mainPhoto.value],
+        "startDate": props.event.tanggal_mulai,
+        "endDate": props.event.tanggal_selesai,
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "location": {
+            "@type": "Place",
+            "name": props.event.objek_wisata ? props.event.objek_wisata.nama_objek : "Lokasi Umum",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Manggarai Barat",
+                "addressRegion": "Nusa Tenggara Timur",
+                "addressCountry": "ID"
+            }
+        }
+    });
 });
 
 const status = computed(() => {

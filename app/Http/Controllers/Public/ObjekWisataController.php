@@ -41,22 +41,33 @@ class ObjekWisataController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
+        $isFavorited = false;
+        if (auth()->check()) {
+            $isFavorited = \App\Models\Favorite::where('user_id', auth()->id())
+                ->where('objek_wisata_id', $objekWisata->id)
+                ->exists();
+        }
+
         return Inertia::render('Public/ObjekWisata/Show', [
             'objekWisata' => $objekWisata,
+            'isFavorited' => $isFavorited,
         ]);
     }
 
     public function map()
     {
-        $objekWisatas = ObjekWisata::with(['fotos', 'kecamatan'])
-            ->withAvg('reviews as rating_avg', 'rating')
-            ->get();
-
-        $fasilitas = FasilitasWisata::with(['fotos', 'objekWisata'])->get();
+        $data = \Illuminate\Support\Facades\Cache::remember('public.map.data', 60 * 60 * 24, function () {
+            return [
+                'objekWisatas' => ObjekWisata::with(['fotos', 'kecamatan'])
+                    ->withAvg('reviews as rating_avg', 'rating')
+                    ->get(),
+                'fasilitas' => FasilitasWisata::with(['fotos', 'objekWisata'])->get(),
+            ];
+        });
 
         return Inertia::render('Public/Map', [
-            'objekWisatas' => $objekWisatas,
-            'fasilitas' => $fasilitas,
+            'objekWisatas' => $data['objekWisatas'],
+            'fasilitas' => $data['fasilitas'],
         ]);
     }
 }

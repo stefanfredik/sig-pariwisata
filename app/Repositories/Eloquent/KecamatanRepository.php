@@ -15,19 +15,42 @@ class KecamatanRepository extends BaseRepository implements BaseRepositoryInterf
     /**
      * Get paginated kecamatans.
      */
-    public function paginate($perPage = 10)
+    public function paginate($perPage = 10, $sortField = 'created_at', $sortDirection = 'desc', $hasObjects = null)
     {
-        return $this->model->withCount('objekWisatas')->paginate($perPage);
+        $query = $this->model->withCount('objekWisatas');
+
+        if ($hasObjects !== null) {
+            if ($hasObjects === 'yes') {
+                $query->has('objekWisatas');
+            } elseif ($hasObjects === 'no') {
+                $query->doesntHave('objekWisatas');
+            }
+        }
+
+        return $query
+            ->orderBy($sortField, $sortDirection)
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     /**
      * Search kecamatans by name.
      */
-    public function search(string $query)
+    public function search(string $query, $sortField = 'created_at', $sortDirection = 'desc', $hasObjects = null)
     {
-        return $this->model
-            ->where('nama_kecamatan', 'like', "%{$query}%")
-            ->withCount('objekWisatas')
+        $q = $this->model->where('nama_kecamatan', 'like', "%{$query}%")
+            ->withCount('objekWisatas');
+
+        if ($hasObjects !== null) {
+            if ($hasObjects === 'yes') {
+                $q->has('objekWisatas');
+            } elseif ($hasObjects === 'no') {
+                $q->doesntHave('objekWisatas');
+            }
+        }
+
+        return $q
+            ->orderBy($sortField, $sortDirection)
             ->paginate(10)
             ->withQueryString();
     }

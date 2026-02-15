@@ -14,12 +14,9 @@ class SitemapController extends Controller
         $objekWisatas = ObjekWisata::latest()->get();
         $events = Event::latest()->get();
 
-        $content = view('sitemap', [
+        return response()->view('sitemap', [
             'objekWisatas' => $objekWisatas,
             'events' => $events,
-        ])->render();
-
-        return response($content, 200)
-            ->header('Content-Type', 'text/xml');
+        ])->header('Content-Type', 'text/xml');
     }
 }

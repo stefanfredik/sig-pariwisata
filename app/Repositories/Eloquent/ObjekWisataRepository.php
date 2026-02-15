@@ -15,7 +15,7 @@ class ObjekWisataRepository extends BaseRepository implements BaseRepositoryInte
     /**
      * Get paginated objek wisatas with relationships.
      */
-    public function paginate($perPage = 10, array $filters = [])
+    public function paginate($perPage = 10, array $filters = [], $sortField = 'created_at', $sortDirection = 'desc')
     {
         $query = $this->model->with(['kecamatan', 'primaryFoto']);
 
@@ -23,11 +23,11 @@ class ObjekWisataRepository extends BaseRepository implements BaseRepositoryInte
             $query->where('nama_objek', 'like', "%{$filters['search']}%");
         }
 
-        if (isset($filters['id_kecamatan'])) {
+        if (isset($filters['id_kecamatan']) && $filters['id_kecamatan'] !== '') {
             $query->where('id_kecamatan', $filters['id_kecamatan']);
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query->orderBy($sortField, $sortDirection)->paginate($perPage)->withQueryString();
     }
 
     /**

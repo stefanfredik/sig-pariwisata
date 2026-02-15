@@ -23,16 +23,24 @@ class KecamatanController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $hasObjects = $request->get('has_objects');
+
         if ($search) {
-            $kecamatans = $this->kecamatanRepo->search($search);
+            $kecamatans = $this->kecamatanRepo->search($search, $sortField, $sortDirection, $hasObjects);
         } else {
-            $kecamatans = $this->kecamatanRepo->paginate(10);
+            $kecamatans = $this->kecamatanRepo->paginate(10, $sortField, $sortDirection, $hasObjects);
         }
 
         return Inertia::render('Admin/Kecamatan/Index', [
             'kecamatans' => $kecamatans,
-            'search' => $search,
+            'filters' => [
+                'search' => $search,
+                'sort_field' => $sortField,
+                'sort_direction' => $sortDirection,
+                'has_objects' => $hasObjects,
+            ],
         ]);
     }
 

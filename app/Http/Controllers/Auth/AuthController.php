@@ -26,7 +26,7 @@ class AuthController extends Controller
     {
         // Rate limiting: 5 attempts per minute
         $key = 'login.' . $request->ip();
-        
+
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
             throw ValidationException::withMessages([
@@ -44,13 +44,13 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            
+
             // Redirect based on role
             if ($user->isAdmin()) {
                 return redirect()->intended('/admin/dashboard');
             }
-            
-            return redirect()->intended('/');
+
+            return redirect()->intended('/dashboard');
         }
 
         RateLimiter::hit($key, 60);

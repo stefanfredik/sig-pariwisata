@@ -1,189 +1,238 @@
+<script setup lang="ts">
+import { ref, watch, reactive, computed } from 'vue'
+import { Head, Link, router } from '@inertiajs/vue3'
+import AdminLayout from '@/Layouts/AdminLayout.vue'
+import Pagination from '@/Components/Pagination.vue'
+import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
+import { Button } from '@/Components/ui/button'
+import { MoreVertical, Plus, Pencil, Trash2, Calendar, MapPin } from 'lucide-vue-next'
+import { debounce } from 'lodash'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/Components/ui/dropdown-menu'
+
+const props = defineProps<{
+    events: {
+        data: Array<any>
+        links: Array<any>
+        from: number
+        to: number
+        total: number
+        current_page: number
+        per_page: number
+    }
+    objekWisatas: Array<any>
+    filters: {
+        search?: string
+        id_objek?: string
+        status?: string
+        sort_field?: string
+        sort_direction?: string
+    }
+}>()
+
+const params = reactive({
+    search: props.filters.search || '',
+    id_objek: props.filters.id_objek || '',
+    status: props.filters.status || '',
+    sort_field: props.filters.sort_field || 'tanggal_mulai',
+    sort_direction: props.filters.sort_direction || 'desc',
+})
+
+const sortOptions = [
+    { label: 'Newest', value: 'tanggal_mulai,desc' },
+    { label: 'Oldest', value: 'tanggal_mulai,asc' },
+    { label: 'Name (A-Z)', value: 'nama_event,asc' },
+    { label: 'Name (Z-A)', value: 'nama_event,desc' },
+]
+
+const currentSort = computed(() => `${params.sort_field},${params.sort_direction}`)
+
+watch(
+    () => params.search,
+    debounce(() => {
+        updateParams()
+    }, 500)
+)
+
+const updateParams = () => {
+    router.get(
+        route('admin.events.index'),
+        params,
+        { preserveState: true, replace: true }
+    )
+}
+
+const handleSort = (value: string) => {
+    const [field, direction] = value.split(',')
+    params.sort_field = field
+    params.sort_direction = direction
+    updateParams()
+}
+
+const resetFilters = () => {
+    params.search = ''
+    params.id_objek = ''
+    params.status = ''
+    params.sort_field = 'tanggal_mulai'
+    params.sort_direction = 'desc'
+    updateParams()
+}
+
+const confirmDelete = (event: any) => {
+    if (confirm(`Yakin ingin menghapus event "${event.nama_event}"?`)) {
+        router.delete(route('admin.events.destroy', event.id))
+    }
+}
+
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    })
+}
+</script>
+
 <template>
+    <Head title="Kelola Event" />
+
     <AdminLayout>
-        <div class="space-y-6">
-            <!-- Header -->
-            <div class="sm:flex sm:items-center sm:justify-between">
+        <div class="max-w-7xl mx-auto py-6">
+            <!-- Header Section -->
+            <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Kelola Event</h2>
-                    <p class="mt-1 text-sm text-gray-600">Daftar agenda kegiatan pariwisata</p>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Event Management</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage events and schedules.</p>
                 </div>
-                <div class="mt-4 sm:mt-0">
-                    <a :href="route('admin.events.create')" class="btn-primary group">
-                        <svg class="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        Tambah Event
-                    </a>
+                <div class="flex items-center gap-3">
+                    <Button variant="outline" class="bg-white px-4 py-2 border-slate-200 text-slate-700">Export</Button>
+                    <Button as-child class="bg-primary hover:bg-primary/90 text-white px-4 py-2">
+                        <Link :href="route('admin.events.create')">
+                            <Plus class="mr-2 h-4 w-4" /> New Event
+                        </Link>
+                    </Button>
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="bg-white shadow rounded-xl p-4 border border-gray-100">
-                <form @submit.prevent="applyFilters" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="relative group">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input
-                            v-model="filterForm.search"
-                            type="text"
-                            placeholder="Cari nama event..."
-                            class="block w-full pl-10 rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary text-sm transition-all bg-gray-50/50 focus:bg-white"
-                        />
-                    </div>
-                    <div>
-                        <select
-                            v-model="filterForm.id_objek"
-                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary text-sm transition-all bg-gray-50/50 focus:bg-white"
-                        >
-                            <option value="">Semua Lokasi</option>
-                            <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
-                                {{ objek.nama_objek }}
-                            </option>
-                        </select>
-                    </div>
-                    <div>
-                        <select
-                            v-model="filterForm.status"
-                            class="block w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary text-sm transition-all bg-gray-50/50 focus:bg-white"
-                        >
-                            <option value="">Semua Status</option>
-                            <option value="upcoming">Upcoming</option>
-                            <option value="ongoing">Ongoing</option>
-                            <option value="past">Past</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-2">
-                        <button type="submit" class="btn-primary flex-1 justify-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            Filter
-                        </button>
-                        <a :href="route('admin.events.index')" class="btn-secondary whitespace-nowrap">
-                            Reset
-                        </a>
-                    </div>
-                </form>
-            </div>
+            <!-- Main Card Container -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                
+                <DataTableToolbar 
+                    :search="params.search" 
+                    :sort-options="sortOptions"
+                    :current-sort="currentSort"
+                    @update:search="params.search = $event" 
+                    @update:sort="handleSort"
+                    @reset="resetFilters"
+                    placeholder="Search events..."
+                >
+                    <template #filters>
+                         <div class="grid gap-2">
+                            <label class="text-xs font-medium text-slate-500">Filters</label>
+                            <select
+                                v-model="params.id_objek"
+                                @change="updateParams"
+                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                            >
+                                <option value="">All Locations</option>
+                                <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
+                                    {{ objek.nama_objek }}
+                                </option>
+                            </select>
 
-            <!-- Table -->
-            <div class="bg-white shadow rounded-xl overflow-hidden border border-gray-100">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50 uppercase tracking-wider text-[10px] font-bold">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-gray-500">Nama Event</th>
-                            <th class="px-6 py-3 text-left text-gray-500">Waktu</th>
-                            <th class="px-6 py-3 text-left text-gray-500">Lokasi</th>
-                            <th class="px-6 py-3 text-right text-gray-500">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="event in events.data" :key="event.id" class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <div class="font-bold text-gray-900">{{ event.nama_event }}</div>
-                                <div class="text-[11px] text-gray-400 font-mono">{{ event.slug }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                <div class="flex items-center">
-                                    <svg class="w-3.5 h-3.5 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z" />
-                                    </svg>
-                                    {{ formatDate(event.tanggal_mulai) }} - {{ formatDate(event.tanggal_selesai) }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                <span v-if="event.objek_wisata" class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[10px] border border-blue-100 uppercase font-semibold">
-                                    {{ event.objek_wisata.nama_objek }}
-                                </span>
-                                <span v-else class="text-gray-400 italic text-xs">Lokasi Umum</span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
-                                <a :href="route('admin.events.edit', event.id)" class="inline-flex items-center text-primary hover:text-primary/70 transition-colors">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Edit
-                                </a>
-                                <button @click="confirmDelete(event)" class="inline-flex items-center text-red-600 hover:text-red-800 transition-colors">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Hapus
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="events.data.length === 0">
-                            <td colspan="4" class="px-6 py-10 text-center text-gray-400">
-                                <div class="flex flex-col items-center">
-                                    <svg class="w-10 h-10 mb-2 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z" />
-                                    </svg>
-                                    <p class="text-sm">Tidak ada data event ditemukan.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Pagination -->
-                <div v-if="events.links.length > 3" class="bg-white px-4 py-3 border-t border-gray-50 sm:px-6">
-                    <div class="sm:flex sm:items-center sm:justify-between">
-                        <div class="mb-4 sm:mb-0">
-                            <p class="text-sm text-gray-700">
-                                Menampilkan <span class="font-bold text-gray-900 border-b border-gray-100 px-1">{{ events.from || 0 }}</span> 
-                                sampai <span class="font-bold text-gray-900 border-b border-gray-100 px-1">{{ events.to || 0 }}</span> 
-                                dari <span class="font-bold text-gray-900 border-b border-gray-100 px-1">{{ events.total || 0 }}</span> data
-                            </p>
+                             <select
+                                v-model="params.status"
+                                @change="updateParams"
+                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
+                            >
+                                <option value="">All Status</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="past">Past</option>
+                            </select>
                         </div>
-                        <Pagination :links="events.links" />
-                    </div>
+                    </template>
+                </DataTableToolbar>
+
+                <!-- Table Section -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Event Name</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Date Range</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Location</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                             <tr v-for="event in events.data" :key="event.id" class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
+                                <td class="px-6 py-4">
+                                     <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                                            EV
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-slate-900 dark:text-white text-sm">{{ event.nama_event }}</div>
+                                            <div class="text-[10px] text-slate-400 font-mono">{{ event.slug }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+                                        <Calendar class="h-4 w-4 text-slate-400" />
+                                        <span>{{ formatDate(event.tanggal_mulai) }} - {{ formatDate(event.tanggal_selesai) }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <span v-if="event.objek_wisata" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-900/30 dark:text-blue-400">
+                                            <MapPin class="h-3 w-3 mr-1" />
+                                            {{ event.objek_wisata.nama_objek }}
+                                        </span>
+                                        <span v-else class="text-xs text-slate-400 italic">General Location</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger as-child>
+                                            <button class="text-slate-400 hover:text-primary transition-colors outline-none">
+                                                <MoreVertical class="h-5 w-5" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem as-child>
+                                                <Link :href="route('admin.events.edit', event.id)" class="cursor-pointer">
+                                                    <Pencil class="mr-2 h-4 w-4" /> Edit
+                                                </Link>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem @click="confirmDelete(event)" class="text-destructive cursor-pointer">
+                                                <Trash2 class="mr-2 h-4 w-4" /> Delete
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </td>
+                             </tr>
+                              <tr v-if="events.data.length === 0">
+                                <td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">
+                                    No events found.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div v-if="events.links.length > 3">
+                     <Pagination :links="events.links" />
                 </div>
             </div>
         </div>
     </AdminLayout>
 </template>
-
-<script setup>
-import { reactive } from 'vue';
-import { router } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
-import Pagination from '@/Components/Pagination.vue';
-
-const props = defineProps({
-    events: Object,
-    objekWisatas: Array,
-    filters: Object,
-});
-
-const filterForm = reactive({
-    search: props.filters.search || '',
-    id_objek: props.filters.id_objek || '',
-    status: props.filters.status || '',
-});
-
-const applyFilters = () => {
-    router.get(route('admin.events.index'), filterForm, {
-        preserveState: true,
-        replace: true,
-    });
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-    });
-};
-
-const confirmDelete = (event) => {
-    if (confirm(`Yakin ingin menghapus event "${event.nama_event}"?`)) {
-        router.delete(route('admin.events.destroy', event.id));
-    }
-};
-</script>

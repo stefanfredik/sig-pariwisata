@@ -8,6 +8,7 @@ use App\Models\ObjekWisata;
 use App\Models\Foto;
 use App\Repositories\Eloquent\EventRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -28,13 +29,19 @@ class EventController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['search', 'id_objek', 'status']);
-        $events = $this->eventRepo->paginate(10, $filters);
+        $sortField = $request->get('sort_field', 'tanggal_mulai');
+        $sortDirection = $request->get('sort_direction', 'desc');
+
+        $events = $this->eventRepo->paginate(10, $filters, $sortField, $sortDirection);
         $objekWisatas = ObjekWisata::all();
 
         return Inertia::render('Admin/Event/Index', [
             'events' => $events,
             'objekWisatas' => $objekWisatas,
-            'filters' => $filters,
+            'filters' => array_merge($filters, [
+                'sort_field' => $sortField,
+                'sort_direction' => $sortDirection,
+            ]),
         ]);
     }
 
@@ -82,6 +89,8 @@ class EventController extends Controller
                 ]);
             }
         }
+
+        Cache::forget('public.home.data');
 
         return redirect()->route('admin.events.index')
             ->with('message', 'Event berhasil ditambahkan.');
@@ -137,6 +146,8 @@ class EventController extends Controller
             }
         }
 
+        Cache::forget('public.home.data');
+
         return redirect()->route('admin.events.index')
             ->with('message', 'Event berhasil diupdate.');
     }
@@ -155,6 +166,8 @@ class EventController extends Controller
 
         $this->eventRepo->delete($id);
 
+        Cache::forget('public.home.data');
+
         return redirect()->route('admin.events.index')
             ->with('message', 'Event berhasil dihapus.');
     }
@@ -167,6 +180,8 @@ class EventController extends Controller
         $foto = Foto::findOrFail($id);
         Storage::disk('public')->delete($foto->path);
         $foto->delete();
+
+        Cache::forget('public.home.data');
 
         return back()->with('message', 'Foto berhasil dihapus.');
     }
@@ -181,6 +196,8 @@ class EventController extends Controller
 
         $foto = Foto::findOrFail($fotoId);
         $foto->update(['is_primary' => true]);
+
+        Cache::forget('public.home.data');
 
         return back()->with('message', 'Foto utama berhasil diupdate.');
     }

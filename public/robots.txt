@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
-Sitemap: /sitemap.xml
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /storage/*.zip
+
+Sitemap: https://sig.kopiflores.my.id/sitemap.xml

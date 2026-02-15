@@ -17,15 +17,30 @@ class ReviewController extends Controller
     {
         $query = Review::with(['user', 'objekWisata', 'fotos']);
 
+        if ($request->search) {
+            $query->where('komentar', 'like', "%{$request->search}%")
+                ->orWhereHas('user', function ($q) use ($request) {
+                    $q->where('name', 'like', "%{$request->search}%");
+                });
+        }
+
         if ($request->status) {
             $query->where('status', $request->status);
         }
 
-        $reviews = $query->latest()->paginate(10)->withQueryString();
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+
+        $reviews = $query->orderBy($sortField, $sortDirection)
+            ->paginate(10)
+            ->withQueryString();
 
         return Inertia::render('Admin/Review/Index', [
             'reviews' => $reviews,
-            'filters' => $request->only(['status']),
+            'filters' => array_merge($request->only(['search', 'status']), [
+                'sort_field' => $sortField,
+                'sort_direction' => $sortDirection,
+            ]),
         ]);
     }
 

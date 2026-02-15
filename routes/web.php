@@ -17,6 +17,9 @@ use App\Http\Controllers\Public\ProfileController as PublicProfileController;
 use App\Http\Controllers\Public\SearchController as PublicSearchController;
 use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\FavoriteController;
+use App\Http\Controllers\Public\SearchController;
 
 // Public routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -33,6 +36,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/reviews', [PublicReviewController::class, 'store'])->name('public.reviews.store');
     Route::get('/profil', [PublicProfileController::class, 'show'])->name('public.profile');
     Route::put('/profil', [PublicProfileController::class, 'update'])->name('public.profile.update');
+
+    // User Dashboard & Favorites
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+    Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
+    // Global Search
+    Route::get('/search/suggest', [SearchController::class, 'suggest'])->name('public.search.suggest');
 });
 
 

@@ -8,6 +8,7 @@ use App\Models\ObjekWisata;
 use App\Models\Foto;
 use App\Repositories\Eloquent\ObjekWisataRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -28,13 +29,19 @@ class ObjekWisataController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['search', 'id_kecamatan']);
-        $objekWisatas = $this->objekWisataRepo->paginate(10, $filters);
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+
+        $objekWisatas = $this->objekWisataRepo->paginate(10, $filters, $sortField, $sortDirection);
         $kecamatans = Kecamatan::all();
 
         return Inertia::render('Admin/ObjekWisata/Index', [
             'objekWisatas' => $objekWisatas,
             'kecamatans' => $kecamatans,
-            'filters' => $filters,
+            'filters' => array_merge($filters, [
+                'sort_field' => $sortField,
+                'sort_direction' => $sortDirection,
+            ]),
         ]);
     }
 
@@ -175,6 +182,9 @@ class ObjekWisataController extends Controller
 
         $this->objekWisataRepo->delete($id);
 
+        Cache::forget('public.map.data');
+        Cache::forget('public.home.data');
+
         return redirect()->route('admin.objek-wisata.index')
             ->with('message', 'Objek Wisata berhasil dihapus.');
     }
@@ -187,6 +197,9 @@ class ObjekWisataController extends Controller
         $foto = Foto::findOrFail($id);
         Storage::disk('public')->delete($foto->path);
         $foto->delete();
+
+        Cache::forget('public.map.data');
+        Cache::forget('public.home.data');
 
         return back()->with('message', 'Foto berhasil dihapus.');
     }
@@ -201,6 +214,9 @@ class ObjekWisataController extends Controller
         $objekWisata->fotos()->update(['is_primary' => false]);
         $foto = Foto::findOrFail($fotoId);
         $foto->update(['is_primary' => true]);
+
+        Cache::forget('public.map.data');
+        Cache::forget('public.home.data');
 
         return back()->with('message', 'Foto utama berhasil diupdate.');
     }

@@ -57,6 +57,11 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'id_user');
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     /**
      * Check if user is admin.
      */

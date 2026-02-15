@@ -15,7 +15,7 @@ class FasilitasWisataRepository extends BaseRepository implements BaseRepository
     /**
      * Get paginated facilities with relationships.
      */
-    public function paginate($perPage = 10, array $filters = [])
+    public function paginate($perPage = 10, array $filters = [], $sortField = 'created_at', $sortDirection = 'desc')
     {
         $query = $this->model->with('objekWisata');
 
@@ -27,6 +27,6 @@ class FasilitasWisataRepository extends BaseRepository implements BaseRepository
             $query->where('id_objek', $filters['id_objek']);
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query->orderBy($sortField, $sortDirection)->paginate($perPage)->withQueryString();
     }
 }

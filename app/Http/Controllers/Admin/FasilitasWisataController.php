@@ -8,6 +8,7 @@ use App\Models\Foto;
 use App\Models\FasilitasWisata;
 use App\Repositories\Eloquent\FasilitasWisataRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -28,13 +29,19 @@ class FasilitasWisataController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['search', 'id_objek']);
-        $fasilitas = $this->fasilitasRepo->paginate(10, $filters);
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+
+        $fasilitas = $this->fasilitasRepo->paginate(10, $filters, $sortField, $sortDirection);
         $objekWisatas = ObjekWisata::all();
 
         return Inertia::render('Admin/FasilitasWisata/Index', [
             'fasilitas' => $fasilitas,
             'objekWisatas' => $objekWisatas,
-            'filters' => $filters,
+            'filters' => array_merge($filters, [
+                'sort_field' => $sortField,
+                'sort_direction' => $sortDirection,
+            ]),
         ]);
     }
 
@@ -83,6 +90,8 @@ class FasilitasWisataController extends Controller
                 ]);
             }
         }
+
+        Cache::forget('public.map.data');
 
         return redirect()->route('admin.fasilitas-wisata.index')
             ->with('message', 'Fasilitas berhasil ditambahkan.');
@@ -138,6 +147,8 @@ class FasilitasWisataController extends Controller
             }
         }
 
+        Cache::forget('public.map.data');
+
         return redirect()->route('admin.fasilitas-wisata.index')
             ->with('message', 'Fasilitas berhasil diupdate.');
     }
@@ -157,6 +168,8 @@ class FasilitasWisataController extends Controller
 
         $fasilitas->delete();
 
+        Cache::forget('public.map.data');
+
         return redirect()->route('admin.fasilitas-wisata.index')
             ->with('message', 'Fasilitas berhasil dihapus.');
     }
@@ -169,6 +182,8 @@ class FasilitasWisataController extends Controller
         $foto = Foto::findOrFail($id);
         Storage::disk('public')->delete($foto->path);
         $foto->delete();
+
+        Cache::forget('public.map.data');
 
         return back()->with('message', 'Foto berhasil dihapus.');
     }

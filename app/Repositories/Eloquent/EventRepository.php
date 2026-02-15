@@ -15,7 +15,7 @@ class EventRepository extends BaseRepository implements BaseRepositoryInterface
     /**
      * Get paginated events with relationships.
      */
-    public function paginate($perPage = 10, array $filters = [])
+    public function paginate($perPage = 10, array $filters = [], $sortField = 'tanggal_mulai', $sortDirection = 'desc')
     {
         $query = $this->model->with(['objekWisata', 'fotos']);
 
@@ -41,7 +41,7 @@ class EventRepository extends BaseRepository implements BaseRepositoryInterface
             }
         }
 
-        return $query->latest('tanggal_mulai')->paginate($perPage);
+        return $query->orderBy($sortField, $sortDirection)->paginate($perPage)->withQueryString();
     }
 
     /**

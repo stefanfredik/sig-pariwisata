@@ -6,6 +6,9 @@
             <meta property="og:title" :content="objekWisata.nama_objek + ' - SIG Wisata Manggarai Barat'" />
             <meta property="og:description" :content="objekWisata.keterangan ? objekWisata.keterangan.substring(0, 160) : 'Informasi detail tentang ' + objekWisata.nama_objek" />
             <meta property="og:image" :content="mainPhoto" />
+            <component :is="'script'" type="application/ld+json">
+                {{ jsonLd }}
+            </component>
         </Head>
         <!-- Sticky Header Background -->
         <div class="h-20 bg-gray-900"></div>
@@ -40,8 +43,16 @@
                                     <span class="text-lg font-black text-gray-900">{{ Number(objekWisata.rating_avg || 0).toFixed(1) }}</span>
                                 </div>
                             </div>
-                            <button class="bg-gray-50 p-4 rounded-2xl hover:bg-red-50 hover:text-red-500 transition-all shadow-sm">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="2" /></svg>
+                            <button 
+                                @click="toggleFavorite"
+                                :class="[
+                                    'p-4 rounded-2xl transition-all shadow-sm',
+                                    isFavorited ? 'bg-pink-50 text-pink-500' : 'bg-gray-50 hover:bg-pink-50 hover:text-pink-500 text-gray-400'
+                                ]"
+                            >
+                                <svg class="w-6 h-6" :fill="isFavorited ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-width="2" />
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -292,19 +303,56 @@
 
 <script setup>
 import { onMounted, ref, computed } from 'vue';
-import { useForm, Head } from '@inertiajs/vue3';
+import { useForm, Head, usePage, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const props = defineProps({
     objekWisata: Object,
+    isFavorited: Boolean,
 });
+
+const toggleFavorite = () => {
+    if (!usePage().props.auth.user) {
+        router.visit(route('login'));
+        return;
+    }
+
+    router.post(route('favorites.toggle'), {
+        objek_wisata_id: props.objekWisata.id
+    }, {
+        preserveScroll: true,
+    });
+};
 
 const activePhoto = ref(props.objekWisata.fotos.length > 0 ? props.objekWisata.fotos[0].path : null);
 
 const mainPhoto = computed(() => {
     return activePhoto.value ? '/storage/' + activePhoto.value : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1?q=80&w=1000';
+});
+
+const jsonLd = computed(() => {
+    return JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "TouristAttraction",
+        "name": props.objekWisata.nama_objek,
+        "description": props.objekWisata.keterangan,
+        "image": [mainPhoto.value],
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": props.objekWisata.kecamatan.nama_kecamatan,
+            "addressRegion": "Nusa Tenggara Timur",
+            "addressCountry": "ID"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": props.objekWisata.latitude,
+            "longitude": props.objekWisata.longitude
+        },
+        "url": window.location.href,
+        "telephone": props.objekWisata.no_telepon
+    });
 });
 
 const form = useForm({
