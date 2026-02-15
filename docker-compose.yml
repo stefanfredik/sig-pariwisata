@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sig_wisata_app
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -13,9 +13,9 @@ services:
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_DATABASE=sig_wisata
-      - DB_USERNAME=sig_wisata_user
-      - DB_PASSWORD=sig_wisata_pass
+      - DB_DATABASE=${DB_DATABASE:-sig_wisata}
+      - DB_USERNAME=${DB_USERNAME:-sig_wisata_user}
+      - DB_PASSWORD=${DB_PASSWORD:-sig_wisata_pass}
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
@@ -29,13 +29,14 @@ services:
   # Nginx Web Server
   nginx:
     image: nginx:alpine
-    container_name: sig_wisata_nginx
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "${NGINX_PORT:-8080}:80"
     volumes:
       - ./:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/cloudflare-ips.conf:/etc/nginx/conf.d/cloudflare-ips.conf
     depends_on:
       - app
     networks:
@@ -44,15 +45,15 @@ services:
   # MySQL Database
   mysql:
     image: mariadb:10.5.8
-    container_name: sig_wisata_db
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: sig_wisata
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_USER: sig_wisata_user
-      MYSQL_PASSWORD: sig_wisata_pass
+      MYSQL_DATABASE: ${DB_DATABASE:-sig_wisata}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${DB_USERNAME:-sig_wisata_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sig_wisata_pass}
     ports:
-      - "3307:3306"
+      - "${MYSQL_PORT:-3307}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -65,10 +66,10 @@ services:
   # Redis Cache & Session Storage
   redis:
     image: redis:alpine
-    container_name: sig_wisata_redis
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6380}:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -78,17 +79,30 @@ services:
   # Node.js for Vite Development Server (HMR)
   node:
     image: node:20-alpine
-    container_name: sig_wisata_node
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_node
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
     ports:
-      - "5173:5173"
+      - "${VITE_PORT:-5174}:5173"
     networks:
       - sig_wisata_network
     command: sh -c "npm install && npm run dev -- --host"
     stdin_open: true
     tty: true
+
+  # Cloudflare Tunnel
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - sig_wisata_network
+    depends_on:
+      - nginx
 
 volumes:
   mysql_data:
