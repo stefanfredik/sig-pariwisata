@@ -1,0 +1,7 @@
+tunnel: 2b3306a7-84ed-4836-a2b4-985f3a0b36a4
+credentials-file: /etc/cloudflared/2b3306a7-84ed-4836-a2b4-985f3a0b36a4.json
+
+ingress:
+  - hostname: sig.kopiflores.my.id
+    service: http://nginx:80
+  - service: http_status:404

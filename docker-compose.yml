@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_app
     restart: unless-stopped
+    user: root
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
@@ -96,9 +97,11 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata}_cloudflared
     restart: unless-stopped
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    user: root
+    command: tunnel --no-autoupdate --config /etc/cloudflared/sig-config.yml run
+    volumes:
+      - /home/homenet/.cloudflared:/etc/cloudflared:ro
+      - ./docker/cloudflared/sig-config.yml:/etc/cloudflared/sig-config.yml:ro
     networks:
       - sig_wisata_network
     depends_on:
