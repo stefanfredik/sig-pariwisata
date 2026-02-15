@@ -1,0 +1,97 @@
+services:
+  # PHP-FPM Application Container
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_app
+    restart: unless-stopped
+    user: root
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./storage:/var/www/html/storage
+    env_file:
+      - .env.dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - sig_wisata_dev_network
+
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-8081}:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/nginx/dev/cloudflare-ips.conf:/etc/nginx/conf.d/cloudflare-ips.conf
+    depends_on:
+      - app
+    networks:
+      - sig_wisata_dev_network
+
+  # MySQL Database
+  mysql:
+    image: mariadb:10.5.8
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-sig_wisata_dev}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${DB_USERNAME:-sig_wisata_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-sig_wisata_pass}
+    ports:
+      - "${MYSQL_PORT:-3308}:3306"
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    networks:
+      - sig_wisata_dev_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  # Redis Cache & Session Storage
+  redis:
+    image: redis:alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_redis
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_REDIS_PORT:-6381}:6379"
+    volumes:
+      - redis_data_dev:/data
+    networks:
+      - sig_wisata_dev_network
+    command: redis-server --appendonly yes
+
+  # Node.js for Vite Development Server (HMR)
+  node:
+    image: node:20-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_node
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "${VITE_PORT:-5175}:5173"
+    networks:
+      - sig_wisata_dev_network
+    command: sh -c "npm install && npm run dev -- --host"
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data_dev:
+    driver: local
+  redis_data_dev:
+    driver: local
+
+networks:
+  sig_wisata_dev_network:
+    driver: bridge
