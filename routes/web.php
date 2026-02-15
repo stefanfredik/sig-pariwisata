@@ -111,6 +111,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
     // Review Moderation
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');
+    Route::get('/reviews/{id}', [AdminReviewController::class, 'show'])->name('admin.reviews.show');
     Route::post('/reviews/{id}/approve', [AdminReviewController::class, 'approve'])->name('admin.reviews.approve');
     Route::delete('/reviews/{id}', [AdminReviewController::class, 'destroy'])->name('admin.reviews.destroy');
 });

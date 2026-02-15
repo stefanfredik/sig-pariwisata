@@ -1,5 +1,5 @@
 <template>
-    <PublicLayout :transparent="false">
+    <PublicLayout :forceSolid="true">
         <Head>
             <title>{{ event.nama_event }} - Event Manggarai Barat</title>
             <meta name="description" :content="event.keterangan ? event.keterangan.substring(0, 160) : 'Ikuti keseruan ' + event.nama_event" />

@@ -1,5 +1,5 @@
 <template>
-    <PublicLayout :transparent="false">
+    <PublicLayout :forceSolid="true">
         <div class="h-20 bg-gray-900"></div>
 
         <section class="py-16 bg-white min-h-[60vh]">

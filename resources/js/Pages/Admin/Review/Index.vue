@@ -5,7 +5,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
-import { Check, X, Trash2, Star, User } from 'lucide-vue-next'
+import { Check, X, Trash2, Star, User, Eye } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import { cn } from '@/lib/utils'
 
@@ -191,6 +191,13 @@ const confirmDelete = (id: number) => {
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <div class="flex items-center justify-end gap-2">
+                                        <Link 
+                                            :href="route('admin.reviews.show', review.id)" 
+                                            class="p-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                                            title="Detail"
+                                        >
+                                            <Eye class="h-4 w-4" />
+                                        </Link>
                                         <button 
                                             v-if="review.status === 'pending'"
                                             @click="approveReview(review.id)" 

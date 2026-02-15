@@ -54,9 +54,9 @@
                          <div>
                             <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Lokasi (Objek Wisata)</label>
                             <select
-                                v-model="form.id_objek_wisata"
+                                v-model="form.id_objek"
                                 class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
-                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.id_objek_wisata }"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.id_objek }"
                             >
                                 <option :value="null">Tidak Terikat Objek Wisata</option>
                                 <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
@@ -64,7 +64,7 @@
                                 </option>
                             </select>
                              <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Opsional: Jika fasilitas berada di dalam objek wisata tertentu.</p>
-                             <p v-if="form.errors.id_objek_wisata" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.id_objek_wisata }}</p>
+                             <p v-if="form.errors.id_objek" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.id_objek }}</p>
                         </div>
 
                          <div>
@@ -213,12 +213,10 @@ const props = defineProps({
 });
 
 const form = useForm({
-    id_objek: props.fasilitas.id_objek, // Note: backend uses id_objek_wisata? Check Create.vue used id_objek_wisata, Edit.vue used id_objek. 
+    id_objek: props.fasilitas.id_objek,
     nama_fasilitas: props.fasilitas.nama_fasilitas,
-    kategori_fasilitas: props.fasilitas.kategori_fasilitas, // Ensure this exists in props.fasilitas or handle default
+    kategori_fasilitas: props.fasilitas.kategori_fasilitas || '',
     deskripsi: props.fasilitas.deskripsi,
-    // Use consistent naming if possible, but keep existing props binding if backend expects it
-    id_objek_wisata: props.fasilitas.id_objek_wisata || props.fasilitas.id_objek, 
     latitude: props.fasilitas.latitude,
     longitude: props.fasilitas.longitude,
     new_fotos: [],

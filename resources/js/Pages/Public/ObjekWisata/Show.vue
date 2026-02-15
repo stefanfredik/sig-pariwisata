@@ -1,5 +1,5 @@
 <template>
-    <PublicLayout :transparent="false">
+    <PublicLayout :forceSolid="true">
         <Head>
             <title>{{ objekWisata.nama_objek }} - Wisata Manggarai Barat</title>
             <meta name="description" :content="objekWisata.keterangan ? objekWisata.keterangan.substring(0, 160) : 'Jelajahi keindahan ' + objekWisata.nama_objek" />

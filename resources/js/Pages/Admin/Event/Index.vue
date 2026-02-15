@@ -5,7 +5,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
-import { MoreVertical, Plus, Pencil, Trash2, Calendar, MapPin } from 'lucide-vue-next'
+import { MoreVertical, Plus, Pencil, Trash2, Calendar, MapPin, Eye } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import {
   DropdownMenu,
@@ -207,6 +207,11 @@ const formatDate = (dateString: string) => {
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
+                                            <DropdownMenuItem as-child>
+                                                <Link :href="route('admin.events.show', event.id)" class="cursor-pointer font-medium">
+                                                    <Eye class="mr-2 h-4 w-4" /> Detail
+                                                </Link>
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem as-child>
                                                 <Link :href="route('admin.events.edit', event.id)" class="cursor-pointer">
                                                     <Pencil class="mr-2 h-4 w-4" /> Edit

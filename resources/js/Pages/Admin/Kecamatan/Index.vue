@@ -5,7 +5,7 @@ import AdminLayout from '@/Layouts/AdminLayout.vue'
 import Pagination from '@/Components/Pagination.vue'
 import DataTableToolbar from '@/Components/Admin/Table/DataTableToolbar.vue'
 import { Button } from '@/Components/ui/button'
-import { MoreVertical, Plus, Pencil, Trash2, MapPin } from 'lucide-vue-next'
+import { MoreVertical, Plus, Pencil, Trash2, MapPin, Eye } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import {
   DropdownMenu,
@@ -183,6 +183,11 @@ const confirmDelete = (kecamatan: any) => {
                                             </button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
+                                            <DropdownMenuItem as-child>
+                                                <Link :href="route('admin.kecamatan.show', kecamatan.id)" class="cursor-pointer font-medium">
+                                                    <Eye class="mr-2 h-4 w-4" /> Detail
+                                                </Link>
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem as-child>
                                                 <Link :href="route('admin.kecamatan.edit', kecamatan.id)" class="cursor-pointer">
                                                     <Pencil class="mr-2 h-4 w-4" /> Edit

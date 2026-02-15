@@ -63,6 +63,7 @@ class FasilitasWisataController extends Controller
         $validated = $request->validate([
             'id_objek' => 'required|exists:objek_wisatas,id',
             'nama_fasilitas' => 'required|string|max:50',
+            'kategori_fasilitas' => 'nullable|string|max:50',
             'deskripsi' => 'nullable|string|max:500',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
@@ -98,6 +99,19 @@ class FasilitasWisataController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $fasilitas = $this->fasilitasRepo->find($id);
+        $fasilitas->load(['objekWisata', 'fotos']);
+
+        return Inertia::render('Admin/FasilitasWisata/Show', [
+            'fasilitas' => $fasilitas,
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
@@ -119,6 +133,7 @@ class FasilitasWisataController extends Controller
         $validated = $request->validate([
             'id_objek' => 'required|exists:objek_wisatas,id',
             'nama_fasilitas' => 'required|string|max:50',
+            'kategori_fasilitas' => 'nullable|string|max:50',
             'deskripsi' => 'nullable|string|max:500',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',

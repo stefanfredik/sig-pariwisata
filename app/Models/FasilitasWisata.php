@@ -12,6 +12,7 @@ class FasilitasWisata extends Model
     protected $fillable = [
         'id_objek',
         'nama_fasilitas',
+        'kategori_fasilitas',
         'deskripsi',
         'latitude',
         'longitude',

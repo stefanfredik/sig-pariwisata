@@ -3,7 +3,11 @@
         <!-- Navbar -->
         <nav 
             class="fixed w-full z-50 transition-all duration-300" 
-            :class="[isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg py-3' : 'bg-transparent py-5']"
+            :class="[
+                (isScrolled || forceSolid)
+                    ? 'bg-white/95 backdrop-blur-md shadow-lg py-3'
+                    : 'bg-black/5 backdrop-blur-[2px] py-5'
+            ]"
         >
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm">
                 <a :href="route('home')" class="flex items-center gap-2 group">
@@ -16,7 +20,7 @@
                 
                 <!-- Search Bar -->
                 <div class="hidden lg:flex flex-1 max-w-md mx-8 relative">
-                    <div class="w-full relative group">
+                    <form @submit.prevent="submitSearch" class="w-full relative group">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <svg class="w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2.5" /></svg>
                         </div>
@@ -25,8 +29,12 @@
                             @input="handleSearch"
                             type="text" 
                             placeholder="Cari destinasi atau event..."
-                            class="w-full bg-gray-100/50 border-transparent rounded-2xl py-2.5 pl-11 pr-4 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder-gray-400"
-                            :class="[isScrolled ? 'bg-gray-100' : 'bg-white/10 text-white placeholder-white/50 focus:text-gray-900']"
+                            class="w-full border-transparent rounded-2xl py-2.5 pl-11 pr-4 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                            :class="[
+                                (isScrolled || forceSolid) 
+                                    ? 'bg-gray-100 text-gray-900 placeholder-gray-400' 
+                                    : 'bg-white/10 text-white placeholder-white/50 focus:text-gray-900'
+                            ]"
                         >
                         
                         <!-- Search Results Dropdown -->
@@ -50,25 +58,25 @@
                                 </div>
                             </a>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8 font-bold">
-                    <a :href="route('public.objek-wisata.index')" :class="[isScrolled ? 'text-gray-600 hover:text-primary' : 'text-white/80 hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'">
+                    <a :href="route('public.objek-wisata.index')" :class="[(isScrolled || forceSolid) ? 'text-gray-600 hover:text-primary' : 'text-white hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'">
                         Objek Wisata
                     </a>
-                    <a :href="route('public.events.index')" :class="[isScrolled ? 'text-gray-600 hover:text-primary' : 'text-white/80 hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'">
+                    <a :href="route('public.events.index')" :class="[(isScrolled || forceSolid) ? 'text-gray-600 hover:text-primary' : 'text-white hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'">
                         Event
                     </a>
-                    <a :href="route('public.map')" :class="[isScrolled ? 'text-gray-600 hover:text-primary' : 'text-white/80 hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'">
+                    <a :href="route('public.map')" :class="[(isScrolled || forceSolid) ? 'text-gray-600 hover:text-primary' : 'text-white hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'">
                         Peta
                     </a>
                     
                     <div v-if="!$page.props.auth.user" class="flex gap-4 items-center">
                         <a 
                             :href="route('login')" 
-                            :class="[isScrolled ? 'text-gray-600 hover:text-primary' : 'text-white/80 hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'"
+                            :class="[(isScrolled || forceSolid) ? 'text-gray-600 hover:text-primary' : 'text-white hover:text-white', 'transition-colors'] + ' text-sm tracking-wide uppercase font-black px-2 py-2'"
                         >
                             Masuk
                         </a>
@@ -84,8 +92,8 @@
                             <div class="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xs uppercase">
                                 {{ $page.props.auth.user.name.charAt(0) }}
                             </div>
-                            <span :class="[isScrolled ? 'text-gray-900' : 'text-white font-bold']">{{ $page.props.auth.user.name.split(' ')[0] }}</span>
-                            <svg class="w-4 h-4" :class="[isScrolled ? 'text-gray-900' : 'text-white']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" /></svg>
+                            <span :class="[(isScrolled || forceSolid) ? 'text-gray-900' : 'text-white font-bold']">{{ $page.props.auth.user.name.split(' ')[0] }}</span>
+                            <svg class="w-4 h-4" :class="[(isScrolled || forceSolid) ? 'text-gray-900' : 'text-white']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" /></svg>
                         </button>
                         
                         <!-- Dropdown -->
@@ -111,7 +119,7 @@
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="md:hidden p-2" :class="[isScrolled ? 'text-gray-900' : 'text-white']">
+                <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="md:hidden p-2" :class="[(isScrolled || forceSolid) ? 'text-gray-900' : 'text-white']">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path v-if="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -219,10 +227,23 @@ import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 
+const props = defineProps({
+    forceSolid: {
+        type: Boolean,
+        default: false
+    }
+});
+
 const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
 const searchQuery = ref('');
 const searchResults = ref([]);
+
+const submitSearch = () => {
+    if (searchQuery.value.trim().length > 0) {
+        router.get(route('public.objek-wisata.index'), { search: searchQuery.value });
+    }
+};
 
 const handleSearch = debounce(async () => {
     if (searchQuery.value.length < 2) {

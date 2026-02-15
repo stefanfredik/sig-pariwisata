@@ -45,6 +45,18 @@ class ReviewController extends Controller
     }
 
     /**
+     * Display the specified review.
+     */
+    public function show($id)
+    {
+        $review = Review::with(['user', 'objekWisata', 'fotos'])->findOrFail($id);
+
+        return Inertia::render('Admin/Review/Show', [
+            'review' => $review,
+        ]);
+    }
+
+    /**
      * Approve the specified review.
      */
     public function approve($id)

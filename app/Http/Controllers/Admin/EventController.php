@@ -97,6 +97,18 @@ class EventController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $event = $this->eventRepo->findWithDetails($id);
+
+        return Inertia::render('Admin/Event/Show', [
+            'event' => $event,
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
