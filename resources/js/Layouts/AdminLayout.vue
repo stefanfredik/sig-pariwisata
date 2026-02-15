@@ -59,7 +59,7 @@ watch(() => page.props.flash, (flash: any) => {
             variant: 'destructive',
         })
     }
-}, { deep: true })
+}, { deep: true, immediate: true })
 </script>
 
 <template>
