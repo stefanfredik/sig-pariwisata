@@ -93,7 +93,7 @@ const confirmDelete = (objek: any) => {
     <Head title="Kelola Objek Wisata" />
 
     <AdminLayout>
-        <div class="max-w-7xl mx-auto py-6">
+        <div class="max-w-7xl py-6">
             <!-- Header Section -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>

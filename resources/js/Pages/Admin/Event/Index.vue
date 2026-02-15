@@ -103,7 +103,7 @@ const formatDate = (dateString: string) => {
     <Head title="Kelola Event" />
 
     <AdminLayout>
-        <div class="max-w-7xl mx-auto py-6">
+        <div class="max-w-7xl py-6">
             <!-- Header Section -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>

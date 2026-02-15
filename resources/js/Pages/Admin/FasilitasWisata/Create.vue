@@ -1,153 +1,186 @@
 <template>
     <AdminLayout>
-        <div class="max-w-4xl mx-auto space-y-6">
+        <div class="max-w-4xl space-y-6">
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Tambah Fasilitas</h2>
-                    <p class="mt-1 text-sm text-gray-600">Buat sarana pendukung objek wisata baru</p>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Tambah Fasilitas Wisata</h2>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Tambahkan fasilitas baru ke sistem</p>
                 </div>
-                <a :href="route('admin.fasilitas-wisata.index')" class="btn-secondary">
-                    Kembali
-                </a>
+                <Button variant="outline" as-child>
+                    <Link :href="route('admin.fasilitas-wisata.index')">
+                        <ArrowLeft class="w-4 h-4 mr-2" />
+                        Kembali
+                    </Link>
+                </Button>
             </div>
 
             <form @submit.prevent="submit" class="space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Form Side -->
-                    <div class="space-y-6">
-                        <div class="bg-white shadow rounded-xl p-6 border border-gray-100 space-y-6">
-                            <div class="flex items-center gap-2 border-b border-gray-50 pb-4 mb-2">
-                                <div class="w-2 h-6 bg-primary rounded-full"></div>
-                                <h3 class="text-lg font-bold text-gray-900">Informasi Fasilitas</h3>
-                            </div>
-
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Objek Wisata <span class="text-red-500">*</span></label>
-                                    <select
-                                        v-model="form.id_objek"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                        :class="{ 'border-red-500': form.errors.id_objek }"
-                                    >
-                                        <option :value="null">Pilih Lokasi Utama</option>
-                                        <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
-                                            {{ objek.nama_objek }}
-                                        </option>
-                                    </select>
-                                    <p v-if="form.errors.id_objek" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.id_objek }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Nama Fasilitas <span class="text-red-500">*</span></label>
-                                    <input
-                                        v-model="form.nama_fasilitas"
-                                        type="text"
-                                        placeholder="Contoh: Toilet Umum, Musholla, ATM"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                        :class="{ 'border-red-500': form.errors.nama_fasilitas }"
-                                    />
-                                    <p v-if="form.errors.nama_fasilitas" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.nama_fasilitas }}</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Ikon (Emoji/Text)</label>
-                                    <input
-                                        v-model="form.icon"
-                                        type="text"
-                                        placeholder="Contoh: 🚻, 🕌, 🏧"
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                    />
-                                    <p class="mt-1 text-[10px] text-gray-400 font-medium uppercase tracking-wider italic">Gunakan emoji untuk ikon yang menarik</p>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Foto Fasilitas</label>
-                                    <input
-                                        type="file"
-                                        multiple
-                                        @change="handleFileUpload"
-                                        class="w-full rounded-xl border border-gray-200 shadow-sm text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-                                        accept="image/*"
-                                    />
-                                    <p v-if="form.errors.fotos" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.fotos }}</p>
-                                    
-                                    <!-- Preview -->
-                                    <div v-if="previewUrls.length" class="grid grid-cols-4 gap-2 mt-4">
-                                        <div v-for="(url, index) in previewUrls" :key="index" class="relative group">
-                                            <img :src="url" class="w-full h-20 object-cover rounded-lg border border-gray-200">
-                                            <button @click.prevent="removePhoto(index)" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Deskripsi Singkat</label>
-                                    <textarea
-                                        v-model="form.deskripsi"
-                                        rows="3"
-                                        placeholder="Jelaskan kondisi atau posisi fasilitas..."
-                                        class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                    ></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white shadow rounded-xl p-6 border border-gray-100">
-                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Latitude</label>
-                                    <input
-                                        v-model="form.latitude"
-                                        type="text"
-                                        readonly
-                                        class="w-full rounded-xl border-gray-100 bg-gray-50 text-xs font-mono text-gray-500 cursor-not-allowed"
-                                    />
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-gray-700 mb-2">Longitude</label>
-                                    <input
-                                        v-model="form.longitude"
-                                        type="text"
-                                        readonly
-                                        class="w-full rounded-xl border-gray-100 bg-gray-50 text-xs font-mono text-gray-500 cursor-not-allowed"
-                                    />
-                                </div>
-                            </div>
-                            <p class="mt-2 text-[10px] text-blue-500 font-bold uppercase tracking-wider">Geser marker pada peta untuk mengubah posisi</p>
-                        </div>
+                <!-- Informasi Dasar -->
+                <div class="bg-white dark:bg-slate-800 shadow rounded-xl p-6 border border-slate-200 dark:border-slate-700 space-y-6">
+                    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-4 mb-2">
+                        <div class="w-2 h-6 bg-primary rounded-full"></div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Informasi Fasilitas</h3>
                     </div>
 
-                    <!-- Map Side -->
-                    <div class="bg-white shadow rounded-xl border border-gray-100 overflow-hidden flex flex-col h-[500px] lg:h-auto">
-                        <div class="p-4 border-b border-gray-50 flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider">Lokasi Fasilitas</h3>
-                            <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase">Interactive Map</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Nama Fasilitas <span class="text-red-500">*</span></label>
+                            <Input
+                                v-model="form.nama_fasilitas"
+                                type="text"
+                                placeholder="Contoh: Toilet Umum, Parkir Luas"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.nama_fasilitas }"
+                            />
+                            <p v-if="form.errors.nama_fasilitas" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.nama_fasilitas }}</p>
                         </div>
-                        <div id="map" class="flex-1 z-10"></div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Kategori Fasilitas <span class="text-red-500">*</span></label>
+                            <select
+                                v-model="form.kategori_fasilitas"
+                                class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.kategori_fasilitas }"
+                            >
+                                <option value="">Pilih Kategori</option>
+                                <option value="Akomodasi">Akomodasi</option>
+                                <option value="Kuliner">Kuliner</option>
+                                <option value="Transportasi">Transportasi</option>
+                                <option value="Umum">Umum</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                            <p v-if="form.errors.kategori_fasilitas" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.kategori_fasilitas }}</p>
+                        </div>
+
+                         <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Lokasi (Objek Wisata)</label>
+                            <select
+                                v-model="form.id_objek_wisata"
+                                class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.id_objek_wisata }"
+                            >
+                                <option :value="null">Tidak Terikat Objek Wisata</option>
+                                <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
+                                    {{ objek.nama_objek }}
+                                </option>
+                            </select>
+                             <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Opsional: Jika fasilitas berada di dalam objek wisata tertentu.</p>
+                             <p v-if="form.errors.id_objek_wisata" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.id_objek_wisata }}</p>
+                        </div>
+
+                         <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Deskripsi Singkat</label>
+                            <Input
+                                v-model="form.deskripsi"
+                                type="text"
+                                placeholder="Keterangan tambahan..."
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.deskripsi }"
+                            />
+                            <p v-if="form.errors.deskripsi" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.deskripsi }}</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 mt-6">
-                    <a :href="route('admin.fasilitas-wisata.index')" class="btn-secondary">
-                        Batal
-                    </a>
-                    <button
+                <!-- Peta Lokasi -->
+                <div class="bg-white dark:bg-slate-800 shadow rounded-xl p-6 border border-slate-200 dark:border-slate-700 space-y-6">
+                    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-4 mb-2">
+                        <div class="w-2 h-6 bg-primary rounded-full"></div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Titik Koordinat</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Latitude</label>
+                            <Input
+                                v-model="form.latitude"
+                                type="text"
+                                readonly
+                                class="bg-slate-50 dark:bg-slate-900 font-mono text-sm"
+                            />
+                            <p v-if="form.errors.latitude" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.latitude }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Longitude</label>
+                            <Input
+                                v-model="form.longitude"
+                                type="text"
+                                readonly
+                                class="bg-slate-50 dark:bg-slate-900 font-mono text-sm"
+                            />
+                             <p v-if="form.errors.longitude" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.longitude }}</p>
+                        </div>
+                    </div>
+
+                    <div class="relative w-full h-96 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner group">
+                        <div id="map" class="w-full h-full z-0"></div>
+                        <div class="absolute top-4 right-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm text-xs font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 z-[1000]">
+                            Klik peta untuk ubah lokasi
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Foto Fasilitas -->
+                <div class="bg-white dark:bg-slate-800 shadow rounded-xl p-6 border border-slate-200 dark:border-slate-700 space-y-6">
+                     <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-4 mb-2">
+                        <div class="w-2 h-6 bg-primary rounded-full"></div>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Foto Fasilitas</h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="relative flex flex-col items-center justify-center w-full h-40 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all group">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                <UploadCloud class="w-10 h-10 mb-3 text-slate-400 group-hover:text-primary transition-colors" />
+                                <p class="mb-2 text-sm text-slate-500 dark:text-slate-400"><span class="font-bold text-primary">Klik upload</span> atau drag and drop</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Maks. 2MB per file</p>
+                            </div>
+                            <input
+                                type="file"
+                                class="hidden"
+                                multiple
+                                accept="image/*"
+                                @change="handleFileUpload"
+                            />
+                        </label>
+
+                         <div v-if="photoPreviews.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div v-for="(preview, index) in photoPreviews" :key="index" class="relative group aspect-video rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700">
+                                <img :src="preview" class="h-full w-full object-cover" />
+                                <button
+                                    type="button"
+                                    @click="removePhoto(index)"
+                                    class="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
+                                >
+                                    <X class="w-4 h-4" />
+                                </button>
+                                <div v-if="index === 0" class="absolute bottom-2 left-2 bg-primary/90 text-white text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-wider">
+                                    Primary
+                                </div>
+                            </div>
+                        </div>
+                        <p v-if="form.errors.fotos" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.fotos }}</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <Button
+                        variant="outline"
+                        as-child
+                    >
+                        <Link :href="route('admin.fasilitas-wisata.index')">
+                            Batal
+                        </Link>
+                    </Button>
+                    <Button
                         type="submit"
-                        class="btn-primary px-8"
+                        class="bg-primary hover:bg-primary/90 text-white px-8"
                         :disabled="form.processing"
                     >
                         <span v-if="form.processing" class="flex items-center">
-                            <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                            <Loader2 class="animate-spin h-4 w-4 mr-2" />
                             Menyimpan...
                         </span>
                         <span v-else>Simpan Fasilitas</span>
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>
@@ -156,57 +189,38 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { ArrowLeft, UploadCloud, X, Loader2 } from 'lucide-vue-next';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 const props = defineProps({
     objekWisatas: Array,
 });
 
 const form = useForm({
-    id_objek: null,
     nama_fasilitas: '',
+    kategori_fasilitas: '',
     deskripsi: '',
-    latitude: -8.5, // Default Labuan Bajo coordinate
+    id_objek_wisata: null,
+    latitude: -8.5,
     longitude: 119.88,
-    icon: '',
     fotos: [],
 });
 
-const previewUrls = ref([]);
-
-const handleFileUpload = (event) => {
-    const files = Array.from(event.target.files);
-    form.fotos = [...form.fotos, ...files];
-
-    files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            previewUrls.value.push(e.target.result);
-        };
-        reader.readAsDataURL(file);
-    });
-};
-
-const removePhoto = (index) => {
-    form.fotos.splice(index, 1);
-    previewUrls.value.splice(index, 1);
-};
-
-let map;
-let marker;
+const photoPreviews = ref([]);
+let map = null;
+let marker = null;
 
 onMounted(() => {
-    // Initialize map
     map = L.map('map').setView([form.latitude, form.longitude], 13);
-
+    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Custom Icon for marker (standard Leaflet marker has issues with absolute paths in some build setups)
     const icon = L.icon({
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',

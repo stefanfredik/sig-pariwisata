@@ -1,43 +1,45 @@
 <template>
     <AdminLayout>
-        <div class="max-w-4xl mx-auto space-y-6">
+        <div class="max-w-4xl space-y-6">
             <!-- Header -->
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Edit Event</h2>
-                    <p class="mt-1 text-sm text-gray-600">Perbarui data agenda kegiatan</p>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Edit Event</h2>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Perbarui data agenda kegiatan</p>
                 </div>
-                <a :href="route('admin.events.index')" class="btn-secondary">
-                    Kembali
-                </a>
+                <Button variant="outline" as-child>
+                    <Link :href="route('admin.events.index')">
+                        <ArrowLeft class="w-4 h-4 mr-2" />
+                        Kembali
+                    </Link>
+                </Button>
             </div>
 
             <form @submit.prevent="submit" class="space-y-6">
                 <!-- Informasi Dasar -->
-                <div class="bg-white shadow rounded-xl p-6 border border-gray-100 space-y-6">
-                    <div class="flex items-center gap-2 border-b border-gray-50 pb-4 mb-2">
+                <div class="bg-white dark:bg-slate-800 shadow rounded-xl p-6 border border-slate-200 dark:border-slate-700 space-y-6">
+                    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-4 mb-2">
                         <div class="w-2 h-6 bg-primary rounded-full"></div>
-                        <h3 class="text-lg font-bold text-gray-900">Informasi Dasar</h3>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Informasi Dasar</h3>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Nama Event <span class="text-red-500">*</span></label>
-                            <input
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Nama Event <span class="text-red-500">*</span></label>
+                            <Input
                                 v-model="form.nama_event"
                                 type="text"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                :class="{ 'border-red-500': form.errors.nama_event }"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.nama_event }"
                             />
                             <p v-if="form.errors.nama_event" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.nama_event }}</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Lokasi Objek Wisata (Optional)</label>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Lokasi Objek Wisata (Optional)</label>
                             <select
                                 v-model="form.id_objek"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                :class="{ 'border-red-500': form.errors.id_objek }"
+                                class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.id_objek }"
                             >
                                 <option :value="null">Pilih Objek Wisata (Jika ada)</option>
                                 <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
@@ -48,83 +50,75 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
-                            <input
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
+                            <Input
                                 v-model="form.alamat"
                                 type="text"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                :class="{ 'border-red-500': form.errors.alamat }"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.alamat }"
                             />
                             <p v-if="form.errors.alamat" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.alamat }}</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2 text-emerald-600">Tanggal Mulai <span class="text-emerald-500">*</span></label>
-                            <input
+                            <label class="block text-sm font-bold text-emerald-600 dark:text-emerald-400 mb-2">Tanggal Mulai <span class="text-emerald-500">*</span></label>
+                            <Input
                                 v-model="form.tanggal_mulai"
                                 type="date"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                :class="{ 'border-red-500': form.errors.tanggal_mulai }"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.tanggal_mulai }"
                             />
                             <p v-if="form.errors.tanggal_mulai" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.tanggal_mulai }}</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2 text-rose-600">Tanggal Selesai <span class="text-rose-500">*</span></label>
-                            <input
+                            <label class="block text-sm font-bold text-rose-600 dark:text-rose-400 mb-2">Tanggal Selesai <span class="text-rose-500">*</span></label>
+                            <Input
                                 v-model="form.tanggal_selesai"
                                 type="date"
-                                class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                                :class="{ 'border-red-500': form.errors.tanggal_selesai }"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.tanggal_selesai }"
                             />
                             <p v-if="form.errors.tanggal_selesai" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.tanggal_selesai }}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Keterangan/Deskripsi <span class="text-red-500">*</span></label>
-                        <textarea
+                        <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Keterangan/Deskripsi <span class="text-red-500">*</span></label>
+                        <Textarea
                             v-model="form.keterangan"
                             rows="4"
-                            class="w-full rounded-xl border-gray-200 shadow-sm focus:border-primary focus:ring-primary transition-all"
-                            :class="{ 'border-red-500': form.errors.keterangan }"
-                        ></textarea>
+                            :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.keterangan }"
+                        />
                         <p v-if="form.errors.keterangan" class="mt-1 text-xs text-red-600 font-medium">{{ form.errors.keterangan }}</p>
                     </div>
                 </div>
 
                 <!-- Kelola Foto -->
-                <div class="bg-white shadow rounded-xl p-6 border border-gray-100 space-y-6">
-                    <div class="flex items-center gap-2 border-b border-gray-50 pb-4 mb-2">
+                <div class="bg-white dark:bg-slate-800 shadow rounded-xl p-6 border border-slate-200 dark:border-slate-700 space-y-6">
+                    <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-4 mb-2">
                         <div class="w-2 h-6 bg-primary rounded-full"></div>
-                        <h3 class="text-lg font-bold text-gray-900">Foto Dokumentasi</h3>
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Foto Dokumentasi</h3>
                     </div>
 
                     <!-- Existing Photos -->
                     <div v-if="event.fotos.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div v-for="foto in event.fotos" :key="foto.id" class="relative group aspect-video rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                        <div v-for="foto in event.fotos" :key="foto.id" class="relative group aspect-video rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700">
                             <img :src="'/storage/' + foto.path" class="h-full w-full object-cover" />
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                 <button
                                     v-if="!foto.is_primary"
                                     type="button"
                                     @click="setPrimary(foto.id)"
-                                    class="p-2 bg-white text-gray-900 rounded-lg hover:bg-primary hover:text-white transition-all shadow-lg"
+                                    class="p-2 bg-white text-slate-900 rounded-lg hover:bg-primary hover:text-white transition-all shadow-lg active:scale-95"
                                     title="Jadikan Foto Utama"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
+                                    <Star class="w-4 h-4" />
                                 </button>
                                 <button
                                     type="button"
                                     @click="deleteExistingPhoto(foto.id)"
-                                    class="p-2 bg-white text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-lg"
+                                    class="p-2 bg-white text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-lg active:scale-95"
                                     title="Hapus Foto"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
+                                    <Trash2 class="w-4 h-4" />
                                 </button>
                             </div>
                             <div v-if="foto.is_primary" class="absolute top-2 left-2 bg-primary/90 text-white text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-wider shadow-sm">
@@ -134,14 +128,12 @@
                     </div>
 
                     <!-- Upload New Photos -->
-                    <div class="space-y-4 pt-4 border-t border-gray-50">
-                        <p class="text-sm font-bold text-gray-700">Tambah Foto Baru</p>
-                        <label class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-gray-200 border-dashed rounded-2xl cursor-pointer bg-gray-50/50 hover:bg-gray-50 transition-all group">
+                    <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-300">Tambah Foto Baru</p>
+                        <label class="relative flex flex-col items-center justify-center w-full h-32 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded-2xl cursor-pointer bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all group">
                             <div class="flex flex-col items-center justify-center">
-                                <svg class="w-8 h-8 mb-2 text-gray-400 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                <p class="text-xs text-gray-500 italic">Klik untuk menambah foto baru</p>
+                                <UploadCloud class="w-8 h-8 mb-2 text-slate-400 group-hover:text-primary transition-colors" />
+                                <p class="text-xs text-slate-500 dark:text-slate-400 italic">Klik untuk menambah foto baru</p>
                             </div>
                             <input
                                 type="file"
@@ -154,16 +146,14 @@
 
                         <!-- Previews -->
                         <div v-if="photoPreviews.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div v-for="(preview, index) in photoPreviews" :key="index" class="relative group aspect-video rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                            <div v-for="(preview, index) in photoPreviews" :key="index" class="relative group aspect-video rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700">
                                 <img :src="preview" class="h-full w-full object-cover" />
                                 <button
                                     type="button"
                                     @click="removeNewPhoto(index)"
                                     class="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600"
                                 >
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                                    <X class="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
@@ -171,24 +161,26 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3">
-                    <a :href="route('admin.events.index')" class="btn-secondary">
-                        Batal
-                    </a>
-                    <button
+                <div class="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <Button
+                        variant="outline"
+                        as-child
+                    >
+                        <Link :href="route('admin.events.index')">
+                            Batal
+                        </Link>
+                    </Button>
+                    <Button
                         type="submit"
-                        class="btn-primary px-8"
+                        class="bg-primary hover:bg-primary/90 text-white px-8"
                         :disabled="form.processing"
                     >
                         <span v-if="form.processing" class="flex items-center">
-                            <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
+                            <Loader2 class="animate-spin h-4 w-4 mr-2" />
                             Menyimpan...
                         </span>
                         <span v-else>Update Event</span>
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>
@@ -197,8 +189,12 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useForm, router } from '@inertiajs/vue3';
+import { useForm, router, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import Textarea from '@/Components/ui/textarea/Textarea.vue';
+import { ArrowLeft, Star, Trash2, UploadCloud, X, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
     event: Object,

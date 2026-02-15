@@ -2,25 +2,32 @@
     <AdminLayout>
         <div class="max-w-2xl">
             <!-- Header -->
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900">Edit Kecamatan</h2>
-                <p class="mt-1 text-sm text-gray-600">Ubah data kecamatan</p>
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Edit Kecamatan</h2>
+                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Ubah data kecamatan</p>
+                </div>
+                <Button variant="outline" as-child>
+                    <Link :href="route('admin.kecamatan.index')">
+                        <ArrowLeft class="w-4 h-4 mr-2" />
+                        Kembali
+                    </Link>
+                </Button>
             </div>
 
             <!-- Form -->
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 border border-slate-200 dark:border-slate-700">
                 <form @submit.prevent="submit">
                     <div class="space-y-4">
                         <div>
-                            <label for="nama_kecamatan" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="nama_kecamatan" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                                 Nama Kecamatan <span class="text-red-500">*</span>
                             </label>
-                            <input
+                            <Input
                                 id="nama_kecamatan"
                                 v-model="form.nama_kecamatan"
                                 type="text"
-                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-                                :class="{ 'border-red-500': form.errors.nama_kecamatan }"
+                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.nama_kecamatan }"
                                 placeholder="Contoh: Komodo"
                             />
                             <p v-if="form.errors.nama_kecamatan" class="mt-1 text-sm text-red-600">
@@ -28,24 +35,26 @@
                             </p>
                         </div>
 
-                        <div class="flex gap-3 pt-6 border-t">
-                            <button
+                        <div class="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+                            <Button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="btn-primary"
+                                class="bg-primary hover:bg-primary/90 text-white"
                             >
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
+                                <Save class="w-4 h-4 mr-2" />
                                 <span v-if="form.processing">Memperbarui...</span>
                                 <span v-else>Update Kecamatan</span>
-                            </button>
-                            <a :href="route('admin.kecamatan.index')" class="btn-secondary">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                                </svg>
-                                Batal
-                            </a>
+                            </Button>
+                            
+                            <Button
+                                variant="outline"
+                                as-child
+                            >
+                                <Link :href="route('admin.kecamatan.index')">
+                                    <ArrowLeft class="w-4 h-4 mr-2" />
+                                    Batal
+                                </Link>
+                            </Button>
                         </div>
                     </div>
                 </form>
@@ -55,8 +64,11 @@
 </template>
 
 <script setup>
-import { useForm } from '@inertiajs/vue3';
+import { useForm, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Save, ArrowLeft } from 'lucide-vue-next';
 
 const props = defineProps({
     kecamatan: Object,
