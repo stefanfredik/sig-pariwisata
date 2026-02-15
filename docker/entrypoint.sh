@@ -3,7 +3,7 @@
 set -e
 
 echo "Waiting for MySQL to be ready..."
-until mysql -h"$DB_HOST" -u"$DB_USERNAME" -p"$DB_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; do
+until php -r "new PDO('mysql:host=${DB_HOST};dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}');" 2>/dev/null; do
     echo "MySQL is unavailable - sleeping"
     sleep 2
 done
