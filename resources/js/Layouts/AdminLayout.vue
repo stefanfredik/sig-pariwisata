@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Link, usePage, router } from '@inertiajs/vue3'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { Button } from '@/Components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from '@/Components/ui/sheet'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar'
+import { Toaster } from '@/Components/ui/toast'
+import { useToast } from '@/Components/ui/toast/use-toast'
 import { 
   LayoutDashboard, 
   Map as MapIcon, 
@@ -20,6 +22,7 @@ import { cn } from '@/lib/utils'
 
 const page = usePage()
 const user = computed(() => page.props.auth.user)
+const { toast } = useToast()
 
 const navItems = [
   { label: 'Dashboard', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
@@ -39,6 +42,24 @@ const isUrl = (pattern: string) => {
 const logout = () => {
     router.post('/logout')
 }
+
+// Watch for flash messages
+watch(() => page.props.flash, (flash: any) => {
+    if (flash?.message) {
+        toast({
+            title: 'Berhasil',
+            description: flash.message,
+            variant: 'default',
+        })
+    }
+    if (flash?.error) {
+        toast({
+            title: 'Error',
+            description: flash.error,
+            variant: 'destructive',
+        })
+    }
+}, { deep: true })
 </script>
 
 <template>
@@ -147,16 +168,9 @@ const logout = () => {
       </header>
       
       <main class="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 min-w-0">
-            <!-- Flash Messages -->
-            <div v-if="$page.props.flash.message" class="rounded-md bg-green-50 p-4 text-sm text-green-700 dark:bg-green-900/50 dark:text-green-400">
-                {{ $page.props.flash.message }}
-            </div>
-            <div v-if="$page.props.flash.error" class="rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/50 dark:text-red-400">
-                {{ $page.props.flash.error }}
-            </div>
-
            <slot />
       </main>
     </div>
+    <Toaster />
   </div>
 </template>
