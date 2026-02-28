@@ -68,7 +68,7 @@ class EventController extends Controller
             'alamat' => 'required|string|max:255',
             'keterangan' => 'required|string',
             'fotos' => 'nullable|array',
-            'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
         ]);
 
         $event = $this->eventRepo->create($validated);
@@ -136,7 +136,7 @@ class EventController extends Controller
             'alamat' => 'required|string|max:255',
             'keterangan' => 'required|string',
             'new_fotos' => 'nullable|array',
-            'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
         ]);
 
         $this->eventRepo->update($id, $validated);
