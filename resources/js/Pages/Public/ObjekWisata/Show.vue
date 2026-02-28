@@ -102,10 +102,19 @@
                                 <h3 class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Fasilitas Tersedia</h3>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-                                <div v-for="fas in objekWisata.fasilitas" :key="fas.id" class="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 items-center text-center space-y-3 group hover:bg-primary transition-all duration-300">
-                                    <div class="text-3xl group-hover:scale-110 transition-transform">{{ fas.icon || '📍' }}</div>
+                                <button 
+                                    v-for="fas in objekWisata.fasilitas" 
+                                    :key="fas.id" 
+                                    @click="openFasilitasModal(fas)"
+                                    class="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 items-center text-center space-y-3 group hover:bg-primary transition-all duration-300 relative overflow-hidden"
+                                >
+                                    <component :is="getFasilitasIcon(fas.kategori_fasilitas)" class="w-8 h-8 text-primary group-hover:text-white mx-auto transition-transform group-hover:scale-110" stroke-width="2" />
                                     <div class="text-xs font-black text-gray-900 group-hover:text-white uppercase tracking-wider">{{ fas.nama_fasilitas }}</div>
-                                </div>
+                                    
+                                    <div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4">
+                                        <span class="bg-white text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg ring-2 ring-white/50 transform translate-y-4 group-hover:translate-y-0 transition-transform">Lihat Detail</span>
+                                    </div>
+                                </button>
                             </div>
                         </div>
 
@@ -133,7 +142,28 @@
                                             </svg>
                                         </div>
                                     </div>
+
+                                    <!-- Judul -->
+                                    <p v-if="review.judul" class="text-sm font-black text-gray-900">{{ review.judul }}</p>
+
+                                    <!-- Komentar -->
                                     <p class="text-gray-600 font-medium leading-relaxed italic">"{{ review.komentar }}"</p>
+
+                                    <!-- Foto Review -->
+                                    <div v-if="review.fotos && review.fotos.length > 0" class="grid grid-cols-3 sm:grid-cols-5 gap-2 pt-3">
+                                        <a
+                                            v-for="foto in review.fotos"
+                                            :key="foto.id"
+                                            :href="'/storage/' + foto.path"
+                                            target="_blank"
+                                            class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 hover:border-primary transition-all shadow-sm"
+                                        >
+                                            <img :src="'/storage/' + foto.path" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" stroke-width="2" stroke-linecap="round"/></svg>
+                                            </div>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                             <div v-else class="p-12 text-center bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200">
@@ -147,12 +177,25 @@
                                     <p class="text-gray-500 text-sm font-medium">Bagikan pengalaman Anda mengunjungi tempat ini kepada wisatawan lain.</p>
                                 </div>
 
+                                <!-- Toast Notif -->
+                                <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                    <div 
+                                        v-if="reviewToast" 
+                                        class="flex items-start gap-3 p-4 rounded-2xl text-sm font-bold"
+                                        :class="reviewToast.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'"
+                                    >
+                                        <span class="text-xl flex-shrink-0">{{ reviewToast.type === 'success' ? '✅' : '❌' }}</span>
+                                        <p>{{ reviewToast.message }}</p>
+                                    </div>
+                                </transition>
+
                                 <div v-if="!$page.props.auth.user" class="p-6 bg-white rounded-2xl border border-gray-100 text-center space-y-4">
                                     <p class="text-gray-600 font-bold">Silakan login terlebih dahulu untuk memberikan ulasan.</p>
                                     <a :href="route('login')" class="inline-flex bg-primary text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg shadow-primary/20">Login Sekarang</a>
                                 </div>
 
                                 <form v-else @submit.prevent="submitReview" class="space-y-6">
+                                    <!-- Rating -->
                                     <div class="space-y-4">
                                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Rating Anda</label>
                                         <div class="flex gap-2">
@@ -172,43 +215,63 @@
                                         <span v-if="form.errors.rating" class="text-xs text-red-500 font-bold ml-2">{{ form.errors.rating }}</span>
                                     </div>
 
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Judul (Opsional)</label>
-                                            <input 
-                                                v-model="form.judul"
-                                                type="text" 
-                                                placeholder="Contoh: Sangat Indah!"
-                                                class="w-full bg-white border-gray-100 rounded-2xl px-6 py-4 text-gray-900 focus:border-primary focus:ring-primary transition-all font-bold placeholder-gray-300"
-                                            >
-                                        </div>
-                                        <div class="space-y-2">
-                                            <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Foto (Max 5)</label>
-                                            <input 
-                                                type="file" 
-                                                multiple
-                                                @change="handleFileUpload"
-                                                accept="image/*"
-                                                class="w-full bg-white border-gray-100 rounded-2xl px-6 py-[13px] text-gray-900 focus:border-primary focus:ring-primary transition-all font-bold text-xs file:hidden"
-                                            >
-                                        </div>
+                                    <!-- Judul -->
+                                    <div class="space-y-2">
+                                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Judul (Opsional)</label>
+                                        <input 
+                                            v-model="form.judul"
+                                            type="text" 
+                                            placeholder="Contoh: Sangat Indah!"
+                                            class="w-full bg-white border border-gray-200 rounded-2xl px-6 py-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300"
+                                        >
                                     </div>
 
+                                    <!-- Komentar -->
                                     <div class="space-y-2">
                                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Komentar Ulasan</label>
                                         <textarea 
                                             v-model="form.komentar"
                                             rows="4"
                                             placeholder="Tuliskan detail pengalaman Anda di sini..."
-                                            class="w-full bg-white border-gray-100 rounded-3xl px-6 py-4 text-gray-900 focus:border-primary focus:ring-primary transition-all font-bold placeholder-gray-300"
+                                            class="w-full bg-white border border-gray-200 rounded-3xl px-6 py-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300"
                                         ></textarea>
                                         <span v-if="form.errors.komentar" class="text-xs text-red-500 font-bold ml-2">{{ form.errors.komentar }}</span>
+                                    </div>
+
+                                    <!-- Upload Foto -->
+                                    <div class="space-y-4">
+                                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2">Foto (Maks. 5)</label>
+                                        <label class="flex flex-col items-center justify-center gap-3 px-6 py-8 border-2 border-dashed border-gray-200 rounded-3xl bg-white hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group">
+                                            <svg class="w-10 h-10 text-gray-300 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                            <div class="text-center">
+                                                <p class="text-sm font-black text-primary">Unggah foto</p>
+                                                <p class="text-xs text-gray-400 font-medium mt-1">PNG, JPG hingga 10MB · Maks. 5 foto</p>
+                                            </div>
+                                            <input type="file" class="sr-only" @change="handleFileUpload" multiple accept="image/*" />
+                                        </label>
+
+                                        <!-- Previews -->
+                                        <div v-if="reviewPreviews.length" class="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                                            <div 
+                                                v-for="(src, index) in reviewPreviews" 
+                                                :key="index" 
+                                                class="relative group aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+                                            >
+                                                <img :src="src" class="w-full h-full object-cover transition-transform group-hover:scale-105">
+                                                <button 
+                                                    @click.prevent="removeReviewPhoto(index)" 
+                                                    class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                                >
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="3"/></svg>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <button 
                                         type="submit"
                                         :disabled="form.processing"
-                                        class="bg-gray-900 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-xl shadow-gray-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="bg-gray-900 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {{ form.processing ? 'Mengirim...' : 'Kirim Ulasan' }}
                                     </button>
@@ -262,11 +325,26 @@
                                         <div class="text-sm font-bold leading-relaxed">{{ objekWisata.no_telepon || '-' }}</div>
                                     </div>
                                 </li>
+                                <li v-if="objekWisata.akses_transportasi && objekWisata.akses_transportasi.length > 0" class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                                        <!-- Ikon Car / Transportasi -->
+                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Akses Transportasi</div>
+                                        <div class="text-sm font-bold leading-relaxed">{{ objekWisata.akses_transportasi.join(', ') }}</div>
+                                    </div>
+                                </li>
                             </ul>
 
-                            <button class="w-full mt-10 bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/40 hover:scale-[1.02] transition-all">
+                            <a 
+                                :href="`https://www.google.com/maps?q=${objekWisata.latitude},${objekWisata.longitude}`" 
+                                target="_blank"
+                                class="w-full mt-10 bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-md hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/></svg>
                                 Kunjungi Sekarang
-                            </button>
+                            </a>
 
                             <div class="mt-8 border-t border-white/10 pt-8">
                                 <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-4 text-center">Bagikan</h4>
@@ -342,21 +420,134 @@
                 </div>
             </div>
         </section>
+
+        <!-- Modal Detail Fasilitas -->
+        <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+            <div v-if="isFasilitasModalOpen" class="fixed inset-0 z-[6000] flex items-center justify-center p-4 sm:p-6">
+                <!-- Backdrop -->
+                <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" @click="closeFasilitasModal"></div>
+                
+                <!-- Modal Panel -->
+                <transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 scale-95 translate-y-4" enter-to-class="opacity-100 scale-100 translate-y-0" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 scale-100 translate-y-0" leave-to-class="opacity-0 scale-95 translate-y-4">
+                    <div v-if="isFasilitasModalOpen" class="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <!-- Tombol Close -->
+                        <button @click="closeFasilitasModal" class="absolute top-6 right-6 z-10 w-10 h-10 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                        
+                        <!-- Header / Gambar (Opsional jika fasilitas ada gambar) -->
+                        <div class="relative h-48 md:h-64 bg-slate-100 flex-shrink-0">
+                            <!-- Background gradient pattern if no photo -->
+                            <div v-if="!selectedFasilitas?.fotos?.length" class="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-600/20"></div>
+                            <div v-if="!selectedFasilitas?.fotos?.length" class="absolute inset-0 flex items-center justify-center text-6xl opacity-20 transform scale-150">
+                                <component :is="getFasilitasIcon(selectedFasilitas?.kategori_fasilitas)" class="w-20 h-20" stroke-width="1.5" />
+                            </div>
+                            
+                            <!-- Display photo if exists -->
+                            <img v-if="selectedFasilitas?.fotos?.length" :src="'/storage/' + selectedFasilitas.fotos[0].path" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" v-if="selectedFasilitas?.fotos?.length"></div>
+
+                            <div class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-white to-transparent" v-if="!selectedFasilitas?.fotos?.length"></div>
+                        </div>
+
+                        <!-- Konten Detail -->
+                        <div class="p-8 md:p-12 overflow-y-auto no-scrollbar pb-12">
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="inline-block px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-lg mb-3">
+                                        {{ selectedFasilitas?.kategori_fasilitas || 'Fasilitas Umum' }}
+                                    </div>
+                                    <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{{ selectedFasilitas?.nama_fasilitas }}</h3>
+                                </div>
+                                
+                                <div class="prose prose-sm md:prose-base text-slate-600 leading-relaxed font-medium">
+                                    <p v-if="selectedFasilitas?.deskripsi">{{ selectedFasilitas.deskripsi }}</p>
+                                    <p v-else class="italic text-slate-400">Tidak ada deskripsi rinci untuk fasilitas ini.</p>
+                                </div>
+                                
+                                <div v-if="selectedFasilitas?.fotos?.length > 1" class="pt-6 border-t border-slate-100">
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Galeri Fasilitas</h4>
+                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        <a 
+                                            v-for="foto in selectedFasilitas.fotos.slice(1)" 
+                                            :key="foto.id" 
+                                            :href="'/storage/' + foto.path" 
+                                            target="_blank"
+                                            class="aspect-square sm:aspect-video rounded-xl overflow-hidden border border-slate-100 shadow-sm relative group block"
+                                        >
+                                            <img :src="'/storage/' + foto.path" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" stroke-width="2" stroke-linecap="round"/></svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="pt-6 border-t border-slate-100 flex justify-end">
+                                    <button @click="closeFasilitasModal" class="px-8 py-3 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-primary transition-colors">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+            </div>
+        </transition>
     </PublicLayout>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { useForm, Head, usePage, router } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import {
+    Wifi, Car, Coffee, Info, Utensils, ShoppingBag, Map as MapIcon, Bath,
+    ShieldCheck, Bed, Camera, TreePine, MapPin
+} from 'lucide-vue-next';
 
 const props = defineProps({
     objekWisata: Object,
     isFavorited: Boolean,
     nearbyUmkms: Array,
 });
+
+// Fasilitas Modal
+const isFasilitasModalOpen = ref(false);
+const selectedFasilitas = ref(null);
+
+const openFasilitasModal = (fasilitas) => {
+    selectedFasilitas.value = fasilitas;
+    isFasilitasModalOpen.value = true;
+};
+
+const closeFasilitasModal = () => {
+    isFasilitasModalOpen.value = false;
+    setTimeout(() => {
+        selectedFasilitas.value = null;
+    }, 300);
+};
+
+const getFasilitasIcon = (kategoriFasilitas) => {
+    const defaultIcon = MapPin;
+    if (!kategoriFasilitas) return defaultIcon;
+    
+    const kat = kategoriFasilitas.toLowerCase();
+    
+    if (kat.includes('parkir')) return Car;
+    if (kat.includes('makan') || kat.includes('restoran') || kat.includes('kuliner')) return Utensils;
+    if (kat.includes('minum') || kat.includes('cafe') || kat.includes('kopi')) return Coffee;
+    if (kat.includes('informasi')) return Info;
+    if (kat.includes('belanja') || kat.includes('oleh-oleh') || kat.includes('toko')) return ShoppingBag;
+    if (kat.includes('toilet') || kat.includes('kamar mandi') || kat.includes('wc')) return Bath;
+    if (kat.includes('keamanan') || kat.includes('pos')) return ShieldCheck;
+    if (kat.includes('penginapan') || kat.includes('hotel') || kat.includes('villa')) return Bed;
+    if (kat.includes('foto') || kat.includes('spot')) return Camera;
+    if (kat.includes('alam') || kat.includes('taman') || kat.includes('camping')) return TreePine;
+    if (kat.includes('wifi') || kat.includes('internet')) return Wifi;
+    
+    return defaultIcon;
+};
 
 const toggleFavorite = () => {
     if (!usePage().props.auth.user) {
@@ -408,18 +599,62 @@ const form = useForm({
     fotos: [],
 });
 
+const reviewPreviews = ref([]);
+
 const handleFileUpload = (e) => {
-    form.fotos = Array.from(e.target.files);
+    const files = Array.from(e.target.files);
+    form.fotos = [...form.fotos, ...files];
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (ev) => reviewPreviews.value.push(ev.target.result);
+        reader.readAsDataURL(file);
+    });
+};
+
+const removeReviewPhoto = (index) => {
+    form.fotos.splice(index, 1);
+    reviewPreviews.value.splice(index, 1);
+};
+
+const reviewToast = ref(null);
+
+const showReviewToast = (message, type = 'success') => {
+    reviewToast.value = { message, type };
+    setTimeout(() => { reviewToast.value = null; }, 5000);
 };
 
 const submitReview = () => {
+    console.log('Submitting review...', {
+        id_objek: form.id_objek,
+        rating: form.rating,
+        komentar: form.komentar,
+    });
+
     form.post(route('public.reviews.store'), {
+        forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
             form.reset('rating', 'judul', 'komentar', 'fotos');
+            reviewPreviews.value = [];
+            showReviewToast('Terima kasih! Ulasan Anda telah dikirim dan menunggu moderasi admin.', 'success');
+        },
+        onError: (errors) => {
+            console.log('Form errors:', errors);
+            const firstError = Object.values(errors)[0];
+            showReviewToast(firstError || 'Terjadi kesalahan, silakan coba lagi.', 'error');
+        },
+        onFinish: () => {
+            console.log('Request finished. Processing:', form.processing, 'Errors:', form.errors);
         },
     });
 };
+
+// Tangkap flash message dari backend (misal: review sudah ada)
+const page = usePage();
+watch(() => page.props.flash, (flash) => {
+    if (flash?.error)   showReviewToast(flash.error, 'error');
+    if (flash?.message) showReviewToast(flash.message, 'success');
+}, { immediate: false, deep: true });
 
 onMounted(() => {
     // Mini Map

@@ -40,8 +40,8 @@ const props = defineProps<{
 
 const params = reactive({
     search: props.filters.search || '',
-    id_objek: props.filters.id_objek || '',
-    status: props.filters.status || '',
+    id_objek: props.filters.id_objek || 'all',
+    status: props.filters.status || 'all',
     sort_field: props.filters.sort_field || 'tanggal_mulai',
     sort_direction: props.filters.sort_direction || 'desc',
 })
@@ -65,7 +65,11 @@ watch(
 const updateParams = () => {
     router.get(
         route('admin.events.index'),
-        params,
+        {
+            ...params,
+            id_objek: params.id_objek === 'all' ? '' : params.id_objek,
+            status: params.status === 'all' ? '' : params.status,
+        },
         { preserveState: true, replace: true }
     )
 }
@@ -79,8 +83,8 @@ const handleSort = (value: string) => {
 
 const resetFilters = () => {
     params.search = ''
-    params.id_objek = ''
-    params.status = ''
+    params.id_objek = 'all'
+    params.status = 'all'
     params.sort_field = 'tanggal_mulai'
     params.sort_direction = 'desc'
     updateParams()
@@ -170,7 +174,7 @@ const formatDate = (dateString: string) => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem :value="''">Semua Lokasi</SelectItem>
+                                            <SelectItem value="all">Semua Lokasi</SelectItem>
                                             <SelectItem v-for="objek in objekWisatas" :key="objek.id" :value="String(objek.id)">
                                                 {{ objek.nama_objek }}
                                             </SelectItem>
@@ -187,7 +191,7 @@ const formatDate = (dateString: string) => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem :value="''">Semua Status</SelectItem>
+                                            <SelectItem value="all">Semua Status</SelectItem>
                                             <SelectItem value="upcoming">Akan Datang</SelectItem>
                                             <SelectItem value="ongoing">Sedang Berlangsung</SelectItem>
                                             <SelectItem value="past">Selesai</SelectItem>

@@ -39,8 +39,8 @@ const props = defineProps<{
 
 const params = reactive({
     search: props.filters.search || '',
-    id_objek: props.filters.id_objek || '',
-    kategori_fasilitas: props.filters.kategori_fasilitas || '',
+    id_objek: props.filters.id_objek || 'all',
+    kategori_fasilitas: props.filters.kategori_fasilitas || 'all',
     sort_field: props.filters.sort_field || 'created_at',
     sort_direction: props.filters.sort_direction || 'desc',
 })
@@ -64,7 +64,11 @@ watch(
 const updateParams = () => {
     router.get(
         route('admin.fasilitas-wisata.index'),
-        params,
+        {
+            ...params,
+            id_objek: params.id_objek === 'all' ? '' : params.id_objek,
+            kategori_fasilitas: params.kategori_fasilitas === 'all' ? '' : params.kategori_fasilitas,
+        },
         { preserveState: true, replace: true }
     )
 }
@@ -78,8 +82,8 @@ const handleSort = (value: string) => {
 
 const resetFilters = () => {
     params.search = ''
-    params.id_objek = ''
-    params.kategori_fasilitas = ''
+    params.id_objek = 'all'
+    params.kategori_fasilitas = 'all'
     params.sort_field = 'created_at'
     params.sort_direction = 'desc'
     updateParams()
@@ -161,7 +165,7 @@ const handleDelete = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="">Semua Lokasi</SelectItem>
+                                            <SelectItem value="all">Semua Lokasi</SelectItem>
                                             <SelectItem v-for="objek in objekWisatas" :key="objek.id" :value="String(objek.id)">
                                                 {{ objek.nama_objek }}
                                             </SelectItem>
@@ -177,7 +181,7 @@ const handleDelete = () => {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectItem value="">Semua Kategori</SelectItem>
+                                            <SelectItem value="all">Semua Kategori</SelectItem>
                                             <SelectItem value="Akomodasi">Akomodasi</SelectItem>
                                             <SelectItem value="Kuliner">Kuliner</SelectItem>
                                             <SelectItem value="Transportasi">Transportasi</SelectItem>

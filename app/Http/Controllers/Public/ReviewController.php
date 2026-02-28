@@ -16,44 +16,61 @@ class ReviewController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'id_objek' => 'required|exists:objek_wisatas,id',
-            'rating' => 'required|integer|min:1|max:5',
-            'judul' => 'nullable|string|max:100',
-            'komentar' => 'required|string|max:1000',
-            'fotos' => 'nullable|array|max:5',
-            'fotos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+        \Log::info('Review store called', [
+            'user_id' => \Auth::id(),
+            'data' => $request->except('fotos'),
         ]);
 
-        // Check if user already reviewed this object
-        $existingReview = Review::where('id_user', Auth::id())
-            ->where('id_objek', $request->id_objek)
-            ->first();
+        try {
+            $validated = $request->validate([
+                'id_objek' => 'required|exists:objek_wisatas,id',
+                'rating' => 'required|integer|min:1|max:5',
+                'judul' => 'nullable|string|max:100',
+                'komentar' => 'required|string|max:1000',
+                'fotos' => 'nullable|array|max:5',
+                'fotos.*' => 'image|mimes:jpg,jpeg,png|max:10240',
+            ]);
 
-        if ($existingReview) {
-            return back()->with('error', 'Anda sudah memberikan review untuk objek wisata ini.');
-        }
+            \Log::info('Validation passed');
 
-        $review = Review::create([
-            'id_user' => Auth::id(),
-            'id_objek' => $request->id_objek,
-            'rating' => $request->rating,
-            'judul' => $request->judul,
-            'komentar' => $request->komentar,
-            'status' => 'pending',
-        ]);
+            // Check if user already reviewed this object
+            $existingReview = Review::where('id_user', Auth::id())
+                ->where('id_objek', $request->id_objek)
+                ->first();
 
-        // Handle photos if any
-        if ($request->hasFile('fotos')) {
-            foreach ($request->file('fotos') as $file) {
-                $path = $file->store('reviews', 'public');
-
-                $review->fotos()->create([
-                    'path' => $path,
-                ]);
+            if ($existingReview) {
+                \Log::info('Review already exists', ['review_id' => $existingReview->id]);
+                return back()->with('error', 'Anda sudah memberikan review untuk objek wisata ini.');
             }
-        }
 
-        return back()->with('message', 'Terima kasih! Review Anda telah dikirim dan menunggu moderasi admin.');
+            $review = Review::create([
+                'id_user' => Auth::id(),
+                'id_objek' => $request->id_objek,
+                'rating' => $request->rating,
+                'judul' => $request->judul,
+                'komentar' => $request->komentar,
+                'status' => 'pending',
+            ]);
+
+            \Log::info('Review created', ['review_id' => $review->id]);
+
+            // Handle photos if any
+            if ($request->hasFile('fotos')) {
+                foreach ($request->file('fotos') as $file) {
+                    $path = $file->store('reviews', 'public');
+                    $review->fotos()->create(['path' => $path]);
+                }
+                \Log::info('Photos saved');
+            }
+
+            return back()->with('message', 'Terima kasih! Review Anda telah dikirim dan menunggu moderasi admin.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::warning('Validation failed', ['errors' => $e->errors()]);
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Review store error', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return back()->with('error', 'Terjadi kesalahan server: ' . $e->getMessage());
+        }
     }
 }

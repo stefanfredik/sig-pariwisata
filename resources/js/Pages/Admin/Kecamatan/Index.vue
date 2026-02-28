@@ -40,7 +40,7 @@ const params = reactive({
     search: props.filters?.search || '',
     sort_field: props.filters?.sort_field || 'created_at',
     sort_direction: props.filters?.sort_direction || 'desc',
-    has_objects: props.filters?.has_objects || '',
+    has_objects: props.filters?.has_objects || 'all',
 })
 
 const sortOptions = [
@@ -62,7 +62,10 @@ watch(
 const updateParams = () => {
     router.get(
         route('admin.kecamatan.index'),
-        params,
+        {
+            ...params,
+            has_objects: params.has_objects === 'all' ? '' : params.has_objects,
+        },
         { preserveState: true, replace: true }
     )
 }
@@ -78,7 +81,7 @@ const resetSearch = () => {
     params.search = ''
     params.sort_field = 'created_at'
     params.sort_direction = 'desc'
-    params.has_objects = ''
+    params.has_objects = 'all'
     updateParams()
 }
 
@@ -157,7 +160,7 @@ const handleDelete = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem :value="''">Semua Kecamatan</SelectItem>
+                                        <SelectItem value="all">Semua Kecamatan</SelectItem>
                                         <SelectItem value="yes">Dengan Objek</SelectItem>
                                         <SelectItem value="no">Kosong / Tanpa Objek</SelectItem>
                                     </SelectGroup>

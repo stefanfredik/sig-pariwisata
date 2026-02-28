@@ -212,6 +212,13 @@ const handleConfirmDelete = () => {
                                 </div>
                             </div>
                             <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Akses Transportasi</p>
+                                <div v-if="objekWisata.akses_transportasi?.length" class="flex flex-wrap gap-2">
+                                    <Badge v-for="opsi in objekWisata.akses_transportasi" :key="opsi" variant="secondary" class="font-medium text-[10px]">{{ opsi }}</Badge>
+                                </div>
+                                <span v-else class="text-sm text-slate-500 italic">-</span>
+                            </div>
+                            <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
                                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Koordinat</p>
                                 <code class="text-[11px] bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">
                                     {{ objekWisata.latitude }}, {{ objekWisata.longitude }}

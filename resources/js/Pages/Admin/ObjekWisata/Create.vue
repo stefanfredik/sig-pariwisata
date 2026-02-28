@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useForm, Link } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -22,19 +22,53 @@ const form = useForm({
     alamat: '',
     no_telepon: '',
     keterangan: '',
+    akses_transportasi: [],
     jam_operasional: '',
     harga_tiket: '',
-    latitude: -8.5, // Default Labuan Bajo coordinate
+    latitude: -8.5,
     longitude: 119.88,
     fotos: [],
 });
+
+// ── Jam Operasional ─────────────────────────────────────────
+const waktu_buka  = ref('08:00');
+const waktu_tutup = ref('17:00');
+
+// ── Transportasi Options ──────────────────────────────────────
+const transportOptions = ['Kendaraan Pribadi (Mobil)', 'Kendaraan Pribadi (Motor)', 'Kendaraan Umum / Angkot', 'Bus Pariwisata', 'Bisa Dijangkau Jalan Kaki'];
+
+const jamOptions = computed(() => {
+    const opts = [];
+    for (let h = 0; h < 24; h++) {
+        for (let m of [0, 30]) {
+            const hh = String(h).padStart(2, '0');
+            const mm = String(m).padStart(2, '0');
+            opts.push(`${hh}:${mm}`);
+        }
+    }
+    return opts;
+});
+
+// ── Harga Tiket ─────────────────────────────────────────────
+const hargaDisplay = ref('');
+
+const formatRupiah = (val) => {
+    const num = String(val).replace(/\D/g, '');
+    if (!num) return '';
+    return new Intl.NumberFormat('id-ID').format(Number(num));
+};
+
+const onHargaInput = (e) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    hargaDisplay.value = formatRupiah(raw);
+    form.harga_tiket = raw ? Number(raw) : '';
+};
 
 const previews = ref([]);
 let map = null;
 let marker = null;
 
 onMounted(() => {
-    // Initialize Map
     map = L.map('map').setView([form.latitude, form.longitude], 12);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -43,14 +77,12 @@ onMounted(() => {
 
     marker = L.marker([form.latitude, form.longitude], { draggable: true }).addTo(map);
 
-    // Update form when marker is moved
     marker.on('dragend', (e) => {
         const { lat, lng } = e.target.getLatLng();
         form.latitude = lat.toFixed(6);
         form.longitude = lng.toFixed(6);
     });
 
-    // Update and move marker on click
     map.on('click', (e) => {
         const { lat, lng } = e.latlng;
         marker.setLatLng([lat, lng]);
@@ -76,6 +108,9 @@ const removePhoto = (index) => {
 };
 
 const submit = () => {
+    // Gabungkan waktu buka & tutup
+    form.jam_operasional = `${waktu_buka.value} - ${waktu_tutup.value} WITA`;
+
     form.post(route('admin.objek-wisata.store'), {
         forceFormData: true,
     });
@@ -132,6 +167,17 @@ const submit = () => {
                         <Textarea v-model="form.keterangan" rows="4" placeholder="Tuliskan keterangan lengkap objek wisata..." class="rounded-xl border-slate-200" />
                         <p v-if="form.errors.keterangan" class="text-xs text-red-500 font-medium">{{ form.errors.keterangan }}</p>
                     </div>
+
+                    <div class="space-y-3">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 border-t pt-4 block mt-4">Akses Transportasi</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label v-for="opsi in transportOptions" :key="opsi" class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+                                <input type="checkbox" :value="opsi" v-model="form.akses_transportasi" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-700" />
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ opsi }}</span>
+                            </label>
+                        </div>
+                        <p v-if="form.errors.akses_transportasi" class="text-xs text-red-500 font-medium">{{ form.errors.akses_transportasi }}</p>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -151,12 +197,42 @@ const submit = () => {
 
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase tracking-widest text-slate-500">Jam Operasional</label>
-                        <Input v-model="form.jam_operasional" placeholder="Contoh: 08:00 - 17:00" class="rounded-xl border-slate-200 h-11" />
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Buka</label>
+                                <select
+                                    v-model="waktu_buka"
+                                    class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-bold text-slate-800 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                >
+                                    <option v-for="jam in jamOptions" :key="jam" :value="jam">{{ jam }}</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Tutup</label>
+                                <select
+                                    v-model="waktu_tutup"
+                                    class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-bold text-slate-800 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                >
+                                    <option v-for="jam in jamOptions" :key="jam" :value="jam">{{ jam }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium">Akan disimpan sebagai: <span class="font-black text-slate-600">{{ waktu_buka }} - {{ waktu_tutup }} WITA</span></p>
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase tracking-widest text-slate-500">Harga Tiket</label>
-                        <Input v-model="form.harga_tiket" placeholder="Contoh: Rp 50.000 / orang" class="rounded-xl border-slate-200 h-11" />
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-slate-500 select-none">Rp</span>
+                            <input
+                                :value="hargaDisplay"
+                                @input="onHargaInput"
+                                inputmode="numeric"
+                                placeholder="0"
+                                class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                            />
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium">Kosongkan jika gratis</p>
                     </div>
                 </CardContent>
             </Card>

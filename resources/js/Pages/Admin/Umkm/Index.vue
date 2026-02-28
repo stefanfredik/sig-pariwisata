@@ -42,7 +42,7 @@ const props = defineProps<{
 
 const params = reactive({
     search: props.filters?.search || '',
-    kategori: props.filters?.kategori || '',
+    kategori: props.filters?.kategori || 'all',
     sort_field: props.filters?.sort_field || 'created_at',
     sort_direction: props.filters?.sort_direction || 'desc',
 })
@@ -66,7 +66,10 @@ watch(
 const updateParams = () => {
     router.get(
         route('admin.umkm.index'),
-        params,
+        {
+            ...params,
+            kategori: params.kategori === 'all' ? '' : params.kategori,
+        },
         { preserveState: true, replace: true }
     )
 }
@@ -80,7 +83,7 @@ const handleSort = (value: string) => {
 
 const resetFilters = () => {
     params.search = ''
-    params.kategori = ''
+    params.kategori = 'all'
     params.sort_field = 'created_at'
     params.sort_direction = 'desc'
     updateParams()
@@ -161,7 +164,7 @@ const handleDelete = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem :value="''">Semua Kategori</SelectItem>
+                                        <SelectItem value="all">Semua Kategori</SelectItem>
                                         <SelectItem v-for="cat in categories" :key="cat" :value="cat">
                                             {{ cat }}
                                         </SelectItem>

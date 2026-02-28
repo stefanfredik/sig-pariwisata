@@ -5,13 +5,13 @@
             class="fixed w-full z-50 transition-all duration-300" 
             :class="[
                 (isScrolled || forceSolid)
-                    ? 'bg-white/95 backdrop-blur-md shadow-lg py-3'
+                    ? 'bg-white border-b border-gray-100 shadow-sm py-3'
                     : 'bg-black/5 backdrop-blur-[2px] py-5'
             ]"
         >
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-sm">
                 <a :href="route('home')" class="flex items-center gap-2 group">
-                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform duration-300">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L16 4m0 13V4m0 0L9 7" />
                         </svg>
@@ -38,7 +38,7 @@
                         >
                         
                         <!-- Search Results Dropdown -->
-                        <div v-if="searchResults.length > 0" class="absolute top-12 left-0 w-full bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-[110] overflow-hidden">
+                        <div v-if="searchResults.length > 0" class="absolute top-12 left-0 w-full bg-white rounded-xl shadow-md border border-gray-100 py-2 z-[110] overflow-hidden">
                             <div class="px-4 py-2 border-b border-gray-50 mb-1">
                                 <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Hasil Pencarian</p>
                             </div>
@@ -82,22 +82,22 @@
                         </a>
                         <a 
                             :href="route('register')" 
-                            class="btn-primary-small !rounded-full px-6 py-2 shadow-xl shadow-primary/20"
+                            class="btn-primary-small !rounded-full px-6 py-2"
                         >
                             Daftar
                         </a>
                     </div>
                     <div v-else class="flex gap-4 items-center relative group/user">
-                        <button class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
-                            <div class="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xs uppercase">
+                        <button class="flex items-center gap-2.5 px-3 py-2 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all" :class="(isScrolled || forceSolid) ? 'bg-white' : 'bg-white/10 border-white/20 hover:bg-white/20'">
+                            <div class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-white font-black text-xs uppercase">
                                 {{ $page.props.auth.user.name.charAt(0) }}
                             </div>
-                            <span :class="[(isScrolled || forceSolid) ? 'text-gray-900' : 'text-white font-bold']">{{ $page.props.auth.user.name.split(' ')[0] }}</span>
-                            <svg class="w-4 h-4" :class="[(isScrolled || forceSolid) ? 'text-gray-900' : 'text-white']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" /></svg>
+                            <span class="text-sm font-bold" :class="[(isScrolled || forceSolid) ? 'text-gray-700' : 'text-white']">{{ $page.props.auth.user.name.split(' ')[0] }}</span>
+                            <svg class="w-3.5 h-3.5" :class="[(isScrolled || forceSolid) ? 'text-gray-400' : 'text-white/70']" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" /></svg>
                         </button>
                         
                         <!-- Dropdown -->
-                        <div class="absolute top-12 right-0 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover/user:opacity-100 group-hover/user:visible transition-all duration-300 transform translate-y-2 group-hover/user:translate-y-0 py-2 z-[100]">
+                        <div class="absolute top-11 right-0 w-52 bg-white rounded-xl shadow-md border border-gray-100 opacity-0 invisible group-hover/user:opacity-100 group-hover/user:visible transition-all duration-200 transform translate-y-1 group-hover/user:translate-y-0 py-1.5 z-[100]">
                             <div class="px-4 py-2 border-b border-gray-50 mb-2">
                                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Akun Saya</p>
                                 <p class="text-xs font-bold text-gray-900 truncate">{{ $page.props.auth.user.email }}</p>
@@ -110,7 +110,7 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2" /></svg>
                                 Profil Saya
                             </a>
-                            <button @click="logout" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-50 transition-all">
+                            <button @click="logout" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-all rounded-b-xl">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-width="2" /></svg>
                                 Keluar
                             </button>
@@ -136,7 +136,7 @@
                 leave-from-class="opacity-100 translate-y-0"
                 leave-to-class="opacity-0 -translate-y-4"
             >
-                <div v-if="isMobileMenuOpen" class="md:hidden bg-white shadow-2xl absolute w-full top-full py-4 border-t border-gray-100">
+                <div v-if="isMobileMenuOpen" class="md:hidden bg-white shadow-sm border-t border-gray-100 absolute w-full top-full py-3">
                     <div class="px-4 space-y-2">
                         <a :href="route('public.objek-wisata.index')" class="block px-4 py-3 text-gray-700 font-bold hover:bg-gray-50 rounded-xl">Objek Wisata</a>
                         <a :href="route('public.events.index')" class="block px-4 py-3 text-gray-700 font-bold hover:bg-gray-50 rounded-xl">Event</a>

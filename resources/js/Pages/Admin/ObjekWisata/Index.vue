@@ -42,7 +42,7 @@ const props = defineProps<{
 
 const params = reactive({
     search: props.filters?.search || '',
-    id_kecamatan: props.filters?.id_kecamatan || '',
+    id_kecamatan: props.filters?.id_kecamatan || 'all',
     sort_field: props.filters?.sort_field || 'created_at',
     sort_direction: props.filters?.sort_direction || 'desc',
 })
@@ -67,7 +67,10 @@ watch(
 const updateParams = () => {
     router.get(
         route('admin.objek-wisata.index'),
-        params,
+        {
+            ...params,
+            id_kecamatan: params.id_kecamatan === 'all' ? '' : params.id_kecamatan,
+        },
         { preserveState: true, replace: true }
     )
 }
@@ -81,7 +84,7 @@ const handleSort = (value: string) => {
 
 const resetFilters = () => {
     params.search = ''
-    params.id_kecamatan = ''
+    params.id_kecamatan = 'all'
     params.sort_field = 'created_at'
     params.sort_direction = 'desc'
     updateParams()
@@ -162,7 +165,7 @@ const handleDelete = () => {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectItem :value="''">Semua Lokasi</SelectItem>
+                                        <SelectItem value="all">Semua Lokasi</SelectItem>
                                         <SelectItem v-for="kec in kecamatans" :key="kec.id" :value="String(kec.id)">
                                             {{ kec.nama_kecamatan }}
                                         </SelectItem>

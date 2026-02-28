@@ -72,6 +72,8 @@ class ObjekWisataController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'fotos' => 'required|array|min:1',
             'fotos.*' => 'image|mimes:jpeg,png,jpg|max:10240', // 10MB
+            'akses_transportasi' => 'nullable|array',
+            'akses_transportasi.*' => 'string',
         ]);
 
         try {
@@ -142,6 +144,8 @@ class ObjekWisataController extends Controller
     {
         $objekWisata = $this->objekWisataRepo->find($id);
 
+        \Illuminate\Support\Facades\Log::info('Update Payload:', $request->all());
+
         $validated = $request->validate([
             'id_kecamatan' => 'required|exists:kecamatans,id',
             'nama_objek' => 'required|string|max:100|unique:objek_wisatas,nama_objek,' . $id,
@@ -154,6 +158,8 @@ class ObjekWisataController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'new_fotos' => 'nullable|array',
             'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'akses_transportasi' => 'nullable|array',
+            'akses_transportasi.*' => 'string',
         ]);
 
         $this->objekWisataRepo->update($id, collect($validated)->except('new_fotos')->toArray());

@@ -26,18 +26,18 @@
                 </div>
             </div>
 
-            <!-- Sidebar (Glassmorphism & Responsive) -->
+            <!-- Sidebar -->
             <aside 
-                class="absolute z-[2000] transition-all duration-500 ease-in-out lg:top-0 lg:left-0 lg:h-full w-full lg:w-[400px] bottom-0 h-[40vh] lg:h-full"
+                class="absolute z-[2000] transition-all duration-500 ease-in-out lg:top-0 lg:left-0 lg:h-full w-full lg:w-[400px] bottom-0 h-[60vh] lg:h-full"
                 :class="[
                     sidebarOpen 
                         ? 'translate-y-0 lg:translate-x-0 lg:w-[400px]' 
                         : 'translate-y-full lg:-translate-x-full lg:w-0'
                 ]"
             >
-                <div class="h-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-t lg:border-t-0 lg:border-r border-white/20 shadow-[0_-20px_50px_rgba(0,0,0,0.05)] lg:shadow-[20px_0_50px_rgba(0,0,0,0.05)] p-6 lg:p-8 flex flex-col gap-6 lg:gap-8 rounded-t-[3rem] lg:rounded-none">
+                <div class="h-full bg-white dark:bg-slate-900 border-t-2 lg:border-t-0 lg:border-r-2 border-slate-100 dark:border-slate-800 shadow-2xl p-5 lg:p-7 flex flex-col gap-5 rounded-t-[2.5rem] lg:rounded-none">
                     <!-- Mobile Drag Handle -->
-                    <div class="lg:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-2"></div>
+                    <div class="lg:hidden w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto -mt-1 mb-1"></div>
                     
                     <!-- Sidebar Header -->
                     <div class="flex items-center justify-between">
@@ -50,125 +50,141 @@
                                 <p class="text-[9px] lg:text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Manggarai Barat, NTT</p>
                             </div>
                         </div>
-                        <button @click="sidebarOpen = false" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-400 hover:text-primary transition-all shadow-sm">
+                        <button @click="sidebarOpen = false" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-slate-500 hover:text-primary transition-all shadow-sm">
                             <X class="lg:hidden w-5 h-5" />
                             <ChevronLeft class="hidden lg:block w-5 h-5" />
                         </button>
                     </div>
-                    <!-- Search & Filters -->
-                    <div class="space-y-4">
-                        <!-- Tabs: Wisata / UMKM -->
-                        <div class="flex bg-slate-100 dark:bg-slate-800 rounded-2xl p-1">
-                            <button 
-                                @click="activeTab = 'wisata'"
-                                class="flex-1 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all"
-                                :class="activeTab === 'wisata' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                            >
-                                🏝️ Wisata
-                            </button>
-                            <button 
-                                @click="activeTab = 'umkm'"
-                                class="flex-1 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all"
-                                :class="activeTab === 'umkm' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                            >
-                                🏪 UMKM
-                            </button>
-                        </div>
 
-                        <div class="relative group">
-                            <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                            <input
-                                v-model="searchQuery"
-                                type="text"
-                                :placeholder="activeTab === 'wisata' ? 'Cari objek wisata...' : 'Cari UMKM...'"
-                                class="w-full pl-11 pr-4 py-3.5 bg-slate-100/50 dark:bg-slate-800/50 border-transparent focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-2xl text-sm font-bold placeholder:text-slate-400 dark:text-white transition-all"
-                            />
-                        </div>
+                    <!-- Tabs: Wisata / UMKM -->
+                    <div class="flex bg-slate-100 dark:bg-slate-800 rounded-2xl p-1">
+                        <button 
+                            @click="activeTab = 'wisata'"
+                            class="flex-1 py-2.5 px-4 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all"
+                            :class="activeTab === 'wisata' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-md' : 'text-slate-400 hover:text-slate-600'"
+                        >
+                            🏝️ Wisata
+                        </button>
+                        <button 
+                            @click="activeTab = 'umkm'"
+                            class="flex-1 py-2.5 px-4 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all"
+                            :class="activeTab === 'umkm' ? 'bg-white dark:bg-slate-700 text-amber-600 shadow-md' : 'text-slate-400 hover:text-slate-600'"
+                        >
+                            🏪 UMKM
+                        </button>
                     </div>
 
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                        <input
+                            v-model="searchQuery"
+                            type="text"
+                            :placeholder="activeTab === 'wisata' ? 'Cari objek wisata...' : 'Cari UMKM...'"
+                            class="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-4 focus:ring-primary/10 rounded-2xl text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-400 placeholder:font-medium transition-all outline-none"
+                        />
+                    </div>
 
                     <!-- Results List -->
-                    <div class="flex-1 overflow-y-auto pr-2 no-scrollbar space-y-4">
+                    <div class="flex-1 overflow-y-auto no-scrollbar space-y-2">
 
                         <!-- Objek Wisata List -->
                         <template v-if="activeTab === 'wisata'">
                             <!-- Category Chips -->
-                            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+                            <div class="flex gap-2 overflow-x-auto pb-3 no-scrollbar">
                                 <button 
                                     v-for="cat in categories" 
                                     :key="cat.name"
                                     @click="activeCategory = cat.name"
-                                    class="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all border shadow-sm"
-                                    :class="[activeCategory === cat.name ? 'bg-blue-600 border-blue-600 text-white shadow-blue-200' : 'bg-white/50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 text-slate-500 hover:border-blue-300']"
+                                    class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all border-2"
+                                    :class="[activeCategory === cat.name ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600']"
                                 >
                                     <component :is="cat.icon" class="w-3.5 h-3.5" />
                                     {{ cat.name }}
                                 </button>
                             </div>
 
+                            <!-- Jumlah hasil -->
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                                {{ filteredObjekWisatas.length }} Destinasi Ditemukan
+                            </p>
+
                             <div 
                                 v-for="objek in filteredObjekWisatas" 
                                 :key="objek.id"
                                 @click="focusToMarker(objek)"
-                                class="group relative bg-white/50 dark:bg-slate-800/50 p-4 rounded-3xl border border-white/5 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-200 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all cursor-pointer overflow-hidden"
+                                class="group flex gap-4 p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-50 dark:hover:shadow-none transition-all cursor-pointer"
                             >
-                                <div class="flex gap-4 relative z-10">
-                                    <div class="w-20 h-20 rounded-2xl overflow-hidden shadow-inner flex-shrink-0">
-                                        <img :src="objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                <!-- Foto -->
+                                <div class="w-[72px] h-[72px] rounded-xl overflow-hidden flex-shrink-0 bg-slate-100">
+                                    <img :src="objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                </div>
+                                <!-- Info -->
+                                <div class="flex-1 min-w-0 py-0.5">
+                                    <div class="flex items-start justify-between gap-2 mb-1">
+                                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-tight leading-none">{{ objek.kecamatan.nama_kecamatan }}</span>
+                                        <div v-if="userLocation" class="flex items-center gap-1 text-[9px] font-bold text-slate-400 flex-shrink-0">
+                                            <Navigation class="w-2.5 h-2.5" />
+                                            {{ calculateDistance(userLocation.lat, userLocation.lng, objek.latitude, objek.longitude) }} km
+                                        </div>
                                     </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex items-center justify-between mb-1">
-                                            <span class="text-[9px] font-black text-blue-600 uppercase tracking-tighter">{{ objek.kecamatan.nama_kecamatan }}</span>
-                                            <div v-if="userLocation" class="flex items-center gap-1 text-[9px] font-bold text-slate-400">
-                                                <Navigation class="w-2.5 h-2.5" />
-                                                {{ calculateDistance(userLocation.lat, userLocation.lng, objek.latitude, objek.longitude) }} km
-                                            </div>
+                                    <h3 class="font-black text-slate-900 dark:text-white text-sm leading-tight mb-2 truncate group-hover:text-blue-600 transition-colors">{{ objek.nama_objek }}</h3>
+                                    <div class="flex items-center gap-1.5 mb-3">
+                                        <div class="flex text-yellow-400">
+                                            <svg v-for="i in 5" :key="i" class="w-3 h-3" :class="[i <= Math.round(objek.rating_avg || 0) ? 'fill-current' : 'fill-slate-200']" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
                                         </div>
-                                        <h3 class="font-black text-slate-900 dark:text-white text-sm leading-tight mb-2 truncate group-hover:text-blue-600 transition-colors">{{ objek.nama_objek }}</h3>
-                                        <div class="flex items-center gap-1">
-                                            <div class="flex text-yellow-500">
-                                                <svg v-for="i in 5" :key="i" class="w-2.5 h-2.5" :class="[i <= (objek.rating_avg || 0) ? 'fill-current' : 'fill-slate-200']" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                            </div>
-                                            <span class="text-[10px] font-bold text-slate-600">{{ Number(objek.rating_avg || 0).toFixed(1) }}</span>
-                                        </div>
+                                        <span class="text-[11px] font-bold text-slate-500">{{ Number(objek.rating_avg || 0).toFixed(1) }}</span>
+                                    </div>
+                                    
+                                    <div v-if="objek.akses_transportasi && objek.akses_transportasi.length > 0" class="space-y-1 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                        <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Akses Transportasi</div>
+                                        <ul class="text-[10px] text-slate-600 dark:text-slate-400 font-bold space-y-1">
+                                            <li v-for="akses in objek.akses_transportasi" :key="akses" class="flex items-start gap-1.5">
+                                                <svg class="w-3.5 h-3.5 text-emerald-500 mt-[-1px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                <span>{{ akses }}</span>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
 
-                            <div v-if="filteredObjekWisatas.length === 0" class="py-20 text-center space-y-4">
-                                <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-300">
+                            <div v-if="filteredObjekWisatas.length === 0" class="py-16 text-center space-y-4">
+                                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-300">
                                     <Search class="w-8 h-8" />
                                 </div>
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tidak ditemukan</p>
+                                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Tidak ditemukan</p>
                             </div>
                         </template>
 
                         <!-- UMKM List -->
                         <template v-if="activeTab === 'umkm'">
+                            <!-- Jumlah hasil -->
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                                {{ filteredUmkms.length }} UMKM Ditemukan
+                            </p>
+
                             <div 
                                 v-for="umkm in filteredUmkms" 
                                 :key="umkm.id"
                                 @click="focusToUmkmMarker(umkm)"
-                                class="group relative bg-white/50 dark:bg-slate-800/50 p-4 rounded-3xl border border-white/5 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-amber-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.05)] transition-all cursor-pointer overflow-hidden"
+                                class="group flex gap-4 p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-50 dark:hover:shadow-none transition-all cursor-pointer"
                             >
-                                <div class="flex gap-4 relative z-10">
-                                    <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-inner flex-shrink-0 bg-amber-50 flex items-center justify-center">
-                                        <img v-if="umkm.fotos && umkm.fotos.length > 0" :src="'/storage/' + umkm.fotos[0].path" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                                        <span v-else class="text-2xl">🏪</span>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[9px] font-black uppercase tracking-wider mb-1">{{ umkm.kategori }}</span>
-                                        <h3 class="font-black text-slate-900 dark:text-white text-sm leading-tight truncate group-hover:text-amber-600 transition-colors">{{ umkm.nama_umkm }}</h3>
-                                        <p class="text-[10px] text-slate-400 mt-1 truncate">{{ umkm.alamat }}</p>
-                                    </div>
+                                <!-- Foto/Emoji -->
+                                <div class="w-[60px] h-[60px] rounded-xl overflow-hidden flex-shrink-0 bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center">
+                                    <img v-if="umkm.fotos && umkm.fotos.length > 0" :src="'/storage/' + umkm.fotos[0].path" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                    <span v-else class="text-2xl">🏪</span>
+                                </div>
+                                <!-- Info -->
+                                <div class="flex-1 min-w-0 py-0.5">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider mb-1.5">{{ umkm.kategori }}</span>
+                                    <h3 class="font-black text-slate-900 dark:text-white text-sm leading-tight truncate group-hover:text-amber-600 transition-colors">{{ umkm.nama_umkm }}</h3>
+                                    <p class="text-[10px] text-slate-400 mt-1 truncate font-medium">{{ umkm.alamat }}</p>
                                 </div>
                             </div>
 
-                            <div v-if="filteredUmkms.length === 0" class="py-20 text-center space-y-4">
-                                <div class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-2xl">
-                                    🏪
-                                </div>
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tidak ditemukan</p>
+                            <div v-if="filteredUmkms.length === 0" class="py-16 text-center space-y-4">
+                                <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-2xl">🏪</div>
+                                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Tidak ditemukan</p>
                             </div>
                         </template>
                     </div>
@@ -197,50 +213,23 @@
                 </div>
             </div>
 
-            <!-- Map Controls (FAB) -->
-            <div class="absolute bottom-10 right-10 z-[1500] flex flex-col gap-4">
-                <!-- Layer Switcher -->
-                <div class="relative">
-                    <transition 
-                        enter-active-class="transition duration-300 ease-out"
-                        enter-from-class="opacity-0 translate-y-4 scale-95"
-                        enter-to-class="opacity-100 translate-y-0 scale-100"
-                        leave-active-class="transition duration-200 ease-in"
-                        leave-from-class="opacity-100 translate-y-0 scale-100"
-                        leave-to-class="opacity-0 translate-y-4 scale-95"
-                    >
-                        <div v-if="showLayerSwitcher" class="absolute bottom-16 right-0 w-48 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-3 grid grid-cols-1 gap-2">
-                            <button 
-                                v-for="(val, key) in { street: 'Standard', satellite: 'Satellite', dark: 'Dark Mode' }" 
-                                :key="key"
-                                @click="activeLayer = key; showLayerSwitcher = false"
-                                class="flex items-center gap-3 p-3 rounded-2xl transition-all"
-                                :class="[activeLayer === key ? 'bg-primary/10 text-primary font-black' : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 font-bold']"
-                            >
-                                <div class="w-10 h-10 rounded-xl overflow-hidden border-2" :class="[activeLayer === key ? 'border-primary' : 'border-transparent']">
-                                     <img :src="`https://api.dicebear.com/7.x/identicon/svg?seed=${key}`" class="w-full h-full object-cover opacity-50">
-                                </div>
-                                <span class="text-xs">{{ val }}</span>
-                            </button>
-                        </div>
-                    </transition>
-                    <button 
-                        @click="showLayerSwitcher = !showLayerSwitcher"
-                        class="w-14 h-14 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl shadow-2xl flex items-center justify-center text-slate-700 dark:text-white hover:text-primary transition-all hover:scale-110 border border-white/20"
-                        title="Ubah Layer"
-                    >
-                        <Layers class="w-6 h-6" />
-                    </button>
-                </div>
+            <!-- Lokasi Saya (kanan bawah) -->
+            <button 
+                @click="locateUser"
+                :disabled="isLocating"
+                class="absolute bottom-10 right-10 z-[1500] w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex items-center justify-center transition-all hover:scale-110 border border-slate-100 dark:border-slate-800 disabled:opacity-60 disabled:cursor-wait"
+                :class="isLocating ? 'text-primary' : 'text-slate-700 dark:text-white hover:text-primary'"
+                title="Lokasi Saya"
+            >
+                <LocateFixed class="w-6 h-6" :class="isLocating ? 'animate-pulse' : ''" />
+            </button>
 
-                <button 
-                    @click="map.locate({setView: true, maxZoom: 16})"
-                    class="w-14 h-14 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl shadow-2xl flex items-center justify-center text-slate-700 dark:text-white hover:text-primary transition-all hover:scale-110 border border-white/20"
-                    title="Lokasi Saya"
-                >
-                    <LocateFixed class="w-6 h-6" />
-                </button>
-            </div>
+            <!-- Toast Notif -->
+            <transition enter-active-class="transition duration-300" enter-from-class="opacity-0 translate-y-2" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                <div v-if="locationToast" class="absolute bottom-28 right-10 z-[2000] px-4 py-3 rounded-2xl shadow-xl text-xs font-black uppercase tracking-wider text-white" :class="locationToast.type === 'error' ? 'bg-red-500' : 'bg-emerald-500'">
+                    {{ locationToast.message }}
+                </div>
+            </transition>
 
             <!-- Routing Overlay (if active) -->
             <transition 
@@ -338,6 +327,68 @@ const selectedObjek = ref(null);
 const userLocation = ref(null);
 const userLocationName = ref('Lokasi Saya');
 const showLayerSwitcher = ref(false);
+const isLocating = ref(false);
+const locationToast = ref(null);
+
+const showToast = (message, type = 'success') => {
+    locationToast.value = { message, type };
+    setTimeout(() => { locationToast.value = null; }, 3000);
+};
+
+const locateUser = () => {
+    if (!navigator.geolocation) {
+        showToast('Browser tidak mendukung geolokasi', 'error');
+        return;
+    }
+
+    isLocating.value = true;
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            isLocating.value = false;
+            const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
+            userLocation.value = latlng;
+
+            // Hapus marker lama
+            const ref = window.__mapRef__;
+            if (ref) {
+                const old = ref.getMarker();
+                if (old) ref.map.removeLayer(old);
+
+                const pulsingIcon = L.divIcon({
+                    className: '',
+                    html: `
+                        <div style="position:relative;width:40px;height:40px;">
+                            <div style="position:absolute;inset:0;border-radius:50%;background:rgba(37,99,235,0.2);animation:locatePulse 1.8s ease-out infinite;"></div>
+                            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#2563EB;border:3px solid #fff;box-shadow:0 2px 14px rgba(37,99,235,0.7);"></div>
+                        </div>`,
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
+                });
+
+                const newMarker = L.marker(latlng, { icon: pulsingIcon, zIndexOffset: 1000 })
+                    .addTo(ref.map)
+                    .bindPopup('<div style="font-weight:900;font-size:12px;color:#2563EB;padding:4px 0">📍 Lokasi Saya</div>', { className: 'custom-popup-box' });
+
+                ref.map.flyTo(latlng, 16, { duration: 1.2, easeLinearity: 0.25 });
+                setTimeout(() => newMarker.openPopup(), 1300);
+                ref.setMarker(newMarker);
+            }
+
+            showToast('Lokasi ditemukan!', 'success');
+        },
+        (err) => {
+            isLocating.value = false;
+            const msgs = {
+                1: 'Akses lokasi ditolak. Izinkan lokasi di pengaturan browser.',
+                2: 'Lokasi tidak tersedia saat ini.',
+                3: 'Permintaan lokasi timeout.',
+            };
+            showToast(msgs[err.code] || 'Gagal mendapatkan lokasi', 'error');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+};
 
 const categories = [
     { name: 'All', icon: MapIcon },
@@ -494,6 +545,23 @@ onMounted(() => {
                        </div>`
                     : '';
 
+                let aksesTransportasiHtml = '';
+                if (objek.akses_transportasi && objek.akses_transportasi.length > 0) {
+                    aksesTransportasiHtml = `
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Akses Transportasi</div>
+                            <ul class="text-[10px] text-slate-600 font-bold space-y-1">
+                                ${objek.akses_transportasi.map(akses => `
+                                    <li class="flex items-start gap-1">
+                                        <svg class="w-3.5 h-3.5 text-emerald-500 mt-[-1px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                        <span>${akses}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="w-72 font-sans p-0 overflow-hidden bg-white flex flex-col">
                         <div class="relative h-40">
@@ -509,6 +577,7 @@ onMounted(() => {
                         </div>
                         <div class="p-5 space-y-4">
                             <p class="text-xs text-slate-500 line-clamp-2 font-medium leading-relaxed">${objek.keterangan || 'Jelajahi keindahan alam yang memukau di destinasi ini.'}</p>
+                            ${aksesTransportasiHtml}
                             <div class="grid grid-cols-2 gap-3">
                                 <a href="/destinasi/${objek.slug}" class="flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
                                     <span>Detail</span>
@@ -618,17 +687,21 @@ onMounted(() => {
 
     map.value.addLayer(umkmClusterGroup.value);
 
-    // Get User Location for Routing
+    // ── Handler lokasi user ──────────────────────────────────────
+    let userLocationMarker = null;
+
+    // Get initial user location silently for routing distance calc
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
             userLocation.value = L.latLng(position.coords.latitude, position.coords.longitude);
-        }, (err) => {
-            console.warn("Geolocation disabled or failed:", err);
-            // Default to Labuan Bajo Port area as start if failed
+        }, () => {
             userLocation.value = L.latLng(-8.4905, 119.8783);
             userLocationName.value = "Labuan Bajo (Default)";
         });
     }
+
+    // Expose userLocationMarker for locateUser()
+    window.__mapRef__ = { map: map.value, getMarker: () => userLocationMarker, setMarker: (m) => { userLocationMarker = m; } };
 });
 
 const startRouting = (id) => {
@@ -722,6 +795,13 @@ const focusToUmkmMarker = (umkm) => {
 @keyframes marker-bounce {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
+}
+
+/* User Location Pulse */
+@keyframes locatePulse {
+    0%   { transform: scale(1);   opacity: 0.8; }
+    70%  { transform: scale(2.8); opacity: 0; }
+    100% { transform: scale(2.8); opacity: 0; }
 }
 .custom-marker:hover .marker-pulse {
     animation: marker-bounce 1s infinite ease-in-out;

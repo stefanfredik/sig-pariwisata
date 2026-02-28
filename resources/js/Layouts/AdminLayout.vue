@@ -29,7 +29,7 @@ const navSections = [
   {
     title: 'Umum',
     items: [
-      { label: 'Dasbor', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
+      { label: 'Dashboard', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
     ]
   },
   {

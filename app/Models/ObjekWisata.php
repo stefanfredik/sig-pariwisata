@@ -25,12 +25,14 @@ class ObjekWisata extends Model
         'rating_avg',
         'review_count',
         'view_count',
+        'akses_transportasi',
     ];
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'rating_avg' => 'decimal:2',
+        'akses_transportasi' => 'array',
     ];
 
     /**

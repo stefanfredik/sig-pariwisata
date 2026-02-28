@@ -23,6 +23,7 @@ const form = useForm({
     alamat: props.objekWisata.alamat,
     no_telepon: props.objekWisata.no_telepon,
     keterangan: props.objekWisata.keterangan || '',
+    akses_transportasi: props.objekWisata.akses_transportasi || [],
     jam_operasional: props.objekWisata.jam_operasional,
     harga_tiket: props.objekWisata.harga_tiket,
     latitude: props.objekWisata.latitude,
@@ -41,6 +42,56 @@ const confirmModal = reactive({
 });
 let map = null;
 let marker = null;
+
+// ── Transportasi Options ──────────────────────────────────────
+const transportOptions = ['Kendaraan Pribadi (Mobil)', 'Kendaraan Pribadi (Motor)', 'Kendaraan Umum / Angkot', 'Bus Pariwisata', 'Bisa Dijangkau Jalan Kaki'];
+
+// ── Jam Operasional Options ──────────────────────────────────
+const jamOptions = [
+    '05:00', '06:00', '07:00', '08:00', '09:00', '10:00',
+    '11:00', '12:00', '13:00', '14:00', '15:00', '16:00',
+    '17:00', '18:00', '19:00', '20:00', '21:00', '22:00',
+    '23:00', '24:00'
+];
+
+let initialBuka = '08:00';
+let initialTutup = '17:00';
+
+if (props.objekWisata.jam_operasional) {
+    const parts = props.objekWisata.jam_operasional.split(' - ');
+    if (parts.length === 2) {
+        initialBuka = parts[0].trim();
+        initialTutup = parts[1].replace('WITA', '').trim();
+    }
+}
+
+const waktu_buka = ref(initialBuka);
+const waktu_tutup = ref(initialTutup);
+
+// ── Format Harga Tiket ────────────────────────────────────────
+const formatRupiah = (angka) => {
+    if (!angka) return '';
+    const number_string = angka.toString().replace(/[^,\d]/g, '');
+    const split = number_string.split(',');
+    const sisa = split[0].length % 3;
+    let rupiah = split[0].substr(0, sisa);
+    const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+    if (ribuan) {
+        const separator = sisa ? '.' : '';
+        rupiah += separator + ribuan.join('.');
+    }
+    return split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+};
+
+const hargaDisplay = ref(formatRupiah(form.harga_tiket));
+
+const onHargaInput = (e) => {
+    let rawValue = e.target.value.replace(/[^,\d]/g, '');
+    let parsedRupiah = formatRupiah(rawValue);
+    hargaDisplay.value = parsedRupiah;
+    form.harga_tiket = rawValue ? parseInt(rawValue.replace(/\./g, '')) : null;
+};
 
 onMounted(() => {
     map = L.map('map').setView([form.latitude, form.longitude], 12);
@@ -105,6 +156,9 @@ const handleConfirmDelete = () => {
 };
 
 const submit = () => {
+    // Gabungkan waktu buka & tutup
+    form.jam_operasional = `${waktu_buka.value} - ${waktu_tutup.value} WITA`;
+
     form.post(route('admin.objek-wisata.update', props.objekWisata.id), {
         forceFormData: true,
     });
@@ -161,6 +215,17 @@ const submit = () => {
                         <Textarea v-model="form.keterangan" rows="4" class="rounded-xl border-slate-200" />
                         <p v-if="form.errors.keterangan" class="text-xs text-red-500 font-medium">{{ form.errors.keterangan }}</p>
                     </div>
+
+                    <div class="space-y-3">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 border-t pt-4 block mt-4">Akses Transportasi</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label v-for="opsi in transportOptions" :key="opsi" class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+                                <input type="checkbox" :value="opsi" v-model="form.akses_transportasi" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-700" />
+                                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">{{ opsi }}</span>
+                            </label>
+                        </div>
+                        <p v-if="form.errors.akses_transportasi" class="text-xs text-red-500 font-medium">{{ form.errors.akses_transportasi }}</p>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -180,12 +245,42 @@ const submit = () => {
 
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase tracking-widest text-slate-500">Jam Operasional</label>
-                        <Input v-model="form.jam_operasional" class="rounded-xl border-slate-200 h-11" />
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Buka</label>
+                                <select
+                                    v-model="waktu_buka"
+                                    class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-bold text-slate-800 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                >
+                                    <option v-for="jam in jamOptions" :key="jam" :value="jam">{{ jam }}</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Tutup</label>
+                                <select
+                                    v-model="waktu_tutup"
+                                    class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 text-sm font-bold text-slate-800 dark:text-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                >
+                                    <option v-for="jam in jamOptions" :key="jam" :value="jam">{{ jam }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium">Akan disimpan sebagai: <span class="font-black text-slate-600">{{ waktu_buka }} - {{ waktu_tutup }} WITA</span></p>
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase tracking-widest text-slate-500">Harga Tiket</label>
-                        <Input v-model="form.harga_tiket" class="rounded-xl border-slate-200 h-11" />
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-slate-500 select-none">Rp</span>
+                            <input
+                                :value="hargaDisplay"
+                                @input="onHargaInput"
+                                inputmode="numeric"
+                                placeholder="0"
+                                class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                            />
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium">Kosongkan jika gratis</p>
                     </div>
                 </CardContent>
             </Card>
