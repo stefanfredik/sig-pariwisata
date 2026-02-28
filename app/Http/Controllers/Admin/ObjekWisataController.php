@@ -71,7 +71,7 @@ class ObjekWisataController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'fotos' => 'required|array|min:1',
-            'fotos.*' => 'image|mimes:jpeg,png,jpg|max:10240', // 10MB
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240', // 10MB
             'akses_transportasi' => 'nullable|array',
             'akses_transportasi.*' => 'string',
         ]);
@@ -157,7 +157,7 @@ class ObjekWisataController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'new_fotos' => 'nullable|array',
-            'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
             'akses_transportasi' => 'nullable|array',
             'akses_transportasi.*' => 'string',
         ]);
