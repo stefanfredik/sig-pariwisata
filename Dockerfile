@@ -54,6 +54,9 @@ RUN mkdir -p /var/www/html/storage/framework/cache/data \
     && chmod -R 775 /var/www/html/storage \
     /var/www/html/bootstrap/cache
 
+# Copy PHP configuration
+COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
+
 # Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
