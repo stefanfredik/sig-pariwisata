@@ -63,7 +63,7 @@ class FasilitasWisataController extends Controller
             'deskripsi' => 'nullable|string|max:500',
             'icon' => 'nullable|string|max:50',
             'fotos' => 'nullable|array',
-            'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
         ]);
 
         $fasilitas = $this->fasilitasRepo->create($validated);
@@ -130,7 +130,7 @@ class FasilitasWisataController extends Controller
             'deskripsi' => 'nullable|string|max:500',
             'icon' => 'nullable|string|max:50',
             'new_fotos' => 'nullable|array',
-            'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
         ]);
 
         $this->fasilitasRepo->update($id, $validated);
