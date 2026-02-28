@@ -453,16 +453,35 @@ onMounted(() => {
             const icon = L.divIcon({
                 className: 'custom-marker',
                 html: `
-                    <div class="relative group cursor-pointer">
-                        <div class="w-12 h-12 rounded-2xl bg-white border-4 border-blue-600 shadow-2xl flex items-center justify-center overflow-hidden">
-                            <img src="${objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'}" class="w-full h-full object-cover">
+                    <div style="position:relative;width:52px;height:66px;cursor:pointer;">
+                        <!-- Pin circle -->
+                        <div style="
+                            position:absolute;top:0;left:0;
+                            width:52px;height:52px;
+                            border-radius:50%;
+                            background:#2563EB;
+                            box-shadow:0 6px 20px rgba(37,99,235,0.55);
+                            display:flex;align-items:center;justify-content:center;
+                            border:3px solid #fff;
+                        ">
+                            <!-- Photo clipped in circle -->
+                            <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;">
+                                <img src="${objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'}" style="width:100%;height:100%;object-fit:cover;">
+                            </div>
                         </div>
-                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-blue-600 rotate-45 transform shadow-lg"></div>
+                        <!-- Tail -->
+                        <div style="
+                            position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+                            width:0;height:0;
+                            border-left:8px solid transparent;
+                            border-right:8px solid transparent;
+                            border-top:16px solid #fff;
+                        "></div>
                     </div>
                 `,
-                iconSize: [48, 58],
-                iconAnchor: [24, 58],
-                popupAnchor: [0, -60]
+                iconSize: [52, 66],
+                iconAnchor: [26, 66],
+                popupAnchor: [0, -68]
             });
 
             const marker = L.marker([objek.latitude, objek.longitude], { icon });
@@ -529,27 +548,52 @@ onMounted(() => {
     });
 
     if (props.umkms) {
+        const umkmIconMap = {
+            'Warung makan': '🍽️',
+            'Kios': '🛒',
+            'Villa': '🏡',
+            'Hotel': '🏨',
+            'Penginapan': '🛏️',
+        };
+
         props.umkms.forEach(umkm => {
             const imgSrc = (umkm.fotos && umkm.fotos.length > 0)
                 ? '/storage/' + umkm.fotos[0].path
                 : null;
+            const categoryEmoji = umkmIconMap[umkm.kategori] || '🏪';
 
             const icon = L.divIcon({
                 className: 'custom-marker-umkm',
                 html: `
-                    <div class="relative group cursor-pointer">
-                        <div class="w-12 h-12 rounded-2xl bg-white border-4 border-amber-500 shadow-2xl flex items-center justify-center overflow-hidden">
+                    <div style="position:relative;width:52px;height:66px;cursor:pointer;">
+                        <!-- Pin circle -->
+                        <div style="
+                            position:absolute;top:0;left:0;
+                            width:52px;height:52px;
+                            border-radius:50%;
+                            background:#f59e0b;
+                            box-shadow:0 6px 20px rgba(245,158,11,0.55);
+                            display:flex;align-items:center;justify-content:center;
+                            border:3px solid #fff;
+                        ">
                             ${imgSrc
-                                ? `<img src="${imgSrc}" class="w-full h-full object-cover">`
-                                : `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
+                                ? `<div style="width:44px;height:44px;border-radius:50%;overflow:hidden;"><img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;"></div>`
+                                : `<span style="font-size:22px;line-height:1;">${categoryEmoji}</span>`
                             }
                         </div>
-                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 bg-amber-500 rotate-45 transform shadow-lg"></div>
+                        <!-- Tail -->
+                        <div style="
+                            position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+                            width:0;height:0;
+                            border-left:8px solid transparent;
+                            border-right:8px solid transparent;
+                            border-top:16px solid #fff;
+                        "></div>
                     </div>
                 `,
-                iconSize: [48, 58],
-                iconAnchor: [24, 58],
-                popupAnchor: [0, -60]
+                iconSize: [52, 66],
+                iconAnchor: [26, 66],
+                popupAnchor: [0, -68]
             });
 
             const marker = L.marker([umkm.latitude, umkm.longitude], { icon });

@@ -294,6 +294,50 @@
                                 </a>
                             </div>
                         </div>
+
+                        <!-- Nearby UMKM Card -->
+                        <div v-if="nearbyUmkms && nearbyUmkms.length > 0" class="bg-white rounded-[3rem] border border-gray-100 p-8 shadow-sm space-y-6">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-1 bg-amber-500 rounded-full"></div>
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">UMKM Terdekat</h4>
+                            </div>
+                            <div class="space-y-4">
+                                <div 
+                                    v-for="umkm in nearbyUmkms" 
+                                    :key="umkm.id" 
+                                    class="flex items-center gap-4 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100/60 hover:border-amber-200 transition-all group"
+                                >
+                                    <!-- Photo / Emoji -->
+                                    <div class="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-100 flex items-center justify-center shadow-inner">
+                                        <img 
+                                            v-if="umkm.fotos && umkm.fotos.length > 0" 
+                                            :src="'/storage/' + umkm.fotos[0].path" 
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        >
+                                        <span v-else class="text-2xl">{{ getUmkmEmoji(umkm.kategori) }}</span>
+                                    </div>
+                                    <!-- Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 text-[9px] font-black uppercase tracking-wide leading-none">{{ umkm.kategori }}</span>
+                                        </div>
+                                        <p class="font-black text-gray-900 text-sm truncate leading-tight group-hover:text-amber-700 transition-colors">{{ umkm.nama_umkm }}</p>
+                                        <div class="flex items-center gap-1 mt-1">
+                                            <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/></svg>
+                                            <span class="text-[10px] font-bold text-amber-600">{{ Number(umkm.distance).toFixed(1) }} km dari sini</span>
+                                        </div>
+                                    </div>
+                                    <!-- Direction Button -->
+                                    <button 
+                                        @click="openDirection(umkm)" 
+                                        title="Petunjuk Arah"
+                                        class="w-10 h-10 flex-shrink-0 rounded-2xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white flex items-center justify-center shadow-lg shadow-amber-500/30 transition-all"
+                                    >
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -311,6 +355,7 @@ import 'leaflet/dist/leaflet.css';
 const props = defineProps({
     objekWisata: Object,
     isFavorited: Boolean,
+    nearbyUmkms: Array,
 });
 
 const toggleFavorite = () => {
@@ -402,6 +447,21 @@ const formatDate = (dateString) => {
         year: 'numeric'
     });
 };
+
+const openDirection = (umkm) => {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${umkm.latitude},${umkm.longitude}`;
+    window.open(url, '_blank');
+};
+
+const umkmIconMap = {
+    'Warung makan': '🍽️',
+    'Kios': '🛒',
+    'Villa': '🏡',
+    'Hotel': '🏨',
+    'Penginapan': '🛏️',
+};
+
+const getUmkmEmoji = (kategori) => umkmIconMap[kategori] || '🏪';
 </script>
 
 <style scoped>

@@ -49,9 +49,22 @@ class ObjekWisataController extends Controller
                 ->exists();
         }
 
+        $lat = $objekWisata->latitude;
+        $lng = $objekWisata->longitude;
+
+        $nearbyUmkms = Umkm::with('fotos')
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->selectRaw("*, ( 6371 * acos( cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)) ) ) AS distance", [$lat, $lng, $lat])
+            ->having('distance', '<=', 20)
+            ->orderBy('distance')
+            ->limit(5)
+            ->get();
+
         return Inertia::render('Public/ObjekWisata/Show', [
             'objekWisata' => $objekWisata,
             'isFavorited' => $isFavorited,
+            'nearbyUmkms' => $nearbyUmkms,
         ]);
     }
 
