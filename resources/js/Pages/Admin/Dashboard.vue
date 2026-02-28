@@ -12,7 +12,9 @@ import {
     AlertCircle, 
     ExternalLink 
 } from 'lucide-vue-next'
+// @ts-ignore
 import VisitorChart from '@/Components/Dashboard/VisitorChart.vue'
+// @ts-ignore
 import TopDestinationsChart from '@/Components/Dashboard/TopDestinationsChart.vue'
 
 defineProps<{
@@ -135,12 +137,12 @@ defineProps<{
                                 </div>
                             </div>
                              <div v-if="recentReviews.length === 0" class="text-center text-sm text-muted-foreground py-4">
-                                Belum ada review pendng.
+                                Belum ada ulasan yang menunggu persetujuan.
                              </div>
                          </div>
                          <div class="mt-4 pt-2">
                              <Button variant="outline" class="w-full" as-child>
-                                <Link :href="route('admin.reviews.index')">Lihat Semua Review</Link>
+                                <Link :href="route('admin.reviews.index')">Lihat Semua Ulasan</Link>
                              </Button>
                          </div>
                     </CardContent>
@@ -174,30 +176,6 @@ defineProps<{
                     </CardContent>
                 </Card>
             </div>
-            
-             <!-- Quick Actions -->
-             <Card>
-                <CardHeader>
-                     <CardTitle>Akses Cepat</CardTitle>
-                </CardHeader>
-                <CardContent class="flex gap-4 flex-wrap">
-                    <Button as-child>
-                         <Link :href="route('admin.kecamatan.create')">
-                            <MapIcon class="mr-2 h-4 w-4"/> Tambah Kecamatan
-                         </Link>
-                    </Button>
-                    <Button variant="secondary" as-child>
-                         <Link :href="route('admin.objek-wisata.create')">
-                            <Mountain class="mr-2 h-4 w-4"/> Tambah Objek Wisata
-                         </Link>
-                    </Button>
-                    <Button variant="secondary" as-child>
-                         <Link :href="route('admin.events.create')">
-                            <Calendar class="mr-2 h-4 w-4"/> Tambah Event
-                         </Link>
-                    </Button>
-                </CardContent>
-             </Card>
         </div>
     </AdminLayout>
 </template>

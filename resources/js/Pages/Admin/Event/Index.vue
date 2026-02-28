@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 
 const props = defineProps<{
     events: {
@@ -46,10 +47,10 @@ const params = reactive({
 })
 
 const sortOptions = [
-    { label: 'Newest', value: 'tanggal_mulai,desc' },
-    { label: 'Oldest', value: 'tanggal_mulai,asc' },
-    { label: 'Name (A-Z)', value: 'nama_event,asc' },
-    { label: 'Name (Z-A)', value: 'nama_event,desc' },
+    { label: 'Terbaru', value: 'tanggal_mulai,desc' },
+    { label: 'Terlama', value: 'tanggal_mulai,asc' },
+    { label: 'Nama (A-Z)', value: 'nama_event,asc' },
+    { label: 'Nama (Z-A)', value: 'nama_event,desc' },
 ]
 
 const currentSort = computed(() => `${params.sort_field},${params.sort_direction}`)
@@ -134,14 +135,14 @@ const formatDate = (dateString: string) => {
             <!-- Header Section -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Event Management</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage events and schedules.</p>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Event & Acara</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola data event dan jadwal pariwisata.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <Button variant="outline" class="bg-white px-4 py-2 border-slate-200 text-slate-700">Export</Button>
+                    
                     <Button as-child class="bg-primary hover:bg-primary/90 text-white px-4 py-2">
                         <Link :href="route('admin.events.create')">
-                            <Plus class="mr-2 h-4 w-4" /> New Event
+                            <Plus class="mr-2 h-4 w-4" /> Event Baru
                         </Link>
                     </Button>
                 </div>
@@ -157,32 +158,43 @@ const formatDate = (dateString: string) => {
                     @update:search="params.search = $event" 
                     @update:sort="handleSort"
                     @reset="resetFilters"
-                    placeholder="Search events..."
+                    placeholder="Cari event..."
                 >
                     <template #filters>
-                         <div class="grid gap-2">
-                            <label class="text-xs font-medium text-slate-500">Filters</label>
-                            <select
-                                v-model="params.id_objek"
-                                @change="updateParams"
-                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All Locations</option>
-                                <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
-                                    {{ objek.nama_objek }}
-                                </option>
-                            </select>
+                        <div class="grid gap-4 md:grid-cols-2">
+                             <div class="grid gap-2">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500">Lokasi</label>
+                                <Select v-model="params.id_objek" @update:modelValue="updateParams">
+                                    <SelectTrigger class="h-9 rounded-lg border-slate-200">
+                                        <SelectValue placeholder="Semua Lokasi" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem :value="''">Semua Lokasi</SelectItem>
+                                            <SelectItem v-for="objek in objekWisatas" :key="objek.id" :value="String(objek.id)">
+                                                {{ objek.nama_objek }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-                             <select
-                                v-model="params.status"
-                                @change="updateParams"
-                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All Status</option>
-                                <option value="upcoming">Upcoming</option>
-                                <option value="ongoing">Ongoing</option>
-                                <option value="past">Past</option>
-                            </select>
+                             <div class="grid gap-2">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500">Status</label>
+                                <Select v-model="params.status" @update:modelValue="updateParams">
+                                    <SelectTrigger class="h-9 rounded-lg border-slate-200">
+                                        <SelectValue placeholder="Semua Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem :value="''">Semua Status</SelectItem>
+                                            <SelectItem value="upcoming">Akan Datang</SelectItem>
+                                            <SelectItem value="ongoing">Sedang Berlangsung</SelectItem>
+                                            <SelectItem value="past">Selesai</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </template>
                 </DataTableToolbar>
@@ -192,10 +204,10 @@ const formatDate = (dateString: string) => {
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Event Name</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Date Range</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Location</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama Event</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rentang Tanggal</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Lokasi</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -223,7 +235,7 @@ const formatDate = (dateString: string) => {
                                             <MapPin class="h-3 w-3 mr-1" />
                                             {{ event.objek_wisata.nama_objek }}
                                         </span>
-                                        <span v-else class="text-xs text-slate-400 italic">General Location</span>
+                                        <span v-else class="text-xs text-slate-400 italic">Lokasi Umum</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-right">
@@ -246,7 +258,7 @@ const formatDate = (dateString: string) => {
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem @click="confirmDelete(event.id)" class="text-destructive cursor-pointer">
-                                                <Trash2 class="mr-2 h-4 w-4" /> Delete
+                                                <Trash2 class="mr-2 h-4 w-4" /> Hapus
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -254,7 +266,7 @@ const formatDate = (dateString: string) => {
                              </tr>
                               <tr v-if="events.data.length === 0">
                                 <td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">
-                                    No events found.
+                                    Tidak ada data event yang ditemukan.
                                 </td>
                             </tr>
                         </tbody>

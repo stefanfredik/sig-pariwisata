@@ -28,7 +28,7 @@
                             v-model="searchQuery"
                             @input="handleSearch"
                             type="text" 
-                            placeholder="Cari destinasi atau event..."
+                            placeholder="Cari Destinasi"
                             class="w-full border-transparent rounded-2xl py-2.5 pl-11 pr-4 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                             :class="[
                                 (isScrolled || forceSolid) 
@@ -206,14 +206,6 @@
                                 <span>info@sig-wisata.go.id</span>
                             </li>
                         </ul>
-                    </div>
-                </div>
-                
-                <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold text-gray-500 uppercase tracking-widest">
-                    <p>&copy; 2026 SIG Wisata Manggarai Barat. Developed for Excellence.</p>
-                    <div class="flex gap-6">
-                        <a href="#" class="hover:text-white">Privacy Policy</a>
-                        <a href="#" class="hover:text-white">Terms of Service</a>
                     </div>
                 </div>
             </div>

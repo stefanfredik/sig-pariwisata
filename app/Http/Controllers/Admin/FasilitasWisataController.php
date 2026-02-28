@@ -33,11 +33,9 @@ class FasilitasWisataController extends Controller
         $sortDirection = $request->get('sort_direction', 'desc');
 
         $fasilitas = $this->fasilitasRepo->paginate(10, $filters, $sortField, $sortDirection);
-        $objekWisatas = ObjekWisata::all();
 
         return Inertia::render('Admin/FasilitasWisata/Index', [
             'fasilitas' => $fasilitas,
-            'objekWisatas' => $objekWisatas,
             'filters' => array_merge($filters, [
                 'sort_field' => $sortField,
                 'sort_direction' => $sortDirection,
@@ -50,9 +48,7 @@ class FasilitasWisataController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/FasilitasWisata/Create', [
-            'objekWisatas' => ObjekWisata::all(),
-        ]);
+        return Inertia::render('Admin/FasilitasWisata/Create');
     }
 
     /**
@@ -65,8 +61,6 @@ class FasilitasWisataController extends Controller
             'nama_fasilitas' => 'required|string|max:50',
             'kategori_fasilitas' => 'nullable|string|max:50',
             'deskripsi' => 'nullable|string|max:500',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
             'icon' => 'nullable|string|max:50',
             'fotos' => 'nullable|array',
             'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
@@ -94,7 +88,7 @@ class FasilitasWisataController extends Controller
 
         Cache::forget('public.map.data');
 
-        return redirect()->route('admin.fasilitas-wisata.index')
+        return redirect()->route('admin.objek-wisata.show', $validated['id_objek'])
             ->with('message', 'Fasilitas berhasil ditambahkan.');
     }
 
@@ -121,7 +115,6 @@ class FasilitasWisataController extends Controller
 
         return Inertia::render('Admin/FasilitasWisata/Edit', [
             'fasilitas' => $fasilitas,
-            'objekWisatas' => ObjekWisata::all(),
         ]);
     }
 
@@ -135,8 +128,6 @@ class FasilitasWisataController extends Controller
             'nama_fasilitas' => 'required|string|max:50',
             'kategori_fasilitas' => 'nullable|string|max:50',
             'deskripsi' => 'nullable|string|max:500',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
             'icon' => 'nullable|string|max:50',
             'new_fotos' => 'nullable|array',
             'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
@@ -164,7 +155,7 @@ class FasilitasWisataController extends Controller
 
         Cache::forget('public.map.data');
 
-        return redirect()->route('admin.fasilitas-wisata.index')
+        return redirect()->route('admin.objek-wisata.show', $validated['id_objek'])
             ->with('message', 'Fasilitas berhasil diupdate.');
     }
 
@@ -185,7 +176,7 @@ class FasilitasWisataController extends Controller
 
         Cache::forget('public.map.data');
 
-        return redirect()->route('admin.fasilitas-wisata.index')
+        return redirect()->route('admin.objek-wisata.show', $fasilitas->id_objek)
             ->with('message', 'Fasilitas berhasil dihapus.');
     }
 

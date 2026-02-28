@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 
 const props = defineProps<{
     kecamatans: {
@@ -123,15 +124,13 @@ const handleDelete = () => {
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Kelola Kecamatan</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and monitor all active districts.</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola dan pantau semua data kecamatan.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <Button variant="outline" class="bg-white px-4 py-2 border-slate-200 text-slate-700">
-                        Export
-                    </Button>
+                    
                     <Button as-child class="bg-primary hover:bg-primary/90 text-white px-4 py-2">
                         <Link :href="route('admin.kecamatan.create')">
-                            <Plus class="mr-2 h-4 w-4" /> New Kecamatan
+                            <Plus class="mr-2 h-4 w-4" /> Kecamatan Baru
                         </Link>
                     </Button>
                 </div>
@@ -147,20 +146,23 @@ const handleDelete = () => {
                     @update:search="params.search = $event" 
                     @update:sort="handleSort"
                     @reset="resetSearch" 
-                    placeholder="Search kecamatan..."
+                    placeholder="Cari kecamatan..."
                 >
                     <template #filters>
                          <div class="grid gap-2">
-                            <label class="text-xs font-medium text-slate-500">Object Suitability</label>
-                            <select
-                                v-model="params.has_objects"
-                                @change="updateParams"
-                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All Districts</option>
-                                <option value="yes">With Objects</option>
-                                <option value="no">Empty / No Objects</option>
-                            </select>
+                             <label class="text-xs font-black uppercase tracking-widest text-slate-500">Kesesuaian Objek</label>
+                            <Select v-model="params.has_objects" @update:modelValue="updateParams">
+                                <SelectTrigger class="h-9 rounded-lg border-slate-200">
+                                    <SelectValue placeholder="Semua Kecamatan" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem :value="''">Semua Kecamatan</SelectItem>
+                                        <SelectItem value="yes">Dengan Objek</SelectItem>
+                                        <SelectItem value="no">Kosong / Tanpa Objek</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </template>
                 </DataTableToolbar>
@@ -173,8 +175,8 @@ const handleDelete = () => {
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama Kecamatan</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Objek</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Last Active</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Terakhir Aktif</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -191,12 +193,12 @@ const handleDelete = () => {
                                 </td>
                                 <td class="px-6 py-4">
                                      <div class="flex items-center gap-2">
-                                        <span class="text-sm text-slate-600 dark:text-slate-300">{{ kecamatan.objek_wisatas_count || 0 }} objects</span>
+                                        <span class="text-sm text-slate-600 dark:text-slate-300">{{ kecamatan.objek_wisatas_count || 0 }} objek</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-                                        Active
+                                        Aktif
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
@@ -222,7 +224,7 @@ const handleDelete = () => {
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem @click="confirmDelete(kecamatan.id)" class="text-destructive cursor-pointer">
-                                                <Trash2 class="mr-2 h-4 w-4" /> Delete
+                                                <Trash2 class="mr-2 h-4 w-4" /> Hapus
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -230,7 +232,7 @@ const handleDelete = () => {
                             </tr>
                              <tr v-if="kecamatans.data.length === 0">
                                 <td colspan="5" class="px-6 py-4 text-center text-sm text-slate-500">
-                                    No projects found.
+                                    Tidak ada data kecamatan yang ditemukan.
                                 </td>
                             </tr>
                         </tbody>

@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 
 const props = defineProps<{
     objekWisatas: {
@@ -47,11 +48,11 @@ const params = reactive({
 })
 
 const sortOptions = [
-    { label: 'Newest', value: 'created_at,desc' },
-    { label: 'Oldest', value: 'created_at,asc' },
-    { label: 'Name (A-Z)', value: 'nama_objek,asc' },
-    { label: 'Name (Z-A)', value: 'nama_objek,desc' },
-    { label: 'Ticket Price (Low-High)', value: 'harga_tiket,asc' },
+    { label: 'Terbaru', value: 'created_at,desc' },
+    { label: 'Terlama', value: 'created_at,asc' },
+    { label: 'Nama (A-Z)', value: 'nama_objek,asc' },
+    { label: 'Nama (Z-A)', value: 'nama_objek,desc' },
+    { label: 'Harga Tiket (Rendah-Tinggi)', value: 'harga_tiket,asc' },
 ]
 
 const currentSort = computed(() => `${params.sort_field},${params.sort_direction}`)
@@ -128,13 +129,13 @@ const handleDelete = () => {
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Objek Wisata</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage tourism objects and destinations.</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola data objek wisata dan destinasi pariwisata.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <Button variant="outline" class="bg-white px-4 py-2 border-slate-200 text-slate-700">Export</Button>
+                    
                     <Button as-child class="bg-primary hover:bg-primary/90 text-white px-4 py-2">
                         <Link :href="route('admin.objek-wisata.create')">
-                            <Plus class="mr-2 h-4 w-4" /> New Object
+                            <Plus class="mr-2 h-4 w-4" /> Objek Wisata Baru
                         </Link>
                     </Button>
                 </div>
@@ -150,21 +151,24 @@ const handleDelete = () => {
                     @update:search="params.search = $event"
                     @update:sort="handleSort"
                     @reset="resetFilters"
-                    placeholder="Search objects..."
+                    placeholder="Cari objek wisata..."
                 >
                     <template #filters>
                          <div class="grid gap-2">
-                             <label class="text-xs font-medium text-slate-500">Location</label>
-                             <select
-                                v-model="params.id_kecamatan"
-                                @change="updateParams"
-                                class="h-9 w-full px-3 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary"
-                            >
-                                <option value="">All Locations</option>
-                                <option v-for="kec in kecamatans" :key="kec.id" :value="kec.id">
-                                    {{ kec.nama_kecamatan }}
-                                </option>
-                            </select>
+                             <label class="text-xs font-black uppercase tracking-widest text-slate-500">Lokasi</label>
+                             <Select v-model="params.id_kecamatan" @update:modelValue="updateParams">
+                                <SelectTrigger class="h-9 rounded-lg border-slate-200">
+                                    <SelectValue placeholder="Semua Lokasi" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem :value="''">Semua Lokasi</SelectItem>
+                                        <SelectItem v-for="kec in kecamatans" :key="kec.id" :value="String(kec.id)">
+                                            {{ kec.nama_kecamatan }}
+                                        </SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                             </Select>
                         </div>
                     </template>
                 </DataTableToolbar>
@@ -174,12 +178,12 @@ const handleDelete = () => {
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Destination Name</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Owner / Location</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama Destinasi</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pemilik / Lokasi</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rating</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Completion</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Kelengkapan</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-700">

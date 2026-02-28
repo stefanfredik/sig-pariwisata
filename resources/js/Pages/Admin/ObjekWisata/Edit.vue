@@ -1,231 +1,16 @@
-```html
-<template>
-    <AdminLayout>
-        <div class="max-w-4xl">
-            <!-- Header -->
-            <div class="mb-6 flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Edit Objek Wisata</h2>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Perbarui data {{ objekWisata.nama_objek }}</p>
-                </div>
-                <Button variant="outline" as-child>
-                    <Link :href="route('admin.objek-wisata.index')">
-                        <ArrowLeft class="w-4 h-4 mr-2" />
-                        Kembali
-                    </Link>
-                </Button>
-            </div>
-
-            <!-- Form -->
-            <form @submit.prevent="submit" class="space-y-6">
-                <!-- Basic Info -->
-                <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 space-y-6 border border-slate-200 dark:border-slate-700">
-                    <h3 class="text-lg font-medium text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">Informasi Dasar</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Objek Wisata <span class="text-red-500">*</span></label>
-                            <Input
-                                v-model="form.nama_objek"
-                                type="text"
-                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.nama_objek }"
-                            />
-                            <p v-if="form.errors.nama_objek" class="mt-1 text-sm text-red-600">{{ form.errors.nama_objek }}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kecamatan <span class="text-red-500">*</span></label>
-                            <select
-                                v-model="form.id_kecamatan"
-                                class="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus-visible:ring-slate-300"
-                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.id_kecamatan }"
-                            >
-                                <option v-for="kec in kecamatans" :key="kec.id" :value="kec.id">
-                                    {{ kec.nama_kecamatan }}
-                                </option>
-                            </select>
-                            <p v-if="form.errors.id_kecamatan" class="mt-1 text-sm text-red-600">{{ form.errors.id_kecamatan }}</p>
-                        </div>
-
-                        <!-- Alamat -->
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Alamat Lengkap <span class="text-red-500">*</span>
-                            </label>
-                            <Input
-                                v-model="form.alamat"
-                                type="text"
-                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.alamat }"
-                            />
-                            <p v-if="form.errors.alamat" class="mt-1 text-sm text-red-600">{{ form.errors.alamat }}</p>
-                        </div>
-
-                        <!-- No Telepon -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                No. Telepon
-                            </label>
-                            <Input
-                                v-model="form.no_telepon"
-                                type="text"
-                            />
-                        </div>
-
-                        <!-- Jam Operasional -->
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Jam Operasional
-                            </label>
-                            <Input
-                                v-model="form.jam_operasional"
-                                type="text"
-                            />
-                        </div>
-
-                        <!-- Harga Tiket -->
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Harga Tiket
-                            </label>
-                            <Input
-                                v-model="form.harga_tiket"
-                                type="text"
-                            />
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Keterangan <span class="text-red-500">*</span></label>
-                        <Textarea
-                            v-model="form.keterangan"
-                            rows="4"
-                            :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.keterangan }"
-                        />
-                        <p v-if="form.errors.keterangan" class="mt-1 text-sm text-red-600">{{ form.errors.keterangan }}</p>
-                    </div>
-                </div>
-
-                <!-- Location -->
-                <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 space-y-6 border border-slate-200 dark:border-slate-700">
-                    <h3 class="text-lg font-medium text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2">Lokasi Geografis</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1 uppercase tracking-wider">Latitude</label>
-                            <Input v-model="form.latitude" type="text" class="bg-slate-50 dark:bg-slate-900" readonly />
-                        </div>
-                        <div>
-                            <label class="block text-xs text-slate-500 mb-1 uppercase tracking-wider">Longitude</label>
-                            <Input v-model="form.longitude" type="text" class="bg-slate-50 dark:bg-slate-900" readonly />
-                        </div>
-                    </div>
-                    <div id="map" class="h-80 w-full rounded-lg border border-slate-300 dark:border-slate-700 shadow-inner"></div>
-                </div>
-
-                <!-- Photo Management -->
-                <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 space-y-6 border border-slate-200 dark:border-slate-700">
-                    <h3 class="text-lg font-medium text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 flex items-center gap-2">
-                        <ImageIcon class="w-5 h-5 text-slate-400" />
-                        Manajemen Foto
-                    </h3>
-                    
-                    <!-- Existing Photos -->
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div v-for="foto in objekWisata.fotos" :key="foto.id" class="relative group aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all">
-                            <img :src="'/storage/' + foto.path" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            <div v-if="foto.is_primary" class="absolute top-0 left-0 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-br font-bold uppercase tracking-wider shadow z-10">Primary</div>
-                            
-                            <!-- Overlay Actions -->
-                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 z-20">
-                                <button 
-                                    v-if="!foto.is_primary" 
-                                    @click.prevent="setPrimary(foto.id)" 
-                                    class="bg-white text-slate-900 p-2 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors shadow-lg active:scale-90" 
-                                    title="Set as Primary"
-                                >
-                                    <Star class="w-4 h-4" />
-                                </button>
-                                <button 
-                                    @click.prevent="deletePhoto(foto.id)" 
-                                    class="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-lg active:scale-90" 
-                                    title="Hapus Photo"
-                                >
-                                    <Trash2 class="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- New Photo Upload -->
-                    <div class="mt-8 border-t border-slate-200 dark:border-slate-700 pt-8">
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Tambah Foto Baru</label>
-                        <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-md hover:border-primary transition-colors group">
-                            <div class="space-y-1 text-center">
-                                <UploadCloud class="h-12 w-12 text-slate-400 group-hover:text-primary transition-colors" />
-                                <div class="flex text-sm text-slate-600 dark:text-slate-400">
-                                    <label for="file-upload" class="relative cursor-pointer bg-transparent rounded-md font-medium text-primary hover:text-primary/80">
-                                        <span>Upload foto extra</span>
-                                        <input id="file-upload" name="file-upload" type="file" class="sr-only" @change="handleFileUpload" multiple accept="image/*" />
-                                    </label>
-                                    <p class="pl-1">atau drag and drop</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="previews.length" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div v-for="(src, index) in previews" :key="index" class="relative group aspect-video rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
-                                <img :src="src" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                                <button 
-                                    @click.prevent="removePreview(index)" 
-                                    class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-700 active:scale-90"
-                                >
-                                    <X class="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                    <Button
-                        type="submit"
-                        :disabled="form.processing"
-                        class="bg-primary hover:bg-primary/90 text-white"
-                    >
-                        <Save class="w-4 h-4 mr-2" />
-                        <span v-if="form.processing">Memperbarui...</span>
-                        <span v-else>Update Objek Wisata</span>
-                    </Button>
-                    <Button
-                        variant="outline"
-                        as-child
-                    >
-                        <Link :href="route('admin.objek-wisata.index')">
-                            <ArrowLeft class="w-4 h-4 mr-2" />
-                            Batal
-                        </Link>
-                    </Button>
-                </div>
-            </form>
-        </div>
-
-        <ConfirmDialog 
-            v-model:open="confirmModal.show"
-            :title="confirmModal.title"
-            :description="confirmModal.description"
-            :loading="confirmModal.loading"
-            @confirm="handleConfirmDelete"
-        />
-    </AdminLayout>
-</template>
-
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { useForm, router, Link } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import Textarea from '@/Components/ui/textarea/Textarea.vue';
-import { Save, ArrowLeft, Image as ImageIcon, Star, Trash2, UploadCloud, X } from 'lucide-vue-next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Save, UploadCloud, X, Mountain, MapPin, Phone, Clock, Trash2, Star, Image as ImageIcon } from 'lucide-vue-next';
+import AdminFormLayout from '@/Components/Admin/AdminFormLayout.vue';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
-import { reactive } from 'vue';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const props = defineProps({
     objekWisata: Object,
@@ -233,16 +18,17 @@ const props = defineProps({
 });
 
 const form = useForm({
-    id_kecamatan: props.objekWisata.id_kecamatan,
+    id_kecamatan: String(props.objekWisata.id_kecamatan),
     nama_objek: props.objekWisata.nama_objek,
     alamat: props.objekWisata.alamat,
     no_telepon: props.objekWisata.no_telepon,
-    keterangan: props.objekWisata.keterangan,
+    keterangan: props.objekWisata.keterangan || '',
     jam_operasional: props.objekWisata.jam_operasional,
     harga_tiket: props.objekWisata.harga_tiket,
     latitude: props.objekWisata.latitude,
     longitude: props.objekWisata.longitude,
     new_fotos: [],
+    _method: 'PUT',
 });
 
 const previews = ref([]);
@@ -258,7 +44,10 @@ let marker = null;
 
 onMounted(() => {
     map = L.map('map').setView([form.latitude, form.longitude], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
     marker = L.marker([form.latitude, form.longitude], { draggable: true }).addTo(map);
 
     marker.on('dragend', (e) => {
@@ -303,7 +92,6 @@ const deletePhoto = (fotoId) => {
 
 const handleConfirmDelete = () => {
     if (!confirmModal.id) return;
-    
     confirmModal.loading = true;
     router.delete(route('admin.objek-wisata.delete-photo', confirmModal.id), {
         onSuccess: () => {
@@ -317,14 +105,210 @@ const handleConfirmDelete = () => {
 };
 
 const submit = () => {
-    // Note: Since we are uploading files, we use POST with _method PUT emulation if needed,
-    // but Inertia's PUT might handle it. However, traditionally multipart/form-data doesn't work well with PUT.
-    // Inertia handles this by changing it to POST and adding _method=PUT.
     form.post(route('admin.objek-wisata.update', props.objekWisata.id), {
-        onBefore: () => { form._method = 'PUT'; } // Manually add method for file upload compatibility
+        forceFormData: true,
     });
 };
 </script>
+
+<template>
+    <AdminFormLayout
+        :title="'Edit: ' + objekWisata.nama_objek"
+        description="Perbarui informasi objek wisata Anda agar tetap akurat bagi pengunjung."
+        :backRoute="route('admin.objek-wisata.index')"
+    >
+        <form @submit.prevent="submit" class="space-y-8 pb-12">
+            <!-- Informasi Utama -->
+            <Card class="border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden">
+                <CardHeader class="border-b bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                    <CardTitle class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                        <Mountain class="h-4 w-4" /> 
+                        Informasi Utama
+                    </CardTitle>
+                </CardHeader>
+                <CardContent class="p-6 space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Nama Objek Wisata <span class="text-red-500">*</span></label>
+                        <Input v-model="form.nama_objek" class="rounded-xl border-slate-200 h-11" />
+                        <p v-if="form.errors.nama_objek" class="text-xs text-red-500 font-medium">{{ form.errors.nama_objek }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Kecamatan <span class="text-red-500">*</span></label>
+                        <Select v-model="form.id_kecamatan">
+                            <SelectTrigger>
+                                <SelectValue placeholder="Pilih Kecamatan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectItem v-for="kec in kecamatans" :key="kec.id" :value="String(kec.id)">
+                                        {{ kec.nama_kecamatan }}
+                                    </SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                        <p v-if="form.errors.id_kecamatan" class="text-xs text-red-500 font-medium">{{ form.errors.id_kecamatan }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Alamat Lengkap <span class="text-red-500">*</span></label>
+                        <Input v-model="form.alamat" class="rounded-xl border-slate-200 h-11" />
+                        <p v-if="form.errors.alamat" class="text-xs text-red-500 font-medium">{{ form.errors.alamat }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 border-t pt-4 block mt-4">Keterangan / Deskripsi <span class="text-red-500">*</span></label>
+                        <Textarea v-model="form.keterangan" rows="4" class="rounded-xl border-slate-200" />
+                        <p v-if="form.errors.keterangan" class="text-xs text-red-500 font-medium">{{ form.errors.keterangan }}</p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Kontak & Operasional -->
+            <Card class="border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden">
+                <CardHeader class="border-b bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                    <CardTitle class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                        <Clock class="h-4 w-4" />
+                        Kontak & Operasional
+                    </CardTitle>
+                </CardHeader>
+                <CardContent class="p-6 space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">No. Telepon</label>
+                        <Input v-model="form.no_telepon" class="rounded-xl border-slate-200 h-11" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Jam Operasional</label>
+                        <Input v-model="form.jam_operasional" class="rounded-xl border-slate-200 h-11" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Harga Tiket</label>
+                        <Input v-model="form.harga_tiket" class="rounded-xl border-slate-200 h-11" />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Lokasi Geografis -->
+            <Card class="border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden">
+                <CardHeader class="border-b bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                    <CardTitle class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                        <MapPin class="h-4 w-4" />
+                        Lokasi Geografis
+                    </CardTitle>
+                </CardHeader>
+                <CardContent class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-slate-500">Latitude</label>
+                            <Input v-model="form.latitude" readonly class="rounded-xl border-slate-200 h-11 bg-slate-50 dark:bg-slate-900 cursor-not-allowed" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-slate-500">Longitude</label>
+                            <Input v-model="form.longitude" readonly class="rounded-xl border-slate-200 h-11 bg-slate-50 dark:bg-slate-900 cursor-not-allowed" />
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-400 italic">Klik pada peta atau geser penanda untuk menentukan lokasi tepat.</label>
+                        <div id="map" class="h-80 w-full rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner z-0"></div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Media & Foto -->
+            <Card class="border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden">
+                <CardHeader class="border-b bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                    <CardTitle class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                        <ImageIcon class="h-4 w-4" />
+                        Manajemen Foto
+                    </CardTitle>
+                </CardHeader>
+                <CardContent class="p-6 space-y-8">
+                    <!-- Foto Saat Ini -->
+                    <div class="space-y-4">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Foto Saat Ini</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div v-for="foto in objekWisata.fotos" :key="foto.id" class="relative group aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                                <img :src="'/storage/' + foto.path" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
+                                    <button 
+                                        type="button"
+                                        @click.prevent="setPrimaryPhoto(foto.id)"
+                                        class="bg-white text-primary p-2 rounded-md hover:bg-primary hover:text-white transition-all active:scale-95" 
+                                        :class="{ 'ring-2 ring-primary': foto.is_primary }"
+                                        title="Jadikan Foto Utama"
+                                    >
+                                        <Star class="w-4 h-4" :class="{ 'fill-current': foto.is_primary }" />
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        @click.prevent="confirmDeletePhoto(foto.id)"
+                                        class="bg-white text-red-600 p-2 rounded-md hover:bg-red-600 hover:text-white transition-all active:scale-95" 
+                                        title="Hapus Foto"
+                                    >
+                                        <Trash2 class="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                <div v-if="foto.is_primary" class="absolute top-2 left-2 bg-white/95 backdrop-blur px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-slate-900 border border-slate-100 shadow-sm z-10">Utama</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tambah Foto Baru -->
+                    <div class="space-y-4 pt-8 border-t border-slate-100">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Tambah Foto Baru</label>
+                        <div class="mt-1 flex justify-center px-6 pt-10 pb-10 border-2 border-slate-200 dark:border-slate-700 border-dashed rounded-2xl hover:border-primary transition-all group cursor-pointer bg-slate-50/30">
+                            <div class="space-y-2 text-center">
+                                <UploadCloud class="mx-auto h-12 w-12 text-slate-300 group-hover:text-primary transition-colors" />
+                                <div class="flex text-sm text-slate-600 dark:text-slate-400 justify-center">
+                                    <label class="relative cursor-pointer bg-transparent rounded-md font-black text-primary hover:text-primary/80 focus-within:outline-none">
+                                        <span>Unggah foto tambahan</span>
+                                        <input type="file" class="sr-only" @change="handleFileUpload" multiple accept="image/*" />
+                                    </label>
+                                    <p class="pl-1">atau tarik dan lepas</p>
+                                </div>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">PNG, JPG hingga 10MB</p>
+                            </div>
+                        </div>
+
+                        <!-- Previews Foto Baru -->
+                        <div v-if="previews.length" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+                            <div v-for="(src, index) in previews" :key="index" class="relative group aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                                <img :src="src" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                <button @click.prevent="removePreview(index)" class="absolute top-2 right-2 bg-red-600/90 text-white rounded-md p-1.5 group-hover:opacity-100 opacity-0 transition-opacity backdrop-blur-sm">
+                                    <X class="w-4 h-4" />
+                                </button>
+                                <div class="absolute top-2 left-2 bg-primary/90 backdrop-blur px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">Baru</div>
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <!-- Tombol Aksi -->
+            <div class="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <Button type="submit" :disabled="form.processing" class="px-10 font-bold uppercase tracking-widest text-xs">
+                    <Save class="w-4 h-4 mr-2" />
+                    {{ form.processing ? 'Menyimpan...' : 'Simpan Perubahan' }}
+                </Button>
+                <Button variant="ghost" class="px-8 font-bold uppercase tracking-widest text-xs" as-child>
+                    <Link :href="route('admin.objek-wisata.index')">Batal</Link>
+                </Button>
+            </div>
+        </form>
+
+        <ConfirmDialog 
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirmDelete"
+        />
+    </AdminFormLayout>
+</template>
 
 <style>
 .leaflet-container {
@@ -332,4 +316,3 @@ const submit = () => {
     z-index: 0;
 }
 </style>
-```

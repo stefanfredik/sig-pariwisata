@@ -6,11 +6,13 @@ services:
       dockerfile: Dockerfile
     container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_app
     restart: unless-stopped
-    user: root
+    user: "1000:1000"
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
       - ./storage:/var/www/html/storage
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/entrypoint.sh:/usr/local/bin/entrypoint.sh
     env_file:
       - .env.dev
     depends_on:
@@ -75,9 +77,12 @@ services:
   node:
     image: node:20-alpine
     container_name: ${COMPOSE_PROJECT_NAME:-sig_wisata_dev}_node
+    user: "node"
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+    env_file:
+      - .env.dev
     ports:
       - "${VITE_PORT:-5175}:5173"
     networks:

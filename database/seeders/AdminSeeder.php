@@ -14,21 +14,25 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Create default admin user
-        User::create([
-            'name' => 'Administrator',
-            'username' => 'admin',
-            'email' => 'admin@sigwisata.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'admin'],
+            [
+                'name' => 'Administrator',
+                'email' => 'admin@sigwisata.com',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
 
         // Create test user
-        User::create([
-            'name' => 'Test User',
-            'username' => 'user',
-            'email' => 'user@sigwisata.com',
-            'password' => Hash::make('password'),
-            'role' => 'user',
-        ]);
+        User::updateOrCreate(
+            ['username' => 'user'],
+            [
+                'name' => 'Test User',
+                'email' => 'user@sigwisata.com',
+                'password' => Hash::make('password'),
+                'role' => 'user',
+            ]
+        );
     }
 }

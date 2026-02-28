@@ -14,14 +14,10 @@ class FasilitasWisata extends Model
         'nama_fasilitas',
         'kategori_fasilitas',
         'deskripsi',
-        'latitude',
-        'longitude',
         'icon',
     ];
 
     protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
     ];
 
     /**

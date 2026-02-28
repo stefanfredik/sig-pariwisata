@@ -24,7 +24,7 @@ class KecamatanSeeder extends Seeder
         ];
 
         foreach ($kecamatans as $kecamatan) {
-            Kecamatan::create([
+            Kecamatan::updateOrCreate([
                 'nama_kecamatan' => $kecamatan,
             ]);
         }

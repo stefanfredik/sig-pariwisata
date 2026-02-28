@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/Components/ui/dropdown-menu'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select'
 
 const props = defineProps<{
     fasilitas: {
@@ -45,10 +46,10 @@ const params = reactive({
 })
 
 const sortOptions = [
-    { label: 'Newest', value: 'created_at,desc' },
-    { label: 'Oldest', value: 'created_at,asc' },
-    { label: 'Name (A-Z)', value: 'nama_fasilitas,asc' },
-    { label: 'Name (Z-A)', value: 'nama_fasilitas,desc' },
+    { label: 'Terbaru', value: 'created_at,desc' },
+    { label: 'Terlama', value: 'created_at,asc' },
+    { label: 'Nama (A-Z)', value: 'nama_fasilitas,asc' },
+    { label: 'Nama (Z-A)', value: 'nama_fasilitas,desc' },
 ]
 
 const currentSort = computed(() => `${params.sort_field},${params.sort_direction}`)
@@ -126,13 +127,13 @@ const handleDelete = () => {
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Fasilitas Wisata</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage tourism facilities and amenities.</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola data fasilitas dan sarana pariwisata.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <Button variant="outline" class="bg-white px-4 py-2 border-slate-200 text-slate-700">Export</Button>
+                    
                     <Button as-child class="bg-primary hover:bg-primary/90 text-white px-4 py-2">
                         <Link :href="route('admin.fasilitas-wisata.create')">
-                            <Plus class="mr-2 h-4 w-4" /> New Facility
+                            <Plus class="mr-2 h-4 w-4" /> Fasilitas Baru
                         </Link>
                     </Button>
                 </div>
@@ -148,37 +149,43 @@ const handleDelete = () => {
                     @update:search="params.search = $event" 
                     @update:sort="handleSort"
                     @reset="resetFilters"
-                    placeholder="Search facilities..."
+                    placeholder="Cari fasilitas..."
                 >
                     <template #filters>
                         <div class="grid gap-4 md:grid-cols-2">
                             <div class="grid gap-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Destination</label>
-                                <select
-                                    v-model="params.id_objek"
-                                    @change="updateParams"
-                                    class="h-10 w-full px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                                >
-                                    <option value="">All Locations</option>
-                                    <option v-for="objek in objekWisatas" :key="objek.id" :value="objek.id">
-                                        {{ objek.nama_objek }}
-                                    </option>
-                                </select>
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Destinasi</label>
+                                <Select v-model="params.id_objek" @update:modelValue="updateParams">
+                                    <SelectTrigger class="h-10 rounded-xl border-slate-200">
+                                        <SelectValue placeholder="Semua Lokasi" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="">Semua Lokasi</SelectItem>
+                                            <SelectItem v-for="objek in objekWisatas" :key="objek.id" :value="String(objek.id)">
+                                                {{ objek.nama_objek }}
+                                            </SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div class="grid gap-2">
-                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Category</label>
-                                <select
-                                    v-model="params.kategori_fasilitas"
-                                    @change="updateParams"
-                                    class="h-10 w-full px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm"
-                                >
-                                    <option value="">All Categories</option>
-                                    <option value="Akomodasi">Akomodasi</option>
-                                    <option value="Kuliner">Kuliner</option>
-                                    <option value="Transportasi">Transportasi</option>
-                                    <option value="Umum">Umum</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
+                                <label class="text-xs font-black text-slate-400 uppercase tracking-widest">Kategori</label>
+                                <Select v-model="params.kategori_fasilitas" @update:modelValue="updateParams">
+                                    <SelectTrigger class="h-10 rounded-xl border-slate-200">
+                                        <SelectValue placeholder="Semua Kategori" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            <SelectItem value="">Semua Kategori</SelectItem>
+                                            <SelectItem value="Akomodasi">Akomodasi</SelectItem>
+                                            <SelectItem value="Kuliner">Kuliner</SelectItem>
+                                            <SelectItem value="Transportasi">Transportasi</SelectItem>
+                                            <SelectItem value="Umum">Umum</SelectItem>
+                                            <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
                     </template>
@@ -189,10 +196,10 @@ const handleDelete = () => {
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Facility Name</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Location</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Coordinates</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama Fasilitas</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Lokasi</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Koordinat</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -239,7 +246,7 @@ const handleDelete = () => {
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem @click="confirmDelete(item)" class="text-destructive cursor-pointer">
-                                                <Trash2 class="mr-2 h-4 w-4" /> Delete
+                                                <Trash2 class="mr-2 h-4 w-4" /> Hapus
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
@@ -247,7 +254,7 @@ const handleDelete = () => {
                              </tr>
                               <tr v-if="fasilitas.data.length === 0">
                                 <td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">
-                                    No facilities found.
+                                    Tidak ada data fasilitas yang ditemukan.
                                 </td>
                             </tr>
                         </tbody>

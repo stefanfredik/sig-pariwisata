@@ -1,74 +1,57 @@
 <template>
-    <AdminLayout>
-        <div class="max-w-2xl">
-            <!-- Header -->
-            <div class="mb-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Edit Kecamatan</h2>
-                    <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Ubah data kecamatan</p>
-                </div>
-                <Button variant="outline" as-child>
-                    <Link :href="route('admin.kecamatan.index')">
-                        <ArrowLeft class="w-4 h-4 mr-2" />
-                        Kembali
-                    </Link>
-                </Button>
-            </div>
-
-            <!-- Form -->
-            <div class="bg-white dark:bg-slate-800 shadow rounded-lg p-6 border border-slate-200 dark:border-slate-700">
-                <form @submit.prevent="submit">
-                    <div class="space-y-4">
-                        <div>
-                            <label for="nama_kecamatan" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Nama Kecamatan <span class="text-red-500">*</span>
-                            </label>
-                            <Input
-                                id="nama_kecamatan"
-                                v-model="form.nama_kecamatan"
-                                type="text"
-                                :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.nama_kecamatan }"
-                                placeholder="Contoh: Komodo"
-                            />
-                            <p v-if="form.errors.nama_kecamatan" class="mt-1 text-sm text-red-600">
-                                {{ form.errors.nama_kecamatan }}
-                            </p>
-                        </div>
-
-                        <div class="flex gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
-                            <Button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="bg-primary hover:bg-primary/90 text-white"
-                            >
-                                <Save class="w-4 h-4 mr-2" />
-                                <span v-if="form.processing">Memperbarui...</span>
-                                <span v-else>Update Kecamatan</span>
-                            </Button>
-                            
-                            <Button
-                                variant="outline"
-                                as-child
-                            >
-                                <Link :href="route('admin.kecamatan.index')">
-                                    <ArrowLeft class="w-4 h-4 mr-2" />
-                                    Batal
-                                </Link>
-                            </Button>
-                        </div>
+    <AdminFormLayout
+        :title="'Edit Kecamatan: ' + kecamatan.nama_kecamatan"
+        description="Perbarui data kecamatan."
+        :backRoute="route('admin.kecamatan.index')"
+    >
+        <form @submit.prevent="submit" class="space-y-8 pb-12">
+            <Card class="border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl overflow-hidden">
+                <CardHeader class="border-b bg-slate-50/50 dark:bg-slate-900/50 py-4">
+                    <CardTitle class="text-sm font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                        <MapPin class="h-4 w-4" /> 
+                        Data Kecamatan
+                    </CardTitle>
+                </CardHeader>
+                <CardContent class="p-6 space-y-6">
+                    <div class="space-y-2">
+                        <label for="nama_kecamatan" class="text-xs font-black uppercase tracking-widest text-slate-500">
+                            Nama Kecamatan <span class="text-red-500">*</span>
+                        </label>
+                        <Input
+                            id="nama_kecamatan"
+                            v-model="form.nama_kecamatan"
+                            type="text"
+                            class="rounded-xl border-slate-200 h-11"
+                            :class="{ 'border-red-500 focus-visible:ring-red-500': form.errors.nama_kecamatan }"
+                            placeholder="Contoh: Komodo"
+                        />
+                        <p v-if="form.errors.nama_kecamatan" class="text-xs text-red-500 font-medium">
+                            {{ form.errors.nama_kecamatan }}
+                        </p>
                     </div>
-                </form>
-            </div>
-        </div>
-    </AdminLayout>
+
+                    <div class="flex items-center gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <Button type="submit" :disabled="form.processing" class="px-10 font-bold uppercase tracking-widest text-xs">
+                            <Save class="w-4 h-4 mr-2" />
+                            {{ form.processing ? 'Memperbarui...' : 'Simpan Perubahan' }}
+                        </Button>
+                        <Button variant="ghost" class="px-8 font-bold uppercase tracking-widest text-xs" as-child>
+                            <Link :href="route('admin.kecamatan.index')">Batal</Link>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        </form>
+    </AdminFormLayout>
 </template>
 
 <script setup>
 import { useForm, Link } from '@inertiajs/vue3';
-import AdminLayout from '@/Layouts/AdminLayout.vue';
+import AdminFormLayout from '@/Components/Admin/AdminFormLayout.vue';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
-import { Save, ArrowLeft } from 'lucide-vue-next';
+import { Card, CardContent, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Save, MapPin } from 'lucide-vue-next';
 
 const props = defineProps({
     kecamatan: Object,

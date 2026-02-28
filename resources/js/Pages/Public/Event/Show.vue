@@ -11,7 +11,7 @@
             </component>
         </Head>
         <!-- Sticky Header Background -->
-        <div class="h-20 bg-gray-900"></div>
+        <div class="bg-gray-900"></div>
 
         <section class="py-12 bg-white">
             <div class="max-w-7xl mx-auto px-4">

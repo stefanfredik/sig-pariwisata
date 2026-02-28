@@ -36,10 +36,10 @@ const params = reactive({
 })
 
 const sortOptions = [
-    { label: 'Newest', value: 'created_at,desc' },
-    { label: 'Oldest', value: 'created_at,asc' },
-    { label: 'Rating (High-Low)', value: 'rating,desc' },
-    { label: 'Rating (Low-High)', value: 'rating,asc' },
+    { label: 'Terbaru', value: 'created_at,desc' },
+    { label: 'Terlama', value: 'created_at,asc' },
+    { label: 'Rating (Tertinggi)', value: 'rating,desc' },
+    { label: 'Rating (Terendah)', value: 'rating,asc' },
 ]
 
 const currentSort = computed(() => `${params.sort_field},${params.sort_direction}`)
@@ -141,29 +141,29 @@ const handleConfirm = () => {
 </script>
 
 <template>
-    <Head title="Moderasi Review" />
+    <Head title="Moderasi Ulasan" />
 
     <AdminLayout>
         <div class="max-w-7xl py-6">
             <!-- Header Section -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Review Moderation</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and moderate user reviews.</p>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Moderasi Ulasan</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola dan moderasi ulasan pengguna.</p>
                 </div>
             </div>
 
             <!-- Main Card Container -->
             <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
                 
-                <DataTableToolbar 
+                 <DataTableToolbar 
                     :search="params.search" 
                     :sort-options="sortOptions"
                     :current-sort="currentSort"
                     @update:search="params.search = $event" 
                     @update:sort="handleSort"
                     @reset="resetFilters"
-                    placeholder="Search reviews..."
+                    placeholder="Cari ulasan..."
                 >
                      <template #filters>
                         <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-lg">
@@ -171,19 +171,19 @@ const handleConfirm = () => {
                                 @click="filterStatus('')" 
                                 :class="cn('px-3 py-1 rounded-md text-xs font-medium transition-all', !params.status ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100')"
                             >
-                                All
+                                Semua
                             </button>
                             <button 
                                 @click="filterStatus('pending')" 
                                 :class="cn('px-3 py-1 rounded-md text-xs font-medium transition-all', params.status === 'pending' ? 'bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-500 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100')"
                             >
-                                Pending
+                                Menunggu
                             </button>
                             <button 
                                 @click="filterStatus('approved')" 
                                 :class="cn('px-3 py-1 rounded-md text-xs font-medium transition-all', params.status === 'approved' ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-500 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100')"
                             >
-                                Approved
+                                Disetujui
                             </button>
                         </div>
                     </template>
@@ -192,11 +192,11 @@ const handleConfirm = () => {
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">User Info</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Destination</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rating & Content</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Info Pengguna</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Destinasi</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Rating & Konten</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -207,7 +207,7 @@ const handleConfirm = () => {
                                             {{ review.user?.name?.charAt(0) || 'U' }}
                                         </div>
                                         <div>
-                                            <div class="font-semibold text-slate-900 dark:text-white text-sm">{{ review.user?.name || 'Unknown' }}</div>
+                                            <div class="font-semibold text-slate-900 dark:text-white text-sm">{{ review.user?.name || 'Anonim' }}</div>
                                             <div class="text-xs text-slate-400">{{ review.user?.email }}</div>
                                         </div>
                                     </div>
@@ -229,13 +229,13 @@ const handleConfirm = () => {
                                 </td>
                                 <td class="px-6 py-4">
                                     <span v-if="review.status === 'pending'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2 animate-pulse"></span> Pending
+                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2 animate-pulse"></span> Menunggu
                                     </span>
                                     <span v-else-if="review.status === 'approved'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
-                                        Approved
+                                        Disetujui
                                     </span>
                                     <span v-else class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-                                        Rejected
+                                        Ditolak
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-right">
@@ -267,7 +267,7 @@ const handleConfirm = () => {
                              </tr>
                               <tr v-if="reviews.data.length === 0">
                                 <td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500">
-                                    No reviews found.
+                                    Tidak ada data ulasan yang ditemukan.
                                 </td>
                             </tr>
                         </tbody>

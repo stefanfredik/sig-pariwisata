@@ -13,6 +13,7 @@ import {
   Mountain, 
   Calendar, 
   Coffee, 
+  Store,
   MessageSquare, 
   Menu, 
   LogOut, 
@@ -20,30 +21,30 @@ import {
 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 
-const page = usePage()
+const page = usePage<{ auth: { user: any }; flash: Record<string, string | null> }>()
 const user = computed(() => page.props.auth.user)
 const { toast } = useToast()
 
 const navSections = [
   {
-    title: 'General',
+    title: 'Umum',
     items: [
-      { label: 'Dashboard', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
+      { label: 'Dasbor', route: 'admin.dashboard', icon: LayoutDashboard, pattern: 'admin.dashboard' },
     ]
   },
   {
-    title: 'Tourism Management',
+    title: 'Manajemen Pariwisata',
     items: [
       { label: 'Objek Wisata', route: 'admin.objek-wisata.index', icon: Mountain, pattern: 'admin.objek-wisata.*' },
-      { label: 'Fasilitas Wisata', route: 'admin.fasilitas-wisata.index', icon: Coffee, pattern: 'admin.fasilitas-wisata.*' },
-      { label: 'Events & Agenda', route: 'admin.events.index', icon: Calendar, pattern: 'admin.events.*' },
+      { label: 'UMKM', route: 'admin.umkm.index', icon: Store, pattern: 'admin.umkm.*' },
+      { label: 'Acara & Agenda', route: 'admin.events.index', icon: Calendar, pattern: 'admin.events.*' },
       { label: 'Data Kecamatan', route: 'admin.kecamatan.index', icon: MapIcon, pattern: 'admin.kecamatan.*' },
     ]
   },
   {
-    title: 'Community',
+    title: 'Komunitas',
     items: [
-      { label: 'Moderasi Review', route: 'admin.reviews.index', icon: MessageSquare, pattern: 'admin.reviews.*' },
+      { label: 'Moderasi Ulasan', route: 'admin.reviews.index', icon: MessageSquare, pattern: 'admin.reviews.*' },
     ]
   }
 ]
@@ -179,13 +180,13 @@ watch(() => page.props.flash, (flash: any) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem>Pengaturan</DropdownMenuItem>
+            <DropdownMenuItem>Bantuan</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem @click="logout" class="text-destructive focus:text-destructive cursor-pointer">
-                Logout
+                Keluar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

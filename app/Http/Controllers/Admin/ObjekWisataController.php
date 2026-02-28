@@ -71,31 +71,43 @@ class ObjekWisataController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'fotos' => 'required|array|min:1',
-            'fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'fotos.*' => 'image|mimes:jpeg,png,jpg|max:10240', // 10MB
         ]);
 
-        $objekWisata = $this->objekWisataRepo->create($validated);
+        try {
+            $objekWisata = $this->objekWisataRepo->create(collect($validated)->except('fotos')->toArray());
 
-        // Handle File Uploads
-        if ($request->hasFile('fotos')) {
-            foreach ($request->file('fotos') as $index => $file) {
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-                $path = 'fotos/objek-wisata/' . $filename;
+            // Handle File Uploads
+            if ($request->hasFile('fotos')) {
+                foreach ($request->file('fotos') as $index => $file) {
+                    $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.jpg';
+                    $path = 'fotos/objek-wisata/' . $filename;
 
-                // Resize and Save
-                $image = Image::read($file);
-                $image->scale(width: 800); // Max width 800px
-                Storage::disk('public')->put($path, $image->encode());
+                    // Ensure directory exists
+                    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists('fotos/objek-wisata')) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('fotos/objek-wisata');
+                    }
 
-                $objekWisata->fotos()->create([
-                    'path' => $path,
-                    'is_primary' => $index === 0,
-                ]);
+                    // Resize and Save using Intervention Image v3
+                    $image = Image::read($file);
+                    $image->scale(width: 800);
+
+                    \Illuminate\Support\Facades\Storage::disk('public')->put($path, (string) $image->toJpeg());
+
+                    $objekWisata->fotos()->create([
+                        'path' => $path,
+                        'is_primary' => $index === 0,
+                    ]);
+                }
             }
-        }
 
-        return redirect()->route('admin.objek-wisata.index')
-            ->with('message', 'Objek Wisata berhasil ditambahkan.');
+            return redirect()->route('admin.objek-wisata.index')
+                ->with('message', 'Objek Wisata berhasil ditambahkan.');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Objek Wisata Store Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -144,17 +156,22 @@ class ObjekWisataController extends Controller
             'new_fotos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $this->objekWisataRepo->update($id, $validated);
+        $this->objekWisataRepo->update($id, collect($validated)->except('new_fotos')->toArray());
 
         // Handle New File Uploads
         if ($request->hasFile('new_fotos')) {
             foreach ($request->file('new_fotos') as $file) {
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/objek-wisata/' . $filename;
+
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists('fotos/objek-wisata')) {
+                    Storage::disk('public')->makeDirectory('fotos/objek-wisata');
+                }
 
                 $image = Image::read($file);
                 $image->scale(width: 800);
-                Storage::disk('public')->put($path, $image->encode());
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                 $objekWisata->fotos()->create([
                     'path' => $path,

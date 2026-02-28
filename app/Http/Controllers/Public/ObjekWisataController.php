@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ObjekWisata;
 use App\Models\Kecamatan;
 use App\Models\FasilitasWisata;
+use App\Models\Umkm;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -56,16 +57,22 @@ class ObjekWisataController extends Controller
 
     public function map()
     {
-        $data = \Illuminate\Support\Facades\Cache::remember('public.map.data', 60 * 60 * 24, function () {
-            return [
-                'objekWisatas' => ObjekWisata::with(['fotos', 'kecamatan'])
-                    ->withAvg('reviews as rating_avg', 'rating')
-                    ->get(),
-            ];
+        $objekWisatas = \Illuminate\Support\Facades\Cache::remember('public.map.objek', 60 * 60, function () {
+            return ObjekWisata::with(['fotos', 'kecamatan'])
+                ->withAvg('reviews as rating_avg', 'rating')
+                ->get();
+        });
+
+        $umkms = \Illuminate\Support\Facades\Cache::remember('public.map.umkm', 60 * 60, function () {
+            return Umkm::with('fotos')
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->get();
         });
 
         return Inertia::render('Public/Map', [
-            'objekWisatas' => $data['objekWisatas'],
+            'objekWisatas' => $objekWisatas,
+            'umkms' => $umkms,
         ]);
     }
 }

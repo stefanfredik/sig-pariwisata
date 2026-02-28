@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\KecamatanController;
 use App\Http\Controllers\Admin\ObjekWisataController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\FasilitasWisataController;
+use App\Http\Controllers\Admin\UmkmController;
 
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\ObjekWisataController as PublicObjekWisataController;
@@ -108,6 +109,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         'destroy' => 'admin.fasilitas-wisata.destroy',
     ]);
     Route::delete('fasilitas-wisata/foto/{id}', [FasilitasWisataController::class, 'deletePhoto'])->name('admin.fasilitas-wisata.delete-photo');
+
+    // UMKM CRUD
+    Route::resource('umkm', UmkmController::class)->names([
+        'index' => 'admin.umkm.index',
+        'create' => 'admin.umkm.create',
+        'store' => 'admin.umkm.store',
+        'show' => 'admin.umkm.show',
+        'edit' => 'admin.umkm.edit',
+        'update' => 'admin.umkm.update',
+        'destroy' => 'admin.umkm.destroy',
+    ]);
+    Route::delete('umkm/foto/{id}', [UmkmController::class, 'deletePhoto'])->name('admin.umkm.delete-photo');
+    Route::post('umkm/{umkmId}/foto/{fotoId}/primary', [UmkmController::class, 'setPrimaryPhoto'])->name('admin.umkm.set-primary-photo');
 
     // Review Moderation
     Route::get('/reviews', [AdminReviewController::class, 'index'])->name('admin.reviews.index');

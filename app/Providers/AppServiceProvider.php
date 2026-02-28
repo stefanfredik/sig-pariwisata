@@ -22,5 +22,9 @@ class AppServiceProvider extends ServiceProvider
         if (\Illuminate\Support\Facades\App::environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
+
+        if (\Illuminate\Support\Facades\App::environment('local') || \Illuminate\Support\Facades\App::environment('dev')) {
+            \Illuminate\Support\Facades\Vite::useHotFile(public_path('hot'));
+        }
     }
 }

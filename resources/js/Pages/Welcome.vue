@@ -33,7 +33,7 @@
                 </p>
 
                 <div class="max-w-3xl mx-auto pt-8 animate-fade-in-up delay-300">
-                    <form @submit.prevent="handleSearch" class="bg-white/10 backdrop-blur-xl p-2 rounded-2xl md:rounded-full border border-white/20 shadow-2xl flex flex-col md:flex-row gap-2">
+                    <form @submit.prevent="handleSearch" class="bg-white/10 backdrop-blur-xl p-1 rounded-2xl md:rounded-full border border-white/20 shadow-2xl flex flex-col md:flex-row gap-2">
                         <div class="flex-1 flex items-center px-4 gap-3">
                             <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -41,20 +41,14 @@
                             <input 
                                 v-model="searchQuery"
                                 type="text" 
-                                placeholder="Cari destinasi, beach, festival..."
+                                placeholder="Cari Destinasi Wisata"
                                 class="w-full bg-transparent border-none focus:ring-0 text-white placeholder-white/50 font-bold"
                             >
                         </div>
                         <button type="submit" class="bg-primary text-white px-8 py-4 rounded-xl md:rounded-full font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform active:scale-95 shadow-xl shadow-primary/40">
-                            Mulai Cari
+                            Cari
                         </button>
                     </form>
-                    <div class="flex flex-wrap justify-center gap-4 mt-6 text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                        <span>Paling dicari:</span>
-                        <a href="/destinasi?search=Padar" class="text-white/80 hover:text-primary transition-colors">Padar Island</a>
-                        <a href="/destinasi?search=Pink" class="text-white/80 hover:text-primary transition-colors">Pink Beach</a>
-                        <a href="/destinasi?search=Wae" class="text-white/80 hover:text-primary transition-colors">Wae Rebo</a>
-                    </div>
                 </div>
             </div>
 
@@ -193,30 +187,6 @@
                             </p>
                         </div>
                     </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Newsletter / CTA -->
-        <section class="py-24 px-4">
-            <div class="max-w-5xl mx-auto bg-gray-900 rounded-[3rem] p-8 md:p-16 relative overflow-hidden text-center space-y-8">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] -mr-32 -mt-32"></div>
-                <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/20 blur-[100px] -ml-32 -mb-32"></div>
-                
-                <h2 class="text-4xl md:text-6xl font-black text-white tracking-tight relative z-10">Siap Menjelajahi <span class="text-primary italic">Paradiso?</span></h2>
-                <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto font-medium relative z-10">
-                    Dapatkan update terbaru mengenai destinasi wisata dan promo menarik langsung di email Anda.
-                </p>
-                
-                <div class="max-w-md mx-auto flex flex-col sm:flex-row gap-3 relative z-10">
-                    <input 
-                        type="email" 
-                        placeholder="Alamat email Anda"
-                        class="flex-1 bg-white/5 border-white/10 rounded-2xl px-6 py-4 text-white focus:border-primary focus:ring-primary transition-all font-bold"
-                    >
-                    <button class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-xl shadow-primary/40">
-                        Join Now
-                    </button>
                 </div>
             </div>
         </section>

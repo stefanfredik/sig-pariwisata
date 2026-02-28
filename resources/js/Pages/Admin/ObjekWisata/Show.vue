@@ -13,8 +13,13 @@ import {
     Clock, 
     DollarSign,
     Pencil,
-    Star
+    Star,
+    Plus,
+    Trash2
 } from 'lucide-vue-next'
+import { reactive } from 'vue'
+import { router } from '@inertiajs/vue3'
+import ConfirmDialog from '@/Components/ConfirmDialog.vue'
 
 const props = defineProps<{
     objekWisata: any
@@ -25,6 +30,36 @@ const formatDate = (dateString: string) => {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
+    })
+}
+
+const confirmModal = reactive({
+    show: false,
+    id: null as number | null,
+    title: '',
+    description: '',
+    loading: false
+})
+
+const deleteFacility = (id: number) => {
+    confirmModal.id = id
+    confirmModal.title = 'Hapus Fasilitas'
+    confirmModal.description = 'Apakah Anda yakin ingin menghapus fasilitas ini? Tindakan ini tidak dapat dibatalkan.'
+    confirmModal.show = true
+}
+
+const handleConfirmDelete = () => {
+    if (!confirmModal.id) return
+    
+    confirmModal.loading = true
+    router.delete(route('admin.fasilitas-wisata.destroy', confirmModal.id), {
+        onSuccess: () => {
+            confirmModal.show = false
+            confirmModal.loading = false
+        },
+        onError: () => {
+            confirmModal.loading = false
+        }
     })
 }
 </script>
@@ -46,7 +81,7 @@ const formatDate = (dateString: string) => {
                         <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{{ objekWisata.nama_objek }}</h1>
                         <div class="flex items-center gap-2 mt-1">
                             <Badge variant="outline" class="text-xs">
-                                {{ objekWisata.kategori?.nama_kategori || 'General' }}
+                                {{ objekWisata.kategori?.nama_kategori || 'Umum' }}
                             </Badge>
                             <span class="text-sm text-slate-500">{{ objekWisata.kecamatan?.nama_kecamatan }}</span>
                         </div>
@@ -60,7 +95,7 @@ const formatDate = (dateString: string) => {
                     </Button>
                     <Button as-child>
                         <a :href="route('public.objek-wisata.show', objekWisata.slug)" target="_blank">
-                            <Globe class="mr-2 h-4 w-4" /> View Public
+                            <Globe class="mr-2 h-4 w-4" /> Tinjau Publik
                         </a>
                     </Button>
                 </div>
@@ -72,8 +107,8 @@ const formatDate = (dateString: string) => {
                     <!-- Photos Gallery -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>Photo Gallery</CardTitle>
-                            <CardDescription>Visuals of this destination.</CardDescription>
+                            <CardTitle>Galeri Foto</CardTitle>
+                            <CardDescription>Visualisasi dari destinasi wisata ini.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div v-if="objekWisata.fotos?.length" class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -88,11 +123,11 @@ const formatDate = (dateString: string) => {
                                         :alt="objekWisata.nama_objek"
                                         class="w-full h-full object-cover"
                                     />
-                                    <Badge v-if="foto.is_primary" class="absolute top-2 left-2 text-[10px] h-5">Primary</Badge>
+                                    <Badge v-if="foto.is_primary" class="absolute top-2 left-2 text-[10px] h-5">Utama</Badge>
                                 </div>
                             </div>
                             <div v-else class="py-12 bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 text-center">
-                                <p class="text-sm text-slate-500">No photos uploaded for this destination.</p>
+                                <p class="text-sm text-slate-500">Belum ada foto yang diunggah untuk destinasi ini.</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -100,10 +135,10 @@ const formatDate = (dateString: string) => {
                     <!-- Description -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>Description</CardTitle>
+                            <CardTitle>Deskripsi</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 text-sm leading-relaxed" v-html="objekWisata.deskripsi || 'No description provided.'">
+                            <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-400 text-sm leading-relaxed" v-html="objekWisata.deskripsi || 'Tidak ada deskripsi yang tersedia.'">
                             </div>
                         </CardContent>
                     </Card>
@@ -112,13 +147,13 @@ const formatDate = (dateString: string) => {
                     <Card>
                         <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-4">
                             <div>
-                                <CardTitle>Facilities & Amenities</CardTitle>
-                                <CardDescription>Manage things available at this location.</CardDescription>
+                                <CardTitle>Fasilitas & Sarana</CardTitle>
+                                <CardDescription>Kelola fasilitas yang tersedia di lokasi ini.</CardDescription>
                             </div>
                             <Button size="sm" class="h-8 gap-1" as-child>
                                 <Link :href="route('admin.fasilitas-wisata.create', { objek_id: objekWisata.id })">
                                     <Plus class="h-3.5 w-3.5" />
-                                    <span>Add Facility</span>
+                                    <span>Tambah Fasilitas</span>
                                 </Link>
                             </Button>
                         </CardHeader>
@@ -140,6 +175,14 @@ const formatDate = (dateString: string) => {
                                                 <Pencil class="h-3.5 w-3.5" />
                                             </Link>
                                         </Button>
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            class="h-8 w-8 text-slate-400 hover:text-red-500" 
+                                            @click="deleteFacility(facility.id)"
+                                        >
+                                            <Trash2 class="h-3.5 w-3.5" />
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -158,18 +201,18 @@ const formatDate = (dateString: string) => {
                     <!-- Location Detail -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>Location Info</CardTitle>
+                            <CardTitle>Info Lokasi</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div class="flex items-start gap-3">
                                 <MapPin class="h-4 w-4 text-slate-400 mt-0.5" />
                                 <div>
-                                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Address</p>
+                                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Alamat</p>
                                     <p class="text-sm text-slate-700 dark:text-slate-300 mt-1">{{ objekWisata.alamat }}</p>
                                 </div>
                             </div>
                             <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
-                                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Coordinates</p>
+                                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Koordinat</p>
                                 <code class="text-[11px] bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded">
                                     {{ objekWisata.latitude }}, {{ objekWisata.longitude }}
                                 </code>
@@ -180,15 +223,15 @@ const formatDate = (dateString: string) => {
                     <!-- Stats / Ratings -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>Ratings & Stats</CardTitle>
+                            <CardTitle>Rating & Statistik</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm text-slate-500">Average Rating</span>
+                                <span class="text-sm text-slate-500">Rata-rata Rating</span>
                                 <div class="flex items-center gap-1 text-yellow-400">
                                     <Star class="h-4 w-4 fill-current" />
                                     <span class="text-lg font-bold">{{ objekWisata.rating_avg || '0.0' }}</span>
-                                    <span class="text-xs text-slate-400 ml-1">({{ objekWisata.reviews_count || 0 }} reviews)</span>
+                                    <span class="text-xs text-slate-400 ml-1">({{ objekWisata.reviews_count || 0 }} ulasan)</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -197,15 +240,15 @@ const formatDate = (dateString: string) => {
                     <!-- System Info -->
                     <Card>
                         <CardHeader>
-                            <CardTitle>System Information</CardTitle>
+                            <CardTitle>Informasi Sistem</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-3">
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-500 font-medium">Created at</span>
+                                <span class="text-slate-500 font-medium">Dibuat pada</span>
                                 <span class="text-slate-700 dark:text-slate-300">{{ formatDate(objekWisata.created_at) }}</span>
                             </div>
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-500 font-medium">Last updated</span>
+                                <span class="text-slate-500 font-medium">Terakhir diperbarui</span>
                                 <span class="text-slate-700 dark:text-slate-300">{{ formatDate(objekWisata.updated_at) }}</span>
                             </div>
                         </CardContent>
@@ -213,5 +256,14 @@ const formatDate = (dateString: string) => {
                 </div>
             </div>
         </div>
+
+        <ConfirmDialog 
+            v-slot:default
+            v-model:open="confirmModal.show"
+            :title="confirmModal.title"
+            :description="confirmModal.description"
+            :loading="confirmModal.loading"
+            @confirm="handleConfirmDelete"
+        />
     </AdminLayout>
 </template>
