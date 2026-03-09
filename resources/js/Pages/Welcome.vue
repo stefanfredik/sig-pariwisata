@@ -29,7 +29,7 @@
                 </h1>
                 
                 <p class="text-lg md:text-xl text-white/70 max-w-2xl mx-auto font-medium leading-relaxed animate-fade-in-up">
-                    Temukan destinasi eksotis, budaya yang kaya, dan pengalaman tak terlupakan di gerbang menuju Taman Nasional Komodo.
+                    Selamat datang di portal wisata Kabupaten Manggarai Barat. Jelajahi berbagai objek wisata, budaya lokal, serta informasi perjalanan untuk menikmati pesona alam yang menakjubkan di wilayah ini.
                 </p>
 
                 <div class="max-w-3xl mx-auto pt-8 animate-fade-in-up delay-300">
