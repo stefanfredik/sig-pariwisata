@@ -469,6 +469,10 @@ const handleConfirmDelete = () => {
                                             }}</span
                                         >
                                     </div>
+                                    <div
+                                        v-if="objekWisata.harga_tiket"
+                                        class="mt-2 p-2 bg-slate-50 dark:bg-slate-900 rounded text-[10px] text-slate-400 italic"
+                                    >
                                         Ket. Lama: {{ objekWisata.harga_tiket }}
                                     </div>
                                 </div>
