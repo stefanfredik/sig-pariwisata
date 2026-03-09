@@ -545,6 +545,16 @@ onMounted(() => {
                        </div>`
                     : '';
 
+                const prices = [
+                    objek.harga_tiket_lokal,
+                    objek.harga_tiket_domestik,
+                    objek.harga_tiket_asing
+                ].filter(p => p !== null && p !== undefined);
+                const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+                const priceStr = minPrice 
+                    ? `<div class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">Rp ${minPrice.toLocaleString('id-ID')}</div>`
+                    : '<div class="text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">Gratis</div>';
+
                 let aksesTransportasiHtml = '';
                 if (objek.akses_transportasi && objek.akses_transportasi.length > 0) {
                     aksesTransportasiHtml = `
@@ -562,24 +572,32 @@ onMounted(() => {
                     `;
                 }
 
+                const description = objek.daya_tarik_utama 
+                    ? `<div class="text-[10px] font-black text-primary uppercase tracking-wider mb-1">Daya Tarik Utama</div>
+                       <p class="text-xs text-slate-700 italic font-bold leading-relaxed mb-1">${objek.daya_tarik_utama}</p>`
+                    : `<p class="text-xs text-slate-500 line-clamp-2 font-medium leading-relaxed">${objek.keterangan || 'Jelajahi keindahan alam yang memukau di destinasi ini.'}</p>`;
+
                 return `
                     <div class="w-72 font-sans p-0 overflow-hidden bg-white flex flex-col">
                         <div class="relative h-40">
                             <img src="${objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                                <div>
-                                    <div class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1">${objek.kecamatan.nama_kecamatan}</div>
-                                    <h3 class="font-black text-white text-lg leading-tight">${objek.nama_objek}</h3>
+                            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-2">
+                                <div class="min-w-0">
+                                    <div class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1 truncate">${objek.kecamatan.nama_kecamatan}</div>
+                                    <h3 class="font-black text-white text-base leading-tight truncate">${objek.nama_objek}</h3>
                                 </div>
-                                ${distanceStr}
+                                <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                                    ${distanceStr}
+                                    ${priceStr}
+                                </div>
                             </div>
                         </div>
                         <div class="p-5 space-y-4">
-                            <p class="text-xs text-slate-500 line-clamp-2 font-medium leading-relaxed">${objek.keterangan || 'Jelajahi keindahan alam yang memukau di destinasi ini.'}</p>
+                            ${description}
                             ${aksesTransportasiHtml}
                             <div class="grid grid-cols-2 gap-3">
-                                <a href="/destinasi/${objek.slug}" class="flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
+                                <a href="/destinasi/${objek.slug}" class="flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all text-center no-underline">
                                     <span>Detail</span>
                                 </a>
                                 <button onclick="window.startRouting(${objek.id})" class="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">

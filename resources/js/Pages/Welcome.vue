@@ -124,11 +124,16 @@
                             </div>
                         </div>
                         <div class="p-6 space-y-4">
-                            <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed font-medium">
-                                {{ objek.keterangan }}
+                            <p class="text-sm text-gray-500 line-clamp-3 leading-relaxed font-medium">
+                                <span v-if="objek.daya_tarik_utama" class="text-primary font-black uppercase text-[9px] block mb-1">Daya Tarik Utama</span>
+                                {{ objek.daya_tarik_utama || objek.keterangan }}
                             </p>
                             <div class="pt-4 border-t border-gray-50 flex items-center justify-between">
-                                <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Mulai dari Rp 50rb</div>
+                                <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                    {{ getStartingPrice(objek) 
+                                        ? 'Mulai dari Rp ' + getStartingPrice(objek).toLocaleString('id-ID') 
+                                        : 'Gratis / Cek Detail' }}
+                                </div>
                                 <a :href="route('public.objek-wisata.show', objek.slug)" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-primary transition-colors">
                                     <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -208,6 +213,17 @@ const searchQuery = ref('');
 
 const handleSearch = () => {
     router.get(route('public.objek-wisata.index'), { search: searchQuery.value });
+};
+
+const getStartingPrice = (objek) => {
+    const prices = [
+        objek.harga_tiket_lokal,
+        objek.harga_tiket_domestik,
+        objek.harga_tiket_asing
+    ].filter(p => p !== null && p !== undefined);
+
+    if (prices.length === 0) return null;
+    return Math.min(...prices);
 };
 </script>
 

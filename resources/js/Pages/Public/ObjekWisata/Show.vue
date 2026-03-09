@@ -188,28 +188,11 @@
                             </div>
                         </div>
 
-                        <!-- Description -->
                         <div class="space-y-6">
-                            <div class="flex items-center gap-2">
-                                <div
-                                    class="w-8 h-1 bg-primary rounded-full"
-                                ></div>
-                                <h3
-                                    class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]"
-                                >
-                                    Tentang Destinasi
-                                </h3>
-                            </div>
-                            <div
-                                class="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed"
-                            >
-                                {{ objekWisata.keterangan }}
-                            </div>
-
                             <!-- Daya Tarik Utama -->
                             <div
                                 v-if="objekWisata.daya_tarik_utama"
-                                class="mt-8 space-y-4 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10"
+                                class="mb-12 space-y-4 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 shadow-sm"
                             >
                                 <div class="flex items-center gap-3">
                                     <div class="p-2 bg-primary rounded-xl">
@@ -238,6 +221,22 @@
                                 >
                                     {{ objekWisata.daya_tarik_utama }}
                                 </p>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <div
+                                    class="w-8 h-1 bg-primary rounded-full"
+                                ></div>
+                                <h3
+                                    class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]"
+                                >
+                                    Tentang Destinasi
+                                </h3>
+                            </div>
+                            <div
+                                class="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed"
+                            >
+                                {{ objekWisata.keterangan }}
                             </div>
                         </div>
 
