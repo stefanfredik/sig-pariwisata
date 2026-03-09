@@ -28,6 +28,9 @@ class ObjekWisataFactory extends Factory
             'keterangan' => fake()->paragraph(),
             'jam_operasional' => '08:00 - 17:00',
             'harga_tiket' => 'Rp ' . fake()->numberBetween(10000, 100000),
+            'harga_tiket_lokal' => 10000,
+            'harga_tiket_domestik' => 25000,
+            'harga_tiket_asing' => 100000,
             'latitude' => fake()->latitude(-9, -8), // Manggarai Barat approx
             'longitude' => fake()->longitude(119, 120), // Manggarai Barat approx
             'rating_avg' => fake()->randomFloat(2, 3, 5),

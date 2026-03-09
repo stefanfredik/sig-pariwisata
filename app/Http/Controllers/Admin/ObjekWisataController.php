@@ -68,6 +68,9 @@ class ObjekWisataController extends Controller
             'keterangan' => 'required|string',
             'jam_operasional' => 'nullable|string|max:100',
             'harga_tiket' => 'nullable|string|max:100',
+            'harga_tiket_lokal' => 'nullable|numeric',
+            'harga_tiket_domestik' => 'nullable|numeric',
+            'harga_tiket_asing' => 'nullable|numeric',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'fotos' => 'required|array|min:1',
@@ -105,7 +108,6 @@ class ObjekWisataController extends Controller
 
             return redirect()->route('admin.objek-wisata.index')
                 ->with('message', 'Objek Wisata berhasil ditambahkan.');
-
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Objek Wisata Store Error: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
@@ -154,6 +156,9 @@ class ObjekWisataController extends Controller
             'keterangan' => 'required|string',
             'jam_operasional' => 'nullable|string|max:100',
             'harga_tiket' => 'nullable|string|max:100',
+            'harga_tiket_lokal' => 'nullable|numeric',
+            'harga_tiket_domestik' => 'nullable|numeric',
+            'harga_tiket_asing' => 'nullable|numeric',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'new_fotos' => 'nullable|array',
