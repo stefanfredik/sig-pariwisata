@@ -38,12 +38,15 @@ const form = useForm({
     alamat: "",
     no_telepon: "",
     keterangan: "",
+    daya_tarik_utama: "",
     akses_transportasi: [],
     jam_operasional: "",
     harga_tiket: "",
     harga_tiket_lokal: "",
     harga_tiket_domestik: "",
     harga_tiket_asing: "",
+    harga_parkir_motor: "",
+    harga_parkir_mobil: "",
     latitude: -8.5,
     longitude: 119.88,
     fotos: [],
@@ -53,14 +56,7 @@ const form = useForm({
 const waktu_buka = ref("08:00");
 const waktu_tutup = ref("17:00");
 
-// ── Transportasi Options ──────────────────────────────────────
-const transportOptions = [
-    "Kendaraan Pribadi (Mobil)",
-    "Kendaraan Pribadi (Motor)",
-    "Kendaraan Umum / Angkot",
-    "Bus Pariwisata",
-    "Bisa Dijangkau Jalan Kaki",
-];
+const aksesTransportasiInput = ref("");
 
 const jamOptions = computed(() => {
     const opts = [];
@@ -78,6 +74,8 @@ const jamOptions = computed(() => {
 const hargaLokalDisplay = ref("");
 const hargaDomestikDisplay = ref("");
 const hargaAsingDisplay = ref("");
+const hargaParkirMotorDisplay = ref("");
+const hargaParkirMobilDisplay = ref("");
 
 const formatRupiah = (val) => {
     const num = String(val).replace(/\D/g, "");
@@ -101,6 +99,18 @@ const onHargaAsingInput = (e) => {
     const raw = e.target.value.replace(/\D/g, "");
     hargaAsingDisplay.value = formatRupiah(raw);
     form.harga_tiket_asing = raw ? Number(raw) : "";
+};
+
+const onHargaParkirMotorInput = (e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    hargaParkirMotorDisplay.value = formatRupiah(raw);
+    form.harga_parkir_motor = raw ? Number(raw) : "";
+};
+
+const onHargaParkirMobilInput = (e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    hargaParkirMobilDisplay.value = formatRupiah(raw);
+    form.harga_parkir_mobil = raw ? Number(raw) : "";
 };
 
 const previews = ref([]);
@@ -152,6 +162,9 @@ const removePhoto = (index) => {
 const submit = () => {
     // Gabungkan waktu buka & tutup
     form.jam_operasional = `${waktu_buka.value} - ${waktu_tutup.value} WITA`;
+    form.akses_transportasi = aksesTransportasiInput.value.trim()
+        ? [aksesTransportasiInput.value.trim()]
+        : [];
 
     form.post(route("admin.objek-wisata.store"), {
         forceFormData: true,
@@ -269,29 +282,36 @@ const submit = () => {
                         </p>
                     </div>
 
+                    <div class="space-y-2">
+                        <label
+                            class="text-xs font-black uppercase tracking-widest text-slate-500"
+                            >Daya Tarik Utama</label
+                        >
+                        <Textarea
+                            v-model="form.daya_tarik_utama"
+                            rows="3"
+                            placeholder="Tuliskan daya tarik utama dari objek wisata ini..."
+                            class="rounded-xl border-slate-200"
+                        />
+                        <p
+                            v-if="form.errors.daya_tarik_utama"
+                            class="text-xs text-red-500 font-medium"
+                        >
+                            {{ form.errors.daya_tarik_utama }}
+                        </p>
+                    </div>
+
                     <div class="space-y-3">
                         <label
                             class="text-xs font-black uppercase tracking-widest text-slate-500 border-t pt-4 block mt-4"
                             >Akses Transportasi</label
                         >
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <label
-                                v-for="opsi in transportOptions"
-                                :key="opsi"
-                                class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-                            >
-                                <input
-                                    type="checkbox"
-                                    :value="opsi"
-                                    v-model="form.akses_transportasi"
-                                    class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary dark:border-slate-600 dark:bg-slate-700"
-                                />
-                                <span
-                                    class="text-sm font-medium text-slate-700 dark:text-slate-300"
-                                    >{{ opsi }}</span
-                                >
-                            </label>
-                        </div>
+                        <Textarea
+                            v-model="aksesTransportasiInput"
+                            placeholder="Contoh: Motor, mobil, angkot, speedboat"
+                            rows="3"
+                            class="rounded-xl border-slate-200"
+                        />
                         <p
                             v-if="form.errors.akses_transportasi"
                             class="text-xs text-red-500 font-medium"
@@ -472,6 +492,69 @@ const submit = () => {
                             Kosongkan jika gratis atau gunakan "Harga Tiket"
                             (Lama) di bawah jika masih diperlukan.
                         </p>
+
+                        <!-- Harga Parkir Section -->
+                        <div class="space-y-4 pt-4 border-t border-slate-100">
+                            <label
+                                class="text-xs font-black uppercase tracking-widest text-slate-500"
+                                >Harga Parkir</label
+                            >
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <!-- Motor -->
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                                        >Parkir Motor</label
+                                    >
+                                    <div class="relative">
+                                        <span
+                                            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-slate-500 select-none"
+                                            >Rp</span
+                                        >
+                                        <input
+                                            :value="hargaParkirMotorDisplay"
+                                            @input="onHargaParkirMotorInput"
+                                            inputmode="numeric"
+                                            placeholder="0"
+                                            class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        />
+                                    </div>
+                                    <p
+                                        v-if="form.errors.harga_parkir_motor"
+                                        class="text-xs text-red-500 font-medium"
+                                    >
+                                        {{ form.errors.harga_parkir_motor }}
+                                    </p>
+                                </div>
+
+                                <!-- Mobil -->
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                                        >Parkir Mobil</label
+                                    >
+                                    <div class="relative">
+                                        <span
+                                            class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-black text-slate-500 select-none"
+                                            >Rp</span
+                                        >
+                                        <input
+                                            :value="hargaParkirMobilDisplay"
+                                            @input="onHargaParkirMobilInput"
+                                            inputmode="numeric"
+                                            placeholder="0"
+                                            class="w-full h-11 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-4 text-sm font-bold text-slate-800 dark:text-white placeholder:text-slate-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                        />
+                                    </div>
+                                    <p
+                                        v-if="form.errors.harga_parkir_mobil"
+                                        class="text-xs text-red-500 font-medium"
+                                    >
+                                        {{ form.errors.harga_parkir_mobil }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Field Harga Tiket Lama (Hidden/Optional?) -->
                         <div class="space-y-2 opacity-50">

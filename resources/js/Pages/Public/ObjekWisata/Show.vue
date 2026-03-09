@@ -205,6 +205,40 @@
                             >
                                 {{ objekWisata.keterangan }}
                             </div>
+
+                            <!-- Daya Tarik Utama -->
+                            <div
+                                v-if="objekWisata.daya_tarik_utama"
+                                class="mt-8 space-y-4 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-primary rounded-xl">
+                                        <svg
+                                            class="w-5 h-5 text-white"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <h4
+                                        class="text-sm font-black text-gray-900 uppercase tracking-widest"
+                                    >
+                                        Daya Tarik Utama
+                                    </h4>
+                                </div>
+                                <p
+                                    class="text-gray-600 font-bold leading-relaxed italic"
+                                >
+                                    {{ objekWisata.daya_tarik_utama }}
+                                </p>
+                            </div>
                         </div>
 
                         <!-- Facilities -->
@@ -782,6 +816,76 @@
                                                             ? "Rp " +
                                                               Number(
                                                                   objekWisata.harga_tiket_asing,
+                                                              ).toLocaleString(
+                                                                  "id-ID",
+                                                              )
+                                                            : "Gratis"
+                                                    }}</span
+                                                >
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-4">
+                                    <div
+                                        class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0"
+                                    >
+                                        <svg
+                                            class="w-5 h-5 text-primary"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                                                stroke-width="2"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div class="space-y-2 flex-1">
+                                        <div
+                                            class="text-[10px] font-black text-gray-500 uppercase tracking-widest"
+                                        >
+                                            Harga Parkir
+                                        </div>
+                                        <div class="space-y-1.5 pt-1">
+                                            <div
+                                                class="flex justify-between items-center bg-white/5 p-2 rounded-xl"
+                                            >
+                                                <span
+                                                    class="text-[10px] font-bold text-gray-400"
+                                                    >Motor</span
+                                                >
+                                                <span
+                                                    class="text-xs font-black text-emerald-400"
+                                                    >{{
+                                                        objekWisata.harga_parkir_motor
+                                                            ? "Rp " +
+                                                              Number(
+                                                                  objekWisata.harga_parkir_motor,
+                                                              ).toLocaleString(
+                                                                  "id-ID",
+                                                              )
+                                                            : "Gratis"
+                                                    }}</span
+                                                >
+                                            </div>
+                                            <div
+                                                class="flex justify-between items-center bg-white/5 p-2 rounded-xl"
+                                            >
+                                                <span
+                                                    class="text-[10px] font-bold text-gray-400"
+                                                    >Mobil</span
+                                                >
+                                                <span
+                                                    class="text-xs font-black text-emerald-400"
+                                                    >{{
+                                                        objekWisata.harga_parkir_mobil
+                                                            ? "Rp " +
+                                                              Number(
+                                                                  objekWisata.harga_parkir_mobil,
                                                               ).toLocaleString(
                                                                   "id-ID",
                                                               )

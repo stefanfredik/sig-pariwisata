@@ -8,9 +8,7 @@ use App\Models\Kecamatan;
 use App\Models\ObjekWisata;
 use App\Models\Review;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -22,6 +20,7 @@ class DashboardController extends Controller
             'objek_wisata' => ObjekWisata::count(),
             'event' => Event::count(),
             'user' => User::where('role', 'user')->count(),
+            'jumlah_kunjungan' => ObjekWisata::sum('view_count'),
             'review_pending' => Review::where('status', 'pending')->count(),
             'review_approved' => Review::where('status', 'approved')->count(),
         ];
@@ -33,11 +32,12 @@ class DashboardController extends Controller
             'data' => [120, 150, 180, 220, 300, 280],
         ];
 
-        // 3. Top 5 Objek Wisata by Rating
-        $topDestinations = ObjekWisata::orderBy('rating_avg', 'desc')
-            ->orderBy('review_count', 'desc')
-            ->take(5)
-            ->get(['id', 'nama_objek', 'rating_avg', 'review_count']);
+        // 3. Kunjungan per Objek Wisata (sorted descending)
+        $objekWisataKunjungan = ObjekWisata::query()
+            ->with('kecamatan:id,nama_kecamatan')
+            ->orderByDesc('view_count')
+            ->orderBy('nama_objek')
+            ->get(['id', 'id_kecamatan', 'nama_objek', 'view_count']);
 
         // 4. Recent Pending Reviews (Priority)
         $recentReviews = Review::with(['user', 'objekWisata'])
@@ -55,7 +55,7 @@ class DashboardController extends Controller
         return Inertia::render('Admin/Dashboard', [
             'stats' => $stats,
             'visitorTrends' => $visitorTrends,
-            'topDestinations' => $topDestinations,
+            'objekWisataKunjungan' => $objekWisataKunjungan,
             'recentReviews' => $recentReviews,
             'upcomingEvents' => $upcomingEvents,
         ]);

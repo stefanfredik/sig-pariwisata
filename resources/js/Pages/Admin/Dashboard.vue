@@ -6,16 +6,14 @@ import { Button } from '@/Components/ui/button'
 import { 
     Map as MapIcon, 
     Mountain, 
+    Eye,
     Calendar, 
     MessageSquare, 
     Users, 
-    AlertCircle, 
-    ExternalLink 
+    AlertCircle
 } from 'lucide-vue-next'
 // @ts-ignore
 import VisitorChart from '@/Components/Dashboard/VisitorChart.vue'
-// @ts-ignore
-import TopDestinationsChart from '@/Components/Dashboard/TopDestinationsChart.vue'
 
 defineProps<{
     stats: {
@@ -23,11 +21,12 @@ defineProps<{
         objek_wisata: number
         event: number
         user: number
+        jumlah_kunjungan: number
         review_pending: number
         review_approved: number
     }
     visitorTrends: Object
-    topDestinations: Array<any>
+    objekWisataKunjungan: Array<any>
     recentReviews: Array<any>
     upcomingEvents: Array<any>
 }>()
@@ -83,6 +82,15 @@ defineProps<{
                 </Card>
                 <Card>
                     <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle class="text-sm font-medium">Jumlah Kunjungan</CardTitle>
+                        <Eye class="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div class="text-2xl font-bold">{{ stats.jumlah_kunjungan.toLocaleString('id-ID') }}</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle class="text-sm font-medium">Review Approved</CardTitle>
                         <MessageSquare class="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
@@ -102,8 +110,8 @@ defineProps<{
             </div>
 
             <!-- Charts -->
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card class="col-span-4">
+            <div>
+                <Card>
                     <CardHeader>
                         <CardTitle>Trend Pengunjung</CardTitle>
                     </CardHeader>
@@ -111,15 +119,48 @@ defineProps<{
                         <VisitorChart :data="visitorTrends" />
                     </CardContent>
                 </Card>
-                <Card class="col-span-3">
-                    <CardHeader>
-                        <CardTitle>Destinasi Populer</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                         <TopDestinationsChart :destinations="topDestinations" />
-                    </CardContent>
-                </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Jumlah Kunjungan per Objek Wisata</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b text-left text-muted-foreground">
+                                    <th class="py-3 pr-4 font-medium">No</th>
+                                    <th class="py-3 pr-4 font-medium">Objek Wisata</th>
+                                    <th class="py-3 pr-4 font-medium">Kecamatan</th>
+                                    <th class="py-3 text-right font-medium">Jumlah Kunjungan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(objek, index) in objekWisataKunjungan"
+                                    :key="objek.id"
+                                    class="border-b last:border-0"
+                                >
+                                    <td class="py-3 pr-4">{{ index + 1 }}</td>
+                                    <td class="py-3 pr-4 font-medium">{{ objek.nama_objek }}</td>
+                                    <td class="py-3 pr-4 text-muted-foreground">
+                                        {{ objek.kecamatan?.nama_kecamatan ?? '-' }}
+                                    </td>
+                                    <td class="py-3 text-right font-semibold">
+                                        {{ Number(objek.view_count || 0).toLocaleString('id-ID') }}
+                                    </td>
+                                </tr>
+                                <tr v-if="objekWisataKunjungan.length === 0">
+                                    <td colspan="4" class="py-6 text-center text-muted-foreground">
+                                        Belum ada data kunjungan objek wisata.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </CardContent>
+            </Card>
 
             <!-- Recent Info -->
             <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-2">

@@ -42,6 +42,7 @@ const formatDate = (dateString: string) => {
 const confirmModal = reactive({
     show: false,
     id: null as number | null,
+    type: "facility" as "facility" | "photo",
     title: "",
     description: "",
     loading: false,
@@ -49,25 +50,63 @@ const confirmModal = reactive({
 
 const deleteFacility = (id: number) => {
     confirmModal.id = id;
+    confirmModal.type = "facility";
     confirmModal.title = "Hapus Fasilitas";
     confirmModal.description =
         "Apakah Anda yakin ingin menghapus fasilitas ini? Tindakan ini tidak dapat dibatalkan.";
     confirmModal.show = true;
 };
 
+const confirmDeletePhoto = (id: number) => {
+    confirmModal.id = id;
+    confirmModal.type = "photo";
+    confirmModal.title = "Hapus Foto";
+    confirmModal.description =
+        "Apakah Anda yakin ingin menghapus foto ini secara permanen?";
+    confirmModal.show = true;
+};
+
+const setPrimaryPhoto = (fotoId: number) => {
+    router.post(
+        route("admin.objek-wisata.set-primary-photo", {
+            objekId: props.objekWisata.id,
+            fotoId,
+        }),
+    );
+};
+
 const handleConfirmDelete = () => {
     if (!confirmModal.id) return;
 
     confirmModal.loading = true;
-    router.delete(route("admin.fasilitas-wisata.destroy", confirmModal.id), {
-        onSuccess: () => {
-            confirmModal.show = false;
-            confirmModal.loading = false;
-        },
-        onError: () => {
-            confirmModal.loading = false;
-        },
-    });
+
+    if (confirmModal.type === "facility") {
+        router.delete(
+            route("admin.fasilitas-wisata.destroy", confirmModal.id),
+            {
+                onSuccess: () => {
+                    confirmModal.show = false;
+                    confirmModal.loading = false;
+                },
+                onError: () => {
+                    confirmModal.loading = false;
+                },
+            },
+        );
+    } else {
+        router.delete(
+            route("admin.objek-wisata.delete-photo", confirmModal.id),
+            {
+                onSuccess: () => {
+                    confirmModal.show = false;
+                    confirmModal.loading = false;
+                },
+                onError: () => {
+                    confirmModal.loading = false;
+                },
+            },
+        );
+    }
 };
 </script>
 
@@ -149,7 +188,7 @@ const handleConfirmDelete = () => {
                                 <div
                                     v-for="foto in objekWisata.fotos"
                                     :key="foto.id"
-                                    class="relative aspect-video rounded-lg overflow-hidden border border-slate-200"
+                                    class="relative aspect-video rounded-lg overflow-hidden border border-slate-200 group"
                                     :class="{
                                         'ring-2 ring-primary border-transparent':
                                             foto.is_primary,
@@ -158,11 +197,48 @@ const handleConfirmDelete = () => {
                                     <img
                                         :src="`/storage/${foto.path}`"
                                         :alt="objekWisata.nama_objek"
-                                        class="w-full h-full object-cover"
+                                        class="w-full h-full object-cover transition-transform group-hover:scale-105"
                                     />
+
+                                    <!-- Actions overlay -->
+                                    <div
+                                        class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]"
+                                    >
+                                        <button
+                                            type="button"
+                                            @click.prevent="
+                                                setPrimaryPhoto(foto.id)
+                                            "
+                                            class="bg-white text-primary p-2 rounded-md hover:bg-primary hover:text-white transition-all active:scale-95"
+                                            :class="{
+                                                'ring-2 ring-primary':
+                                                    foto.is_primary,
+                                            }"
+                                            title="Jadikan Foto Utama"
+                                        >
+                                            <Star
+                                                class="w-4 h-4"
+                                                :class="{
+                                                    'fill-current':
+                                                        foto.is_primary,
+                                                }"
+                                            />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            @click.prevent="
+                                                confirmDeletePhoto(foto.id)
+                                            "
+                                            class="bg-white text-red-600 p-2 rounded-md hover:bg-red-600 hover:text-white transition-all active:scale-95"
+                                            title="Hapus Foto"
+                                        >
+                                            <Trash2 class="w-4 h-4" />
+                                        </button>
+                                    </div>
+
                                     <Badge
                                         v-if="foto.is_primary"
-                                        class="absolute top-2 left-2 text-[10px] h-5"
+                                        class="absolute top-2 left-2 text-[10px] h-5 z-10"
                                         >Utama</Badge
                                     >
                                 </div>
@@ -393,11 +469,50 @@ const handleConfirmDelete = () => {
                                             }}</span
                                         >
                                     </div>
-                                    <div
-                                        v-if="objekWisata.harga_tiket"
-                                        class="mt-2 p-2 bg-slate-50 dark:bg-slate-900 rounded text-[10px] text-slate-400 italic"
-                                    >
                                         Ket. Lama: {{ objekWisata.harga_tiket }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="pt-4 border-t border-slate-100 dark:border-slate-800"
+                            >
+                                <p
+                                    class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2"
+                                >
+                                    Harga Parkir
+                                </p>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-500"
+                                            >Motor</span
+                                        >
+                                        <span
+                                            class="font-bold text-emerald-600"
+                                            >{{
+                                                objekWisata.harga_parkir_motor
+                                                    ? "Rp " +
+                                                      Number(
+                                                          objekWisata.harga_parkir_motor,
+                                                      ).toLocaleString("id-ID")
+                                                    : "-"
+                                            }}</span
+                                        >
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-500"
+                                            >Mobil</span
+                                        >
+                                        <span
+                                            class="font-bold text-emerald-600"
+                                            >{{
+                                                objekWisata.harga_parkir_mobil
+                                                    ? "Rp " +
+                                                      Number(
+                                                          objekWisata.harga_parkir_mobil,
+                                                      ).toLocaleString("id-ID")
+                                                    : "-"
+                                            }}</span
+                                        >
                                     </div>
                                 </div>
                             </div>
@@ -481,6 +596,27 @@ const handleConfirmDelete = () => {
                             <CardTitle>Informasi Sistem</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-3">
+                            <div class="space-y-2">
+                                <h3 class="text-xs font-bold text-slate-400">
+                                    Deskripsi
+                                </h3>
+                                <p
+                                    class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed italic"
+                                >
+                                    "{{ objekWisata.keterangan }}"
+                                </p>
+                            </div>
+
+                            <div v-if="objekWisata.daya_tarik_utama" class="space-y-2">
+                                <h3 class="text-xs font-bold text-slate-400">
+                                    Daya Tarik Utama
+                                </h3>
+                                <p
+                                    class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed"
+                                >
+                                    {{ objekWisata.daya_tarik_utama }}
+                                </p>
+                            </div>
                             <div class="flex justify-between text-xs">
                                 <span class="text-slate-500 font-medium"
                                     >Dibuat pada</span
