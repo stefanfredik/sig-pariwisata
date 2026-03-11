@@ -8,11 +8,11 @@ use App\Models\ObjekWisata;
 use App\Models\Foto;
 use App\Repositories\Eloquent\EventRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class EventController extends Controller
 {
@@ -26,22 +26,11 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $filters = $request->only(['search', 'id_objek', 'status']);
-        $sortField = $request->get('sort_field', 'tanggal_mulai');
-        $sortDirection = $request->get('sort_direction', 'desc');
-
-        $events = $this->eventRepo->paginate(10, $filters, $sortField, $sortDirection);
-        $objekWisatas = ObjekWisata::all();
-
+        $events = Event::with(['objekWisata', 'fotos'])->latest()->paginate(10);
         return Inertia::render('Admin/Event/Index', [
-            'events' => $events,
-            'objekWisatas' => $objekWisatas,
-            'filters' => array_merge($filters, [
-                'sort_field' => $sortField,
-                'sort_direction' => $sortDirection,
-            ]),
+            'events' => $events
         ]);
     }
 
@@ -50,8 +39,9 @@ class EventController extends Controller
      */
     public function create()
     {
+        $objekWisatas = ObjekWisata::select('id', 'nama_objek')->get();
         return Inertia::render('Admin/Event/Create', [
-            'objekWisatas' => ObjekWisata::all(),
+            'objekWisatas' => $objekWisatas
         ]);
     }
 
@@ -62,7 +52,8 @@ class EventController extends Controller
     {
         $validated = $request->validate([
             'id_objek' => 'nullable|exists:objek_wisatas,id',
-            'nama_event' => 'required|string|max:100|unique:events',
+            'nama_event' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:events,slug',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'alamat' => 'required|string|max:255',
@@ -106,10 +97,9 @@ class EventController extends Controller
      */
     public function show(string $id)
     {
-        $event = $this->eventRepo->findWithDetails($id);
-
+        $event = Event::with(['objekWisata', 'fotos'])->findOrFail($id);
         return Inertia::render('Admin/Event/Show', [
-            'event' => $event,
+            'event' => $event
         ]);
     }
 
@@ -118,11 +108,12 @@ class EventController extends Controller
      */
     public function edit(string $id)
     {
-        $event = $this->eventRepo->findWithDetails($id);
-
+        $event = Event::with('fotos')->findOrFail($id);
+        $objekWisatas = ObjekWisata::select('id', 'nama_objek')->get();
+        
         return Inertia::render('Admin/Event/Edit', [
             'event' => $event,
-            'objekWisatas' => ObjekWisata::all(),
+            'objekWisatas' => $objekWisatas
         ]);
     }
 
@@ -131,11 +122,10 @@ class EventController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $event = $this->eventRepo->find($id);
-
         $validated = $request->validate([
             'id_objek' => 'nullable|exists:objek_wisatas,id',
-            'nama_event' => 'required|string|max:100|unique:events,nama_event,' . $id,
+            'nama_event' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:events,slug,' . $id,
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'alamat' => 'required|string|max:255',
@@ -148,6 +138,7 @@ class EventController extends Controller
 
         // Handle New File Uploads
         if ($request->hasFile('new_fotos')) {
+            $event = Event::findOrFail($id);
             foreach ($request->file('new_fotos') as $file) {
                 $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/events/' . $filename;
@@ -171,7 +162,7 @@ class EventController extends Controller
         Cache::forget('public.home.data');
 
         return redirect()->route('admin.events.index')
-            ->with('message', 'Event berhasil diupdate.');
+            ->with('message', 'Event berhasil diperbarui.');
     }
 
     /**
@@ -179,11 +170,10 @@ class EventController extends Controller
      */
     public function destroy(string $id)
     {
-        $event = $this->eventRepo->find($id);
-
+        $event = Event::findOrFail($id);
+        
         foreach ($event->fotos as $foto) {
             Storage::disk('public')->delete($foto->path);
-            $foto->delete();
         }
 
         $this->eventRepo->delete($id);
@@ -195,9 +185,46 @@ class EventController extends Controller
     }
 
     /**
-     * Delete a specific photo.
+     * Add photos directly.
      */
-    public function deletePhoto(string $id)
+    public function addPhoto(Request $request, $id)
+    {
+        $request->validate([
+            'fotos' => 'required|array',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
+        ]);
+
+        $event = Event::findOrFail($id);
+
+        if ($request->hasFile('fotos')) {
+            foreach ($request->file('fotos') as $file) {
+                $filename = time() . '_' . Str::random(10) . '.jpg';
+                $path = 'fotos/events/' . $filename;
+
+                if (!Storage::disk('public')->exists('fotos/events')) {
+                    Storage::disk('public')->makeDirectory('fotos/events');
+                }
+
+                $image = Image::read($file);
+                $image->scale(width: 800);
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
+
+                $event->fotos()->create([
+                    'path' => $path,
+                    'is_primary' => false,
+                ]);
+            }
+        }
+
+        Cache::forget('public.home.data');
+
+        return back()->with('message', 'Foto berhasil ditambahkan.');
+    }
+
+    /**
+     * Delete a photo.
+     */
+    public function deletePhoto($id)
     {
         $foto = Foto::findOrFail($id);
         Storage::disk('public')->delete($foto->path);
@@ -209,13 +236,13 @@ class EventController extends Controller
     }
 
     /**
-     * Set a photo as primary.
+     * Set primary photo.
      */
     public function setPrimaryPhoto(string $eventId, string $fotoId)
     {
         $event = Event::findOrFail($eventId);
         $event->fotos()->update(['is_primary' => false]);
-
+        
         $foto = Foto::findOrFail($fotoId);
         $foto->update(['is_primary' => true]);
 

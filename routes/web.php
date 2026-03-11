@@ -83,6 +83,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         'destroy' => 'admin.objek-wisata.destroy',
     ]);
     Route::delete('objek-wisata/foto/{id}', [ObjekWisataController::class, 'deletePhoto'])->name('admin.objek-wisata.delete-photo');
+    Route::post('objek-wisata/{id}/add-photo', [ObjekWisataController::class, 'addPhoto'])->name('admin.objek-wisata.add-photo');
     Route::post('objek-wisata/{objekId}/foto/{fotoId}/primary', [ObjekWisataController::class, 'setPrimaryPhoto'])->name('admin.objek-wisata.set-primary-photo');
 
     // Events CRUD
@@ -96,6 +97,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         'destroy' => 'admin.events.destroy',
     ]);
     Route::delete('events/foto/{id}', [EventController::class, 'deletePhoto'])->name('admin.events.delete-photo');
+    Route::post('events/{id}/add-photo', [EventController::class, 'addPhoto'])->name('admin.events.add-photo');
     Route::post('events/{eventId}/foto/{fotoId}/primary', [EventController::class, 'setPrimaryPhoto'])->name('admin.events.set-primary-photo');
 
     // Fasilitas Wisata CRUD
@@ -121,6 +123,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         'destroy' => 'admin.umkm.destroy',
     ]);
     Route::delete('umkm/foto/{id}', [UmkmController::class, 'deletePhoto'])->name('admin.umkm.delete-photo');
+    Route::post('umkm/{id}/add-photo', [UmkmController::class, 'addPhoto'])->name('admin.umkm.add-photo');
     Route::post('umkm/{umkmId}/foto/{fotoId}/primary', [UmkmController::class, 'setPrimaryPhoto'])->name('admin.umkm.set-primary-photo');
 
     // Review Moderation

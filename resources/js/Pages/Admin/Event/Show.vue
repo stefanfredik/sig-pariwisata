@@ -13,10 +13,23 @@ import {
     Globe,
     Info
 } from 'lucide-vue-next'
+import { ref } from 'vue'
+import ImageLightbox from "@/Components/ImageLightbox.vue"
 
 const props = defineProps<{
     event: any
 }>()
+
+// Lightbox State
+const isLightboxOpen = ref(false)
+const lightboxImages = ref<string[]>([])
+const lightboxIndex = ref(0)
+
+const openLightbox = (images: string[], index: number = 0) => {
+    lightboxImages.value = images
+    lightboxIndex.value = index
+    isLightboxOpen.value = true
+}
 
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
@@ -79,9 +92,15 @@ const formatDate = (dateString: string) => {
                         </CardHeader>
                         <CardContent>
                             <div v-if="event.fotos?.length" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <div v-for="foto in event.fotos" :key="foto.id" class="relative aspect-video rounded-lg overflow-hidden border border-slate-200">
-                                    <img :src="`/storage/${foto.path}`" class="w-full h-full object-cover" />
-                                </div>
+                                <button 
+                                    v-for="(foto, index) in event.fotos" 
+                                    :key="foto.id"
+                                    type="button"
+                                    @click="openLightbox(event.fotos.map(f => `/storage/${f.path}`), index)"
+                                    class="relative aspect-video rounded-lg overflow-hidden border border-slate-200 group cursor-zoom-in"
+                                >
+                                    <img :src="`/storage/${foto.path}`" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                </button>
                             </div>
                             <div v-else class="text-center py-10 bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-200">
                                 <p class="text-sm text-slate-500">No photos available for this event.</p>
@@ -139,5 +158,12 @@ const formatDate = (dateString: string) => {
                 </div>
             </div>
         </div>
+
+        <ImageLightbox 
+            :is-open="isLightboxOpen"
+            :images="lightboxImages"
+            :initial-index="lightboxIndex"
+            @close="isLightboxOpen = false"
+        />
     </AdminLayout>
 </template>

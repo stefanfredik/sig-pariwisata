@@ -8,11 +8,11 @@ use App\Models\ObjekWisata;
 use App\Models\Foto;
 use App\Repositories\Eloquent\ObjekWisataRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class ObjekWisataController extends Controller
 {
@@ -28,20 +28,24 @@ class ObjekWisataController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['search', 'id_kecamatan']);
-        $sortField = $request->get('sort_field', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
+        $query = ObjekWisata::query()->with(['kecamatan', 'fotos']);
 
-        $objekWisatas = $this->objekWisataRepo->paginate(10, $filters, $sortField, $sortDirection);
+        if ($request->filled('search')) {
+            $query->where('nama_objek', 'like', '%' . $request->search . '%')
+                ->orWhere('alamat', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('kecamatan')) {
+            $query->where('id_kecamatan', $request->kecamatan);
+        }
+
+        $objekWisatas = $query->latest()->paginate(10)->withQueryString();
         $kecamatans = Kecamatan::all();
 
         return Inertia::render('Admin/ObjekWisata/Index', [
             'objekWisatas' => $objekWisatas,
             'kecamatans' => $kecamatans,
-            'filters' => array_merge($filters, [
-                'sort_field' => $sortField,
-                'sort_direction' => $sortDirection,
-            ]),
+            'filters' => $request->only(['search', 'kecamatan']),
         ]);
     }
 
@@ -50,8 +54,9 @@ class ObjekWisataController extends Controller
      */
     public function create()
     {
+        $kecamatans = Kecamatan::all();
         return Inertia::render('Admin/ObjekWisata/Create', [
-            'kecamatans' => Kecamatan::all(),
+            'kecamatans' => $kecamatans,
         ]);
     }
 
@@ -62,13 +67,13 @@ class ObjekWisataController extends Controller
     {
         $validated = $request->validate([
             'id_kecamatan' => 'required|exists:kecamatans,id',
-            'nama_objek' => 'required|string|max:100|unique:objek_wisatas',
-            'alamat' => 'required|string|max:255',
-            'no_telepon' => 'nullable|string|max:15',
-            'keterangan' => 'required|string',
+            'nama_objek' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:objek_wisatas,slug',
+            'deskripsi' => 'nullable|string',
+            'keterangan' => 'nullable|string',
             'daya_tarik_utama' => 'nullable|string',
-            'jam_operasional' => 'nullable|string|max:100',
-            'harga_tiket' => 'nullable|string|max:100',
+            'alamat' => 'required|string|max:255',
+            'harga_tiket' => 'nullable|string',
             'harga_tiket_lokal' => 'nullable|numeric',
             'harga_tiket_domestik' => 'nullable|numeric',
             'harga_tiket_asing' => 'nullable|numeric',
@@ -88,19 +93,18 @@ class ObjekWisataController extends Controller
             // Handle File Uploads
             if ($request->hasFile('fotos')) {
                 foreach ($request->file('fotos') as $index => $file) {
-                    $filename = time() . '_' . \Illuminate\Support\Str::random(10) . '.jpg';
+                    $filename = time() . '_' . Str::random(10) . '.jpg';
                     $path = 'fotos/objek-wisata/' . $filename;
 
                     // Ensure directory exists
-                    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists('fotos/objek-wisata')) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('fotos/objek-wisata');
+                    if (!Storage::disk('public')->exists('fotos/objek-wisata')) {
+                        Storage::disk('public')->makeDirectory('fotos/objek-wisata');
                     }
 
-                    // Resize and Save using Intervention Image v3
+                    // Resize and Save
                     $image = Image::read($file);
                     $image->scale(width: 800);
-
-                    \Illuminate\Support\Facades\Storage::disk('public')->put($path, (string) $image->toJpeg());
+                    Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                     $objekWisata->fotos()->create([
                         'path' => $path,
@@ -109,11 +113,13 @@ class ObjekWisataController extends Controller
                 }
             }
 
+            Cache::forget('public.map.data');
+            Cache::forget('public.home.data');
+
             return redirect()->route('admin.objek-wisata.index')
                 ->with('message', 'Objek Wisata berhasil ditambahkan.');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Objek Wisata Store Error: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
         }
     }
 
@@ -122,8 +128,7 @@ class ObjekWisataController extends Controller
      */
     public function show(string $id)
     {
-        $objekWisata = $this->objekWisataRepo->findWithDetails($id);
-
+        $objekWisata = ObjekWisata::with(['kecamatan', 'fotos', 'fasilitas', 'events'])->findOrFail($id);
         return Inertia::render('Admin/ObjekWisata/Show', [
             'objekWisata' => $objekWisata,
         ]);
@@ -134,11 +139,12 @@ class ObjekWisataController extends Controller
      */
     public function edit(string $id)
     {
-        $objekWisata = $this->objekWisataRepo->findWithDetails($id);
+        $objekWisata = ObjekWisata::with('fotos')->findOrFail($id);
+        $kecamatans = Kecamatan::all();
 
         return Inertia::render('Admin/ObjekWisata/Edit', [
             'objekWisata' => $objekWisata,
-            'kecamatans' => Kecamatan::all(),
+            'kecamatans' => $kecamatans,
         ]);
     }
 
@@ -147,19 +153,15 @@ class ObjekWisataController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $objekWisata = $this->objekWisataRepo->find($id);
-
-        \Illuminate\Support\Facades\Log::info('Update Payload:', $request->all());
-
         $validated = $request->validate([
             'id_kecamatan' => 'required|exists:kecamatans,id',
-            'nama_objek' => 'required|string|max:100|unique:objek_wisatas,nama_objek,' . $id,
-            'alamat' => 'required|string|max:255',
-            'no_telepon' => 'nullable|string|max:15',
-            'keterangan' => 'required|string',
+            'nama_objek' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:objek_wisatas,slug,' . $id,
+            'deskripsi' => 'nullable|string',
+            'keterangan' => 'nullable|string',
             'daya_tarik_utama' => 'nullable|string',
-            'jam_operasional' => 'nullable|string|max:100',
-            'harga_tiket' => 'nullable|string|max:100',
+            'alamat' => 'required|string|max:255',
+            'harga_tiket' => 'nullable|string',
             'harga_tiket_lokal' => 'nullable|numeric',
             'harga_tiket_domestik' => 'nullable|numeric',
             'harga_tiket_asing' => 'nullable|numeric',
@@ -177,6 +179,7 @@ class ObjekWisataController extends Controller
 
         // Handle New File Uploads
         if ($request->hasFile('new_fotos')) {
+            $objekWisata = ObjekWisata::findOrFail($id);
             foreach ($request->file('new_fotos') as $file) {
                 $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/objek-wisata/' . $filename;
@@ -186,19 +189,23 @@ class ObjekWisataController extends Controller
                     Storage::disk('public')->makeDirectory('fotos/objek-wisata');
                 }
 
+                // Resize and Save
                 $image = Image::read($file);
                 $image->scale(width: 800);
                 Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                 $objekWisata->fotos()->create([
                     'path' => $path,
-                    'is_primary' => false, // Set manual primary later if needed
+                    'is_primary' => false,
                 ]);
             }
         }
 
+        Cache::forget('public.map.data');
+        Cache::forget('public.home.data');
+
         return redirect()->route('admin.objek-wisata.index')
-            ->with('message', 'Objek Wisata berhasil diupdate.');
+            ->with('message', 'Objek Wisata berhasil diperbarui.');
     }
 
     /**
@@ -206,12 +213,11 @@ class ObjekWisataController extends Controller
      */
     public function destroy(string $id)
     {
-        $objekWisata = $this->objekWisataRepo->find($id);
-
-        // Delete physical photos
-        foreach ($objekWisata->fotos as $foto) {
+        $objekWisata = ObjekWisata::findOrFail($id);
+        
+        // Delete associated photos from storage
+        foreach ($objekWisata.fotos as $foto) {
             Storage::disk('public')->delete($foto->path);
-            $foto->delete();
         }
 
         $this->objekWisataRepo->delete($id);
@@ -224,9 +230,49 @@ class ObjekWisataController extends Controller
     }
 
     /**
+     * Add photos directly to an existing object.
+     */
+    public function addPhoto(Request $request, $id)
+    {
+        $request->validate([
+            'fotos' => 'required|array',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
+        ]);
+
+        $objek = ObjekWisata::findOrFail($id);
+
+        if ($request->hasFile('fotos')) {
+            foreach ($request->file('fotos') as $file) {
+                $filename = time() . '_' . Str::random(10) . '.jpg';
+                $path = 'fotos/objek-wisata/' . $filename;
+
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists('fotos/objek-wisata')) {
+                    Storage::disk('public')->makeDirectory('fotos/objek-wisata');
+                }
+
+                // Resize and Save
+                $image = Image::read($file);
+                $image->scale(width: 800);
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
+
+                $objek->fotos()->create([
+                    'path' => $path,
+                    'is_primary' => false,
+                ]);
+            }
+        }
+
+        Cache::forget('public.map.data');
+        Cache::forget('public.home.data');
+
+        return back()->with('message', 'Foto berhasil ditambahkan.');
+    }
+
+    /**
      * Delete a specific photo.
      */
-    public function deletePhoto(string $id)
+    public function deletePhoto($id)
     {
         $foto = Foto::findOrFail($id);
         Storage::disk('public')->delete($foto->path);

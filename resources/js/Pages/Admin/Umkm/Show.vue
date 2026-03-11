@@ -10,10 +10,23 @@ import {
     Phone, 
     Pencil,
 } from 'lucide-vue-next'
+import { ref } from 'vue'
+import ImageLightbox from "@/Components/ImageLightbox.vue";
 
 const props = defineProps<{
     umkm: any
 }>()
+
+// Lightbox State
+const isLightboxOpen = ref(false)
+const lightboxImages = ref<string[]>([])
+const lightboxIndex = ref(0)
+
+const openLightbox = (images: string[], index: number = 0) => {
+    lightboxImages.value = images
+    lightboxIndex.value = index
+    isLightboxOpen.value = true
+}
 
 const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
@@ -65,19 +78,21 @@ const formatDate = (dateString: string) => {
                         </CardHeader>
                         <CardContent>
                             <div v-if="umkm.fotos?.length" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                <div 
-                                    v-for="foto in umkm.fotos" 
+                                <button 
+                                    v-for="(foto, index) in umkm.fotos" 
                                     :key="foto.id"
-                                    class="relative aspect-video rounded-lg overflow-hidden border border-slate-200"
+                                    type="button"
+                                    @click="openLightbox(umkm.fotos.map(f => `/storage/${f.path}`), index)"
+                                    class="relative aspect-video rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in group"
                                     :class="{ 'ring-2 ring-primary border-transparent': foto.is_primary }"
                                 >
                                     <img 
                                         :src="`/storage/${foto.path}`" 
                                         :alt="umkm.nama_umkm"
-                                        class="w-full h-full object-cover"
+                                        class="w-full h-full object-cover transition-transform group-hover:scale-105"
                                     />
                                     <Badge v-if="foto.is_primary" class="absolute top-2 left-2 text-[10px] h-5">Utama</Badge>
-                                </div>
+                                </button>
                             </div>
                             <div v-else class="py-12 bg-slate-50 dark:bg-slate-900/50 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 text-center">
                                 <p class="text-sm text-slate-500">Tidak ada foto untuk UMKM ini.</p>
@@ -141,5 +156,12 @@ const formatDate = (dateString: string) => {
                 </div>
             </div>
         </div>
+
+        <ImageLightbox 
+            :is-open="isLightboxOpen"
+            :images="lightboxImages"
+            :initial-index="lightboxIndex"
+            @close="isLightboxOpen = false"
+        />
     </AdminLayout>
 </template>

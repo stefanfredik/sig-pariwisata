@@ -156,13 +156,18 @@
                         <!-- Image Gallery -->
                         <div class="relative group">
                             <div
-                                class="aspect-[16/9] rounded-[3rem] overflow-hidden bg-gray-100 shadow-2xl relative"
+                                class="aspect-[16/9] rounded-[3rem] overflow-hidden bg-gray-100 shadow-2xl relative cursor-zoom-in"
+                                @click="openLightbox(objekWisata.fotos.map(f => '/storage/' + f.path), objekWisata.fotos.findIndex(f => f.path === activePhoto))"
                             >
                                 <img
                                     :src="mainPhoto"
-                                    class="w-full h-full object-cover"
+                                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
-                                <!-- Photo Indicators/thumbnails overlaid? Let's just do a simple list for now -->
+                                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <div class="bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/30 text-white font-black uppercase tracking-widest text-[10px]">
+                                        Perbesar Foto
+                                    </div>
+                                </div>
                             </div>
                             <!-- Thumbnails -->
                             <div
@@ -170,9 +175,10 @@
                                 class="flex gap-4 mt-6 overflow-x-auto pb-4 no-scrollbar"
                             >
                                 <button
-                                    v-for="foto in objekWisata.fotos"
+                                    v-for="(foto, index) in objekWisata.fotos"
                                     :key="foto.id"
                                     @click="activePhoto = foto.path"
+                                    @dblclick="openLightbox(objekWisata.fotos.map(f => '/storage/' + f.path), index)"
                                     class="relative flex-shrink-0 w-32 aspect-video rounded-2xl overflow-hidden border-2 transition-all"
                                     :class="
                                         activePhoto === foto.path
@@ -378,12 +384,11 @@
                                         "
                                         class="grid grid-cols-3 sm:grid-cols-5 gap-2 pt-3"
                                     >
-                                        <a
-                                            v-for="foto in review.fotos"
+                                        <button
+                                            v-for="(foto, index) in review.fotos"
                                             :key="foto.id"
-                                            :href="'/storage/' + foto.path"
-                                            target="_blank"
-                                            class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 hover:border-primary transition-all shadow-sm"
+                                            @click="openLightbox(review.fotos.map(f => '/storage/' + f.path), index)"
+                                            class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 hover:border-primary transition-all shadow-sm cursor-zoom-in"
                                         >
                                             <img
                                                 :src="'/storage/' + foto.path"
@@ -405,7 +410,7 @@
                                                     />
                                                 </svg>
                                             </div>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1373,6 +1378,13 @@
                 </transition>
             </div>
         </transition>
+
+        <ImageLightbox 
+            :is-open="isLightboxOpen"
+            :images="lightboxImages"
+            :initial-index="lightboxIndex"
+            @close="isLightboxOpen = false"
+        />
     </PublicLayout>
 </template>
 
@@ -1380,6 +1392,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import { useForm, Head, usePage, router } from "@inertiajs/vue3";
 import PublicLayout from "@/Layouts/PublicLayout.vue";
+import ImageLightbox from "@/Components/ImageLightbox.vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
@@ -1407,6 +1420,17 @@ const props = defineProps({
 // Fasilitas Modal
 const isFasilitasModalOpen = ref(false);
 const selectedFasilitas = ref(null);
+
+// Lightbox State
+const isLightboxOpen = ref(false);
+const lightboxImages = ref([]);
+const lightboxIndex = ref(0);
+
+const openLightbox = (images, index = 0) => {
+    lightboxImages.value = images;
+    lightboxIndex.value = index;
+    isLightboxOpen.value = true;
+};
 
 const openFasilitasModal = (fasilitas) => {
     selectedFasilitas.value = fasilitas;

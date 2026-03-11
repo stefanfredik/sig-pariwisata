@@ -7,11 +7,11 @@ use App\Models\Umkm;
 use App\Models\Foto;
 use App\Repositories\Eloquent\UmkmRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class UmkmController extends Controller
 {
@@ -25,22 +25,11 @@ class UmkmController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $filters = $request->only(['search', 'kategori']);
-        $sortField = $request->get('sort_field', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
-
-        $umkms = $this->umkmRepo->paginate(10, $filters, $sortField, $sortDirection);
-        $categories = ['Warung makan', 'Kios', 'Villa', 'Hotel', 'Penginapan'];
-
+        $umkm = Umkm::latest()->paginate(10);
         return Inertia::render('Admin/Umkm/Index', [
-            'umkms' => $umkms,
-            'categories' => $categories,
-            'filters' => array_merge($filters, [
-                'sort_field' => $sortField,
-                'sort_direction' => $sortDirection,
-            ]),
+            'umkm' => $umkm
         ]);
     }
 
@@ -49,9 +38,7 @@ class UmkmController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Umkm/Create', [
-            'categories' => ['Warung makan', 'Kios', 'Villa', 'Hotel', 'Penginapan'],
-        ]);
+        return Inertia::render('Admin/Umkm/Create');
     }
 
     /**
@@ -60,8 +47,9 @@ class UmkmController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_umkm' => 'required|string|max:100|unique:umkms',
-            'kategori' => 'required|in:Warung makan,Kios,Villa,Hotel,Penginapan',
+            'nama_umkm' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:umkms,slug',
+            'kategori' => 'required|string|max:50',
             'alamat' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
             'latitude' => 'required|numeric|between:-90,90',
@@ -84,10 +72,8 @@ class UmkmController extends Controller
                         Storage::disk('public')->makeDirectory('fotos/umkm');
                     }
 
-                    // Resize and Save using Intervention Image v3
                     $image = Image::read($file);
                     $image->scale(width: 800);
-
                     Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                     $umkm->fotos()->create([
@@ -101,10 +87,8 @@ class UmkmController extends Controller
 
             return redirect()->route('admin.umkm.index')
                 ->with('message', 'UMKM berhasil ditambahkan.');
-
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('UMKM Store Error: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+            return back()->with('error', 'Gagal menambahkan data: ' . $e->getMessage());
         }
     }
 
@@ -113,10 +97,9 @@ class UmkmController extends Controller
      */
     public function show(string $id)
     {
-        $umkm = $this->umkmRepo->findWithDetails($id);
-
+        $umkm = Umkm::with('fotos')->findOrFail($id);
         return Inertia::render('Admin/Umkm/Show', [
-            'umkm' => $umkm,
+            'umkm' => $umkm
         ]);
     }
 
@@ -125,11 +108,9 @@ class UmkmController extends Controller
      */
     public function edit(string $id)
     {
-        $umkm = $this->umkmRepo->findWithDetails($id);
-
+        $umkm = Umkm::with('fotos')->findOrFail($id);
         return Inertia::render('Admin/Umkm/Edit', [
-            'umkm' => $umkm,
-            'categories' => ['Warung makan', 'Kios', 'Villa', 'Hotel', 'Penginapan'],
+            'umkm' => $umkm
         ]);
     }
 
@@ -138,11 +119,10 @@ class UmkmController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $umkm = $this->umkmRepo->find($id);
-
         $validated = $request->validate([
-            'nama_umkm' => 'required|string|max:100|unique:umkms,nama_umkm,' . $id,
-            'kategori' => 'required|in:Warung makan,Kios,Villa,Hotel,Penginapan',
+            'nama_umkm' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:umkms,slug,' . $id,
+            'kategori' => 'required|string|max:50',
             'alamat' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
             'latitude' => 'required|numeric|between:-90,90',
@@ -155,6 +135,7 @@ class UmkmController extends Controller
 
         // Handle New File Uploads
         if ($request->hasFile('new_fotos')) {
+            $umkm = Umkm::findOrFail($id);
             foreach ($request->file('new_fotos') as $file) {
                 $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/umkm/' . $filename;
@@ -178,7 +159,7 @@ class UmkmController extends Controller
         Cache::forget('public.map.data');
 
         return redirect()->route('admin.umkm.index')
-            ->with('message', 'UMKM berhasil diupdate.');
+            ->with('message', 'UMKM berhasil diperbarui.');
     }
 
     /**
@@ -186,12 +167,10 @@ class UmkmController extends Controller
      */
     public function destroy(string $id)
     {
-        $umkm = $this->umkmRepo->find($id);
-
-        // Delete physical photos
+        $umkm = Umkm::findOrFail($id);
+        
         foreach ($umkm->fotos as $foto) {
             Storage::disk('public')->delete($foto->path);
-            $foto->delete();
         }
 
         $this->umkmRepo->delete($id);
@@ -203,9 +182,46 @@ class UmkmController extends Controller
     }
 
     /**
-     * Delete a specific photo.
+     * Add photos directly.
      */
-    public function deletePhoto(string $id)
+    public function addPhoto(Request $request, $id)
+    {
+        $request->validate([
+            'fotos' => 'required|array',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
+        ]);
+
+        $umkm = Umkm::findOrFail($id);
+
+        if ($request->hasFile('fotos')) {
+            foreach ($request->file('fotos') as $file) {
+                $filename = time() . '_' . Str::random(10) . '.jpg';
+                $path = 'fotos/umkm/' . $filename;
+
+                if (!Storage::disk('public')->exists('fotos/umkm')) {
+                    Storage::disk('public')->makeDirectory('fotos/umkm');
+                }
+
+                $image = Image::read($file);
+                $image->scale(width: 800);
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
+
+                $umkm->fotos()->create([
+                    'path' => $path,
+                    'is_primary' => false,
+                ]);
+            }
+        }
+
+        Cache::forget('public.map.data');
+
+        return back()->with('message', 'Foto berhasil ditambahkan.');
+    }
+
+    /**
+     * Delete a photo.
+     */
+    public function deletePhoto($id)
     {
         $foto = Foto::findOrFail($id);
         Storage::disk('public')->delete($foto->path);
@@ -217,13 +233,13 @@ class UmkmController extends Controller
     }
 
     /**
-     * Set a photo as primary.
+     * Set primary photo.
      */
     public function setPrimaryPhoto(string $umkmId, string $fotoId)
     {
         $umkm = Umkm::findOrFail($umkmId);
-
         $umkm->fotos()->update(['is_primary' => false]);
+        
         $foto = Foto::findOrFail($fotoId);
         $foto->update(['is_primary' => true]);
 
