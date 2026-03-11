@@ -65,12 +65,9 @@ class DashboardController extends Controller
                 $latitude = (float) $objek->latitude;
                 $longitude = (float) $objek->longitude;
 
+                // Find the nearest UMKM by simple coordinate distance (no spherical calc needed for display only)
                 $umkmTerdekat = Umkm::query()
                     ->select(['id', 'nama_umkm', 'kategori'])
-                    ->selectRaw(
-                        'ROUND(6371 * ACOS(COS(RADIANS(?)) * COS(RADIANS(latitude)) * COS(RADIANS(longitude) - RADIANS(?)) + SIN(RADIANS(?)) * SIN(RADIANS(latitude))), 2) as jarak_km',
-                        [$latitude, $longitude, $latitude]
-                    )
                     ->orderByRaw('POW(latitude - ?, 2) + POW(longitude - ?, 2)', [$latitude, $longitude])
                     ->first();
 
@@ -81,7 +78,6 @@ class DashboardController extends Controller
                         'id' => $umkmTerdekat->id,
                         'nama_umkm' => $umkmTerdekat->nama_umkm,
                         'kategori' => $umkmTerdekat->kategori,
-                        'jarak_km' => $umkmTerdekat->jarak_km,
                     ] : null,
                 ];
             })

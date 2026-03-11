@@ -67,7 +67,7 @@ class UmkmController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'fotos' => 'required|array|min:1',
-            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
         ]);
 
         try {
@@ -148,7 +148,7 @@ class UmkmController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'new_fotos' => 'nullable|array',
-            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
         ]);
 
         $this->umkmRepo->update($id, collect($validated)->except('new_fotos')->toArray());

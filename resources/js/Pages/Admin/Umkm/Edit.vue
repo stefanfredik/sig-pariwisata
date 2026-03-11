@@ -246,7 +246,7 @@ const submit = () => {
                                     </label>
                                     <p class="pl-1">atau tarik dan lepas</p>
                                 </div>
-                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">PNG, JPG hingga 10MB</p>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">PNG, JPG hingga 25MB</p>
                             </div>
                         </div>
 

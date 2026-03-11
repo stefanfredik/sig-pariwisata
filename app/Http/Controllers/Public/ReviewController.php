@@ -28,7 +28,7 @@ class ReviewController extends Controller
                 'judul' => 'nullable|string|max:100',
                 'komentar' => 'required|string|max:1000',
                 'fotos' => 'nullable|array|max:5',
-                'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+                'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
             ]);
 
             \Log::info('Validation passed');

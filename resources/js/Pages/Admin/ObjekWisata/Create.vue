@@ -673,7 +673,7 @@ const submit = () => {
                                 <p
                                     class="text-[10px] text-slate-400 font-black uppercase tracking-widest"
                                 >
-                                    PNG, JPG, JPEG hingga 10MB
+                                    PNG, JPG, JPEG hingga 25MB
                                 </p>
                             </div>
                         </div>

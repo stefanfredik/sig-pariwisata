@@ -588,7 +588,7 @@
                                                 <p
                                                     class="text-xs text-gray-400 font-medium mt-1"
                                                 >
-                                                    PNG, JPG hingga 10MB · Maks.
+                                                    PNG, JPG hingga 25MB · Maks.
                                                     5 foto
                                                 </p>
                                             </div>

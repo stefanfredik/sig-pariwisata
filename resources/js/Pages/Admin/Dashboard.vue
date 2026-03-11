@@ -180,8 +180,7 @@ defineProps<{
                                         <th class="py-3 pr-4 font-medium">No</th>
                                         <th class="py-3 pr-4 font-medium">Objek Wisata</th>
                                         <th class="py-3 pr-4 font-medium">UMKM Terdekat</th>
-                                        <th class="py-3 pr-4 font-medium">Kategori</th>
-                                        <th class="py-3 text-right font-medium">Jarak</th>
+                                        <th class="py-3 text-right font-medium">Kategori</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -208,15 +207,12 @@ defineProps<{
                                             </Link>
                                             <span v-else class="text-muted-foreground">-</span>
                                         </td>
-                                        <td class="py-2 pr-4 text-[10px] font-black uppercase tracking-tighter text-muted-foreground">
+                                        <td class="py-2 text-right text-[10px] font-black uppercase tracking-tighter text-muted-foreground">
                                             {{ row.umkm?.kategori ?? '-' }}
-                                        </td>
-                                        <td class="py-2 text-right font-black">
-                                            {{ row.umkm ? `${Number(row.umkm.jarak_km || 0).toLocaleString('id-ID')} km` : '-' }}
                                         </td>
                                     </tr>
                                     <tr v-if="umkmTerdekatTable.data.length === 0">
-                                        <td colspan="5" class="py-6 text-center text-muted-foreground">
+                                        <td colspan="4" class="py-6 text-center text-muted-foreground">
                                             Belum ada data objek wisata / UMKM.
                                         </td>
                                     </tr>

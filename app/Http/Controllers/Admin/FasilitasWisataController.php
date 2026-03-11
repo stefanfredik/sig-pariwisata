@@ -63,7 +63,7 @@ class FasilitasWisataController extends Controller
             'deskripsi' => 'nullable|string|max:500',
             'icon' => 'nullable|string|max:50',
             'fotos' => 'nullable|array',
-            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
         ]);
 
         $fasilitas = $this->fasilitasRepo->create($validated);
@@ -71,13 +71,18 @@ class FasilitasWisataController extends Controller
         // Handle File Uploads
         if ($request->hasFile('fotos')) {
             foreach ($request->file('fotos') as $index => $file) {
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/fasilitas/' . $filename;
+
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists('fotos/fasilitas')) {
+                    Storage::disk('public')->makeDirectory('fotos/fasilitas');
+                }
 
                 // Resize and Save
                 $image = Image::read($file);
                 $image->scale(width: 800);
-                Storage::disk('public')->put($path, $image->encode());
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                 $fasilitas->fotos()->create([
                     'path' => $path,
@@ -130,7 +135,7 @@ class FasilitasWisataController extends Controller
             'deskripsi' => 'nullable|string|max:500',
             'icon' => 'nullable|string|max:50',
             'new_fotos' => 'nullable|array',
-            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
         ]);
 
         $this->fasilitasRepo->update($id, $validated);
@@ -139,12 +144,17 @@ class FasilitasWisataController extends Controller
         // Handle New File Uploads
         if ($request->hasFile('new_fotos')) {
             foreach ($request->file('new_fotos') as $file) {
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/fasilitas/' . $filename;
+
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists('fotos/fasilitas')) {
+                    Storage::disk('public')->makeDirectory('fotos/fasilitas');
+                }
 
                 $image = Image::read($file);
                 $image->scale(width: 800);
-                Storage::disk('public')->put($path, $image->encode());
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                 $fasilitas->fotos()->create([
                     'path' => $path,

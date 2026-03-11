@@ -178,7 +178,7 @@ const submit = () => {
                                     </label>
                                     <p class="pl-1">atau tarik dan lepas</p>
                                 </div>
-                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">PNG, JPG, JPEG hingga 10MB</p>
+                                <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">PNG, JPG, JPEG hingga 25MB</p>
                             </div>
                         </div>
                         <p v-if="form.errors.fotos" class="text-xs text-red-500 font-medium">{{ form.errors.fotos }}</p>

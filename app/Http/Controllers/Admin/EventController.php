@@ -68,7 +68,7 @@ class EventController extends Controller
             'alamat' => 'required|string|max:255',
             'keterangan' => 'required|string',
             'fotos' => 'nullable|array',
-            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+            'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
         ]);
 
         $event = $this->eventRepo->create($validated);
@@ -76,12 +76,17 @@ class EventController extends Controller
         // Handle File Uploads
         if ($request->hasFile('fotos')) {
             foreach ($request->file('fotos') as $index => $file) {
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/events/' . $filename;
+
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists('fotos/events')) {
+                    Storage::disk('public')->makeDirectory('fotos/events');
+                }
 
                 $image = Image::read($file);
                 $image->scale(width: 800);
-                Storage::disk('public')->put($path, $image->encode());
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                 $event->fotos()->create([
                     'path' => $path,
@@ -136,7 +141,7 @@ class EventController extends Controller
             'alamat' => 'required|string|max:255',
             'keterangan' => 'required|string',
             'new_fotos' => 'nullable|array',
-            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:10240',
+            'new_fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
         ]);
 
         $this->eventRepo->update($id, $validated);
@@ -144,12 +149,17 @@ class EventController extends Controller
         // Handle New File Uploads
         if ($request->hasFile('new_fotos')) {
             foreach ($request->file('new_fotos') as $file) {
-                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                $filename = time() . '_' . Str::random(10) . '.jpg';
                 $path = 'fotos/events/' . $filename;
+
+                // Ensure directory exists
+                if (!Storage::disk('public')->exists('fotos/events')) {
+                    Storage::disk('public')->makeDirectory('fotos/events');
+                }
 
                 $image = Image::read($file);
                 $image->scale(width: 800);
-                Storage::disk('public')->put($path, $image->encode());
+                Storage::disk('public')->put($path, (string) $image->toJpeg());
 
                 $event->fotos()->create([
                     'path' => $path,
