@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useForm, Link } from "@inertiajs/vue3";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
@@ -19,6 +19,18 @@ import AdminFormLayout from "@/Components/Admin/AdminFormLayout.vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Fix Leaflet icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIconRetina,
+    shadowUrl: markerShadow,
+});
+
 import {
     Select,
     SelectContent,
@@ -35,6 +47,7 @@ const props = defineProps({
 const form = useForm({
     id_kecamatan: "",
     nama_objek: "",
+    slug: "",
     alamat: "",
     no_telepon: "",
     keterangan: "",
@@ -50,6 +63,14 @@ const form = useForm({
     latitude: -8.5,
     longitude: 119.88,
     fotos: [],
+});
+
+// Auto-generate slug
+watch(() => form.nama_objek, (val) => {
+    form.slug = val.toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
 });
 
 // ── Jam Operasional ─────────────────────────────────────────
@@ -210,6 +231,25 @@ const submit = () => {
                             class="text-xs text-red-500 font-medium"
                         >
                             {{ form.errors.nama_objek }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label
+                            class="text-xs font-black uppercase tracking-widest text-slate-500"
+                            >Slug (URL)
+                            <span class="text-red-500">*</span></label
+                        >
+                        <Input
+                            v-model="form.slug"
+                            placeholder="nama-objek-wisata"
+                            class="rounded-xl border-slate-200 h-11"
+                        />
+                        <p
+                            v-if="form.errors.slug"
+                            class="text-xs text-red-500 font-medium"
+                        >
+                            {{ form.errors.slug }}
                         </p>
                     </div>
 

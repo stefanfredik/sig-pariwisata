@@ -76,6 +76,21 @@ watch(() => page.props.flash, (flash: any) => {
         })
     }
 }, { deep: true, immediate: true })
+
+// Watch for validation errors
+watch(() => page.props.errors, (errors: any) => {
+    if (Object.keys(errors).length > 0) {
+        const errorCount = Object.keys(errors).length;
+        toast({
+            title: 'Terjadi Kesalahan',
+            description: `Ada ${errorCount} kesalahan pada pengisian form. Silakan periksa kembali.`,
+            variant: 'destructive',
+        })
+        
+        // Optionally show each error in console for debugging
+        console.error('Validation Errors:', errors);
+    }
+}, { deep: true })
 </script>
 
 <template>

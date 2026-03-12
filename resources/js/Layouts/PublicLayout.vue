@@ -156,10 +156,11 @@
             </transition>
         </nav>
 
-        <!-- Page Content -->
         <main class="flex-1">
             <slot />
         </main>
+
+        <Toaster />
 
         <!-- Footer -->
         <footer class="bg-gray-900 text-white pt-16 pb-8">
@@ -214,10 +215,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
+import { router, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
+import { Toaster } from '@/Components/ui/toast'
+import { useToast } from '@/Components/ui/toast/use-toast'
+
+const { toast } = useToast();
+const page = usePage();
 
 const props = defineProps({
     forceSolid: {
@@ -230,6 +236,37 @@ const isScrolled = ref(false);
 const isMobileMenuOpen = ref(false);
 const searchQuery = ref('');
 const searchResults = ref([]);
+
+// Watch for flash messages
+watch(() => page.props.flash, (flash) => {
+    if (flash?.message) {
+        toast({
+            title: 'Berhasil',
+            description: flash.message,
+            variant: 'default',
+        })
+    }
+    if (flash?.error) {
+        toast({
+            title: 'Error',
+            description: flash.error,
+            variant: 'destructive',
+        })
+    }
+}, { deep: true, immediate: true })
+
+// Watch for validation errors
+watch(() => page.props.errors, (errors) => {
+    if (Object.keys(errors).length > 0) {
+        const errorCount = Object.keys(errors).length;
+        toast({
+            title: 'Terjadi Kesalahan',
+            description: `Ada ${errorCount} kesalahan pada pengisian form. Silakan periksa kembali.`,
+            variant: 'destructive',
+        })
+        console.error('Validation Errors:', errors);
+    }
+}, { deep: true })
 
 const submitSearch = () => {
     if (searchQuery.value.trim().length > 0) {

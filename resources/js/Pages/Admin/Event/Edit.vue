@@ -18,6 +18,7 @@ const props = defineProps({
 const form = useForm({
     id_objek: props.event.id_objek ? String(props.event.id_objek) : null,
     nama_event: props.event.nama_event,
+    slug: props.event.slug,
     tanggal_mulai: props.event.tanggal_mulai.split('T')[0],
     tanggal_selesai: props.event.tanggal_selesai.split('T')[0],
     alamat: props.event.alamat,
@@ -105,6 +106,12 @@ const submit = () => {
                         <Input v-model="form.nama_event" class="rounded-xl border-slate-200 h-11" />
                         <p v-if="form.errors.nama_event" class="text-xs text-red-500 font-medium">{{
                             form.errors.nama_event }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Slug (URL) <span class="text-red-500">*</span></label>
+                        <Input v-model="form.slug" class="rounded-xl border-slate-200 h-11" />
+                        <p v-if="form.errors.slug" class="text-xs text-red-500 font-medium">{{ form.errors.slug }}</p>
                     </div>
 
                     <div class="space-y-2">

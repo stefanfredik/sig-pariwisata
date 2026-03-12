@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useForm, Link } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -11,18 +11,39 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Fix Leaflet icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIconRetina,
+    shadowUrl: markerShadow,
+});
+
 const props = defineProps({
     categories: Array,
 });
 
 const form = useForm({
     nama_umkm: '',
+    slug: '',
     kategori: '',
     alamat: '',
     keterangan: '',
     latitude: -8.508333,
     longitude: 119.875000,
     fotos: [],
+});
+
+// Auto-generate slug
+watch(() => form.nama_umkm, (val) => {
+    form.slug = val.toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
 });
 
 const previews = ref([]);
@@ -94,10 +115,17 @@ const submit = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent class="p-6 space-y-6">
-                    <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Nama UMKM <span class="text-red-500">*</span></label>
-                        <Input v-model="form.nama_umkm" placeholder="Masukkan nama UMKM" class="rounded-xl border-slate-200 h-11" />
-                        <p v-if="form.errors.nama_umkm" class="text-xs text-red-500 font-medium">{{ form.errors.nama_umkm }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-slate-500">Nama UMKM <span class="text-red-500">*</span></label>
+                            <Input v-model="form.nama_umkm" placeholder="Masukkan nama UMKM" class="rounded-xl border-slate-200 h-11" />
+                            <p v-if="form.errors.nama_umkm" class="text-xs text-red-500 font-medium">{{ form.errors.nama_umkm }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-slate-500">Slug (URL) <span class="text-red-500">*</span></label>
+                            <Input v-model="form.slug" placeholder="nama-umkm" class="rounded-xl border-slate-200 h-11" />
+                            <p v-if="form.errors.slug" class="text-xs text-red-500 font-medium">{{ form.errors.slug }}</p>
+                        </div>
                     </div>
 
                     <div class="space-y-2">

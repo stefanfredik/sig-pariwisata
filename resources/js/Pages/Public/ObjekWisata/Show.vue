@@ -1395,6 +1395,18 @@ import PublicLayout from "@/Layouts/PublicLayout.vue";
 import ImageLightbox from "@/Components/ImageLightbox.vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+
+// Fix Leaflet icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIconRetina,
+    shadowUrl: markerShadow,
+});
 import {
     Wifi,
     Car,

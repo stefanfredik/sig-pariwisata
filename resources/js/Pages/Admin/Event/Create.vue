@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useForm, Link, Head } from '@inertiajs/vue3';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
@@ -16,11 +16,20 @@ const props = defineProps({
 const form = useForm({
     id_objek: null,
     nama_event: '',
+    slug: '',
     tanggal_mulai: '',
     tanggal_selesai: '',
     alamat: '',
     keterangan: '',
     fotos: [],
+});
+
+// Auto-generate slug
+watch(() => form.nama_event, (val) => {
+    form.slug = val.toLowerCase()
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
 });
 
 const photoPreviews = ref([]);
@@ -67,6 +76,12 @@ const submit = () => {
                         <label class="text-xs font-black uppercase tracking-widest text-slate-500">Nama Event <span class="text-red-500">*</span></label>
                         <Input v-model="form.nama_event" placeholder="Contoh: Festival Komodo 2026" class="rounded-xl border-slate-200 h-11" />
                         <p v-if="form.errors.nama_event" class="text-xs text-red-500 font-medium">{{ form.errors.nama_event }}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Slug (URL) <span class="text-red-500">*</span></label>
+                        <Input v-model="form.slug" placeholder="festival-komodo-2026" class="rounded-xl border-slate-200 h-11" />
+                        <p v-if="form.errors.slug" class="text-xs text-red-500 font-medium">{{ form.errors.slug }}</p>
                     </div>
 
                     <div class="space-y-2">

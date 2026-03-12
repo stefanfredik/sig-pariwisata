@@ -30,6 +30,18 @@ import ConfirmDialog from "@/Components/ConfirmDialog.vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Fix Leaflet icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIconRetina,
+    shadowUrl: markerShadow,
+});
+
 const props = defineProps({
     objekWisata: Object,
     kecamatans: Array,
@@ -52,9 +64,13 @@ const form = useForm({
     harga_parkir_mobil: props.objekWisata.harga_parkir_mobil,
     latitude: props.objekWisata.latitude,
     longitude: props.objekWisata.longitude,
+    slug: props.objekWisata.slug,
     new_fotos: [],
     _method: "PUT",
 });
+
+import { useToast } from "@/Components/ui/toast/use-toast";
+const { toast } = useToast();
 
 const previews = ref([]);
 const confirmModal = reactive({
@@ -253,12 +269,32 @@ const handleConfirmDelete = () => {
 const submit = () => {
     // Gabungkan waktu buka & tutup
     form.jam_operasional = `${waktu_buka.value} - ${waktu_tutup.value} WITA`;
-    form.akses_transportasi = aksesTransportasiInput.value.trim()
-        ? [aksesTransportasiInput.value.trim()]
-        : [];
+    
+    // Split akses transportasi by comma or newline
+    if (typeof aksesTransportasiInput.value === 'string') {
+        form.akses_transportasi = aksesTransportasiInput.value
+            .split(/,|\n/)
+            .map(s => s.trim())
+            .filter(s => s !== '');
+    }
 
     form.post(route("admin.objek-wisata.update", props.objekWisata.id), {
         forceFormData: true,
+        onSuccess: () => {
+             toast({
+                title: "Berhasil",
+                description: "Data objek wisata berhasil diperbarui.",
+                variant: "default",
+            });
+        },
+        onError: (errors) => {
+            console.error(errors);
+            toast({
+                title: "Gagal",
+                description: "Terjadi kesalahan saat memperbarui data. Periksa kembali form Anda.",
+                variant: "destructive",
+            });
+        }
     });
 };
 </script>
@@ -285,22 +321,41 @@ const submit = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent class="p-6 space-y-6">
-                    <div class="space-y-2">
-                        <label
-                            class="text-xs font-black uppercase tracking-widest text-slate-500"
-                            >Nama Objek Wisata
-                            <span class="text-red-500">*</span></label
-                        >
-                        <Input
-                            v-model="form.nama_objek"
-                            class="rounded-xl border-slate-200 h-11"
-                        />
-                        <p
-                            v-if="form.errors.nama_objek"
-                            class="text-xs text-red-500 font-medium"
-                        >
-                            {{ form.errors.nama_objek }}
-                        </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label
+                                class="text-xs font-black uppercase tracking-widest text-slate-500"
+                                >Nama Objek Wisata
+                                <span class="text-red-500">*</span></label
+                            >
+                            <Input
+                                v-model="form.nama_objek"
+                                class="rounded-xl border-slate-200 h-11"
+                            />
+                            <p
+                                v-if="form.errors.nama_objek"
+                                class="text-xs text-red-500 font-medium"
+                            >
+                                {{ form.errors.nama_objek }}
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <label
+                                class="text-xs font-black uppercase tracking-widest text-slate-500"
+                                >Slug (URL)
+                                <span class="text-red-500">*</span></label
+                            >
+                            <Input
+                                v-model="form.slug"
+                                class="rounded-xl border-slate-200 h-11"
+                            />
+                            <p
+                                v-if="form.errors.slug"
+                                class="text-xs text-red-500 font-medium"
+                            >
+                                {{ form.errors.slug }}
+                            </p>
+                        </div>
                     </div>
 
                     <div class="space-y-2">

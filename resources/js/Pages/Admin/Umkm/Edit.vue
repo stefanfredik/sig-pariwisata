@@ -12,6 +12,18 @@ import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Fix Leaflet icon issue
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIconRetina,
+    shadowUrl: markerShadow,
+});
+
 const props = defineProps({
     umkm: Object,
     categories: Array,
@@ -20,6 +32,7 @@ const props = defineProps({
 const form = useForm({
     _method: 'PUT',
     nama_umkm: props.umkm.nama_umkm,
+    slug: props.umkm.slug,
     kategori: props.umkm.kategori,
     alamat: props.umkm.alamat,
     keterangan: props.umkm.keterangan || '',
@@ -129,10 +142,17 @@ const submit = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent class="p-6 space-y-6">
-                    <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-500">Nama UMKM <span class="text-red-500">*</span></label>
-                        <Input v-model="form.nama_umkm" class="rounded-xl border-slate-200 h-11" />
-                        <p v-if="form.errors.nama_umkm" class="text-xs text-red-500 font-medium">{{ form.errors.nama_umkm }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-slate-500">Nama UMKM <span class="text-red-500">*</span></label>
+                            <Input v-model="form.nama_umkm" class="rounded-xl border-slate-200 h-11" />
+                            <p v-if="form.errors.nama_umkm" class="text-xs text-red-500 font-medium">{{ form.errors.nama_umkm }}</p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-slate-500">Slug (URL) <span class="text-red-500">*</span></label>
+                            <Input v-model="form.slug" class="rounded-xl border-slate-200 h-11" />
+                            <p v-if="form.errors.slug" class="text-xs text-red-500 font-medium">{{ form.errors.slug }}</p>
+                        </div>
                     </div>
 
                     <div class="space-y-2">

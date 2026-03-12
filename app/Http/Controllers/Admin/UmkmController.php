@@ -60,7 +60,16 @@ class UmkmController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Umkm/Create');
+        $categories = Umkm::distinct()->pluck('kategori')->filter()->values();
+        
+        // If no categories in DB, provide some defaults
+        if ($categories->isEmpty()) {
+            $categories = collect(['Kuliner', 'Kerajinan', 'Oleh-oleh', 'Fashion', 'Jasa', 'Lainnya']);
+        }
+
+        return Inertia::render('Admin/Umkm/Create', [
+            'categories' => $categories
+        ]);
     }
 
     /**
@@ -131,8 +140,15 @@ class UmkmController extends Controller
     public function edit(string $id)
     {
         $umkm = Umkm::with('fotos')->findOrFail($id);
+        $categories = Umkm::distinct()->pluck('kategori')->filter()->values();
+        
+        if ($categories->isEmpty()) {
+            $categories = collect(['Kuliner', 'Kerajinan', 'Oleh-oleh', 'Fashion', 'Jasa', 'Lainnya']);
+        }
+
         return Inertia::render('Admin/Umkm/Edit', [
-            'umkm' => $umkm
+            'umkm' => $umkm,
+            'categories' => $categories
         ]);
     }
 
