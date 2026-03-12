@@ -202,7 +202,6 @@ const handleDelete = () => {
                             <tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Nama Fasilitas</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Lokasi</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Koordinat</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Aksi</th>
                             </tr>
                         </thead>
@@ -223,12 +222,6 @@ const handleDelete = () => {
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
                                         {{ item.objek_wisata?.nama_objek }}
                                     </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-1 text-xs font-mono text-slate-500">
-                                        <MapPin class="h-3 w-3" />
-                                        {{ item.latitude }}, {{ item.longitude }}
-                                    </div>
                                 </td>
                                 <td class="px-6 py-4 text-right">
                                     <DropdownMenu>

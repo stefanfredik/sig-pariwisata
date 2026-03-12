@@ -25,11 +25,33 @@ class UmkmController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $umkm = Umkm::latest()->paginate(10);
+        $query = Umkm::query()->with('primaryFoto');
+
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('nama_umkm', 'like', '%' . $request->search . '%')
+                  ->orWhere('alamat', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('kategori') && $request->kategori !== 'all') {
+            $query->where('kategori', $request->kategori);
+        }
+
+        // Sorting
+        $sortField = $request->input('sort_field', 'created_at');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        $umkms = $query->paginate(10)->withQueryString();
+
+        $categories = Umkm::distinct()->pluck('kategori')->filter()->values();
+
         return Inertia::render('Admin/Umkm/Index', [
-            'umkm' => $umkm
+            'umkms' => $umkms,
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'kategori', 'sort_field', 'sort_direction'])
         ]);
     }
 

@@ -213,10 +213,10 @@ class ObjekWisataController extends Controller
      */
     public function destroy(string $id)
     {
-        $objekWisata = ObjekWisata::findOrFail($id);
+        $objekWisata = ObjekWisata::with('fotos')->findOrFail($id);
         
         // Delete associated photos from storage
-        foreach ($objekWisata.fotos as $foto) {
+        foreach ($objekWisata->fotos as $foto) {
             Storage::disk('public')->delete($foto->path);
         }
 

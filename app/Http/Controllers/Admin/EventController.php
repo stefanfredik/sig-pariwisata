@@ -26,11 +26,44 @@ class EventController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with(['objekWisata', 'fotos'])->latest()->paginate(10);
+        $query = Event::with(['objekWisata', 'fotos']);
+
+        // Filtering
+        if ($request->filled('search')) {
+            $query->where('nama_event', 'like', '%' . $request->search . '%')
+                  ->orWhere('alamat', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('id_objek') && $request->id_objek !== 'all') {
+            $query->where('id_objek', $request->id_objek);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            $today = now()->toDateString();
+            if ($request->status === 'upcoming') {
+                $query->where('tanggal_mulai', '>', $today);
+            } elseif ($request->status === 'ongoing') {
+                $query->where('tanggal_mulai', '<=', $today)
+                      ->where('tanggal_selesai', '>=', $today);
+            } elseif ($request->status === 'past') {
+                $query->where('tanggal_selesai', '<', $today);
+            }
+        }
+
+        // Sorting
+        $sortField = $request->input('sort_field', 'tanggal_mulai');
+        $sortDirection = $request->input('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        $events = $query->paginate(10)->withQueryString();
+        $objekWisatas = ObjekWisata::select('id', 'nama_objek')->orderBy('nama_objek')->get();
+
         return Inertia::render('Admin/Event/Index', [
-            'events' => $events
+            'events' => $events,
+            'objekWisatas' => $objekWisatas,
+            'filters' => $request->only(['search', 'id_objek', 'status', 'sort_field', 'sort_direction'])
         ]);
     }
 

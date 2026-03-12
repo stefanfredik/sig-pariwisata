@@ -28,14 +28,16 @@ class FasilitasWisataController extends Controller
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['search', 'id_objek']);
+        $filters = $request->only(['search', 'id_objek', 'kategori_fasilitas']);
         $sortField = $request->get('sort_field', 'created_at');
         $sortDirection = $request->get('sort_direction', 'desc');
 
         $fasilitas = $this->fasilitasRepo->paginate(10, $filters, $sortField, $sortDirection);
+        $objekWisatas = ObjekWisata::orderBy('nama_objek')->get();
 
         return Inertia::render('Admin/FasilitasWisata/Index', [
             'fasilitas' => $fasilitas,
+            'objekWisatas' => $objekWisatas,
             'filters' => array_merge($filters, [
                 'sort_field' => $sortField,
                 'sort_direction' => $sortDirection,
