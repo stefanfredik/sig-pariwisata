@@ -125,11 +125,6 @@ const submit = () => {
                         </Link>
                     </div>
 
-                    <div class="text-center text-xs text-slate-500 rounded-lg bg-slate-50 dark:bg-slate-900 p-3 w-full border border-slate-100 dark:border-slate-800">
-                        <p class="font-semibold mb-1">Kredensial Demo:</p>
-                        <p>Admin: <code class="font-mono bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">admin</code> / <code class="font-mono bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">password</code></p>
-                        <p class="mt-1">User: <code class="font-mono bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">user</code> / <code class="font-mono bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-700">password</code></p>
-                    </div>
                 </CardFooter>
             </Card>
         </div>

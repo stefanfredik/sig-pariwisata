@@ -32,12 +32,12 @@
         <!-- Sticky Header Background -->
         <div class="h-20 bg-gray-900"></div>
 
-        <section class="py-12 bg-white">
+        <section class="py-12 bg-white dark:bg-slate-950 transition-colors duration-200">
             <div class="max-w-7xl mx-auto px-4">
                 <!-- Breadcrumbs & Title -->
                 <div class="mb-10 space-y-4">
                     <div
-                        class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400"
+                        class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-500"
                     >
                         <a :href="route('home')" class="hover:text-primary"
                             >Home</a
@@ -63,7 +63,7 @@
                         >
                             <path d="M9 5l7 7-7 7" stroke-width="2" />
                         </svg>
-                        <span class="text-gray-900">{{
+                        <span class="text-gray-900 dark:text-slate-100">{{
                             objekWisata.nama_objek
                         }}</span>
                     </div>
@@ -78,7 +78,7 @@
                                 Manggarai Barat
                             </div>
                             <h1
-                                class="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter"
+                                class="text-4xl md:text-6xl font-black text-gray-900 dark:text-slate-100 tracking-tighter"
                             >
                                 {{ objekWisata.nama_objek }}
                             </h1>
@@ -86,7 +86,7 @@
                         <div class="flex items-center gap-4">
                             <div class="text-right hidden md:block">
                                 <div
-                                    class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1"
+                                    class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest mb-1"
                                 >
                                     Rating Pengunjung
                                 </div>
@@ -104,7 +104,7 @@
                                                     objekWisata.rating_avg || 0,
                                                 )
                                                     ? 'fill-current'
-                                                    : 'text-gray-200'
+                                                    : 'text-gray-200 dark:text-slate-800'
                                             "
                                             viewBox="0 0 20 20"
                                         >
@@ -114,22 +114,21 @@
                                         </svg>
                                     </div>
                                     <span
-                                        class="text-lg font-black text-gray-900"
+                                        class="text-lg font-black text-gray-900 dark:text-slate-100"
                                         >{{
                                             Number(
                                                 objekWisata.rating_avg || 0,
                                             ).toFixed(1)
-                                        }}</span
-                                    >
+                                        }}</span>
                                 </div>
                             </div>
                             <button
                                 @click="toggleFavorite"
                                 :class="[
-                                    'p-4 rounded-2xl transition-all shadow-sm',
+                                    'p-4 rounded-2xl transition-all shadow-sm border dark:border-slate-800 cursor-pointer',
                                     isFavorited
-                                        ? 'bg-pink-50 text-pink-500'
-                                        : 'bg-gray-50 hover:bg-pink-50 hover:text-pink-500 text-gray-400',
+                                        ? 'bg-pink-50 dark:bg-pink-950/20 text-pink-500'
+                                        : 'bg-gray-50 dark:bg-slate-900 hover:bg-pink-50 dark:hover:bg-pink-950/20 hover:text-pink-500 text-gray-400 dark:text-slate-500',
                                 ]"
                             >
                                 <svg
@@ -179,11 +178,11 @@
                                     :key="foto.id"
                                     @click="activePhoto = foto.path"
                                     @dblclick="openLightbox(objekWisata.fotos.map(f => '/storage/' + f.path), index)"
-                                    class="relative flex-shrink-0 w-32 aspect-video rounded-2xl overflow-hidden border-2 transition-all"
+                                    class="relative flex-shrink-0 w-32 aspect-video rounded-2xl overflow-hidden border-2 transition-all cursor-pointer"
                                     :class="
                                         activePhoto === foto.path
                                             ? 'border-primary shadow-lg scale-105'
-                                            : 'border-transparent opacity-60 hover:opacity-100'
+                                            : 'border-transparent dark:border-slate-900 opacity-60 hover:opacity-100'
                                     "
                                 >
                                     <img
@@ -198,7 +197,7 @@
                             <!-- Daya Tarik Utama -->
                             <div
                                 v-if="objekWisata.daya_tarik_utama"
-                                class="mb-12 space-y-4 bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 shadow-sm"
+                                class="mb-12 space-y-4 bg-primary/5 dark:bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 dark:border-primary/20 shadow-sm"
                             >
                                 <div class="flex items-center gap-3">
                                     <div class="p-2 bg-primary rounded-xl">
@@ -217,13 +216,13 @@
                                         </svg>
                                     </div>
                                     <h4
-                                        class="text-sm font-black text-gray-900 uppercase tracking-widest"
+                                        class="text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-widest"
                                     >
                                         Daya Tarik Utama
                                     </h4>
                                 </div>
                                 <p
-                                    class="text-gray-600 font-bold leading-relaxed italic"
+                                    class="text-gray-600 dark:text-slate-350 font-bold leading-relaxed italic"
                                 >
                                     {{ objekWisata.daya_tarik_utama }}
                                 </p>
@@ -234,13 +233,13 @@
                                     class="w-8 h-1 bg-primary rounded-full"
                                 ></div>
                                 <h3
-                                    class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]"
+                                    class="text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-[0.2em]"
                                 >
                                     Tentang Destinasi
                                 </h3>
                             </div>
                             <div
-                                class="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed"
+                                class="prose prose-lg max-w-none text-gray-600 dark:text-slate-300 font-medium leading-relaxed"
                             >
                                 {{ objekWisata.keterangan }}
                             </div>
@@ -256,7 +255,7 @@
                                     class="w-8 h-1 bg-primary rounded-full"
                                 ></div>
                                 <h3
-                                    class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]"
+                                    class="text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-[0.2em]"
                                 >
                                     Fasilitas Tersedia
                                 </h3>
@@ -266,7 +265,7 @@
                                     v-for="fas in objekWisata.fasilitas"
                                     :key="fas.id"
                                     @click="openFasilitasModal(fas)"
-                                    class="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 items-center text-center space-y-3 group hover:bg-primary transition-all duration-300 relative overflow-hidden"
+                                    class="p-6 bg-gray-50 dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 items-center text-center space-y-3 group hover:bg-primary transition-all duration-300 relative overflow-hidden cursor-pointer"
                                 >
                                     <component
                                         :is="
@@ -278,7 +277,7 @@
                                         stroke-width="2"
                                     />
                                     <div
-                                        class="text-xs font-black text-gray-900 group-hover:text-white uppercase tracking-wider"
+                                        class="text-xs font-black text-gray-900 dark:text-slate-200 group-hover:text-white uppercase tracking-wider"
                                     >
                                         {{ fas.nama_fasilitas }}
                                     </div>
@@ -287,7 +286,7 @@
                                         class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4"
                                     >
                                         <span
-                                            class="bg-white text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg ring-2 ring-white/50 transform translate-y-4 group-hover:translate-y-0 transition-transform"
+                                            class="bg-white dark:bg-slate-950 text-primary text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg ring-2 ring-white/50 dark:ring-slate-950/50 transform translate-y-4 group-hover:translate-y-0 transition-transform"
                                             >Lihat Detail</span
                                         >
                                     </div>
@@ -302,7 +301,7 @@
                                     class="w-8 h-1 bg-primary rounded-full"
                                 ></div>
                                 <h3
-                                    class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]"
+                                    class="text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-[0.2em]"
                                 >
                                     Review Pengunjung
                                 </h3>
@@ -314,7 +313,7 @@
                                 <div
                                     v-for="review in objekWisata.reviews"
                                     :key="review.id"
-                                    class="p-8 bg-white border border-gray-100 rounded-[2.5rem] shadow-sm space-y-4"
+                                    class="p-8 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2.5rem] shadow-sm space-y-4"
                                 >
                                     <div
                                         class="flex justify-between items-start"
@@ -327,12 +326,12 @@
                                             </div>
                                             <div>
                                                 <div
-                                                    class="font-black text-gray-900"
+                                                    class="font-black text-gray-900 dark:text-slate-100"
                                                 >
                                                     {{ review.user.name }}
                                                 </div>
                                                 <div
-                                                    class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
+                                                    class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest"
                                                 >
                                                     {{
                                                         formatDate(
@@ -350,7 +349,7 @@
                                                 :class="
                                                     i <= review.rating
                                                         ? 'fill-current'
-                                                        : 'text-gray-200'
+                                                        : 'text-gray-200 dark:text-slate-800'
                                                 "
                                                 viewBox="0 0 20 20"
                                             >
@@ -364,14 +363,14 @@
                                     <!-- Judul -->
                                     <p
                                         v-if="review.judul"
-                                        class="text-sm font-black text-gray-900"
+                                        class="text-sm font-black text-gray-900 dark:text-slate-100"
                                     >
                                         {{ review.judul }}
                                     </p>
 
                                     <!-- Komentar -->
                                     <p
-                                        class="text-gray-600 font-medium leading-relaxed italic"
+                                        class="text-gray-600 dark:text-slate-300 font-medium leading-relaxed italic"
                                     >
                                         "{{ review.komentar }}"
                                     </p>
@@ -388,7 +387,7 @@
                                             v-for="(foto, index) in review.fotos"
                                             :key="foto.id"
                                             @click="openLightbox(review.fotos.map(f => '/storage/' + f.path), index)"
-                                            class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 hover:border-primary transition-all shadow-sm cursor-zoom-in"
+                                            class="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 hover:border-primary transition-all shadow-sm cursor-zoom-in"
                                         >
                                             <img
                                                 :src="'/storage/' + foto.path"
@@ -416,10 +415,10 @@
                             </div>
                             <div
                                 v-else
-                                class="p-12 text-center bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200"
+                                class="p-12 text-center bg-gray-50 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-gray-200 dark:border-slate-800"
                             >
                                 <p
-                                    class="text-gray-400 font-bold uppercase tracking-widest text-sm"
+                                    class="text-gray-400 dark:text-slate-500 font-bold uppercase tracking-widest text-sm"
                                 >
                                     Belum ada review untuk tempat ini.
                                 </p>
@@ -427,11 +426,11 @@
 
                             <!-- Review Form -->
                             <div
-                                class="mt-12 p-8 md:p-12 bg-gray-50 rounded-[3rem] border border-gray-100 space-y-8"
+                                class="mt-12 p-8 md:p-12 bg-gray-50 dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-slate-855 space-y-8"
                             >
                                 <div class="space-y-2">
                                     <h4
-                                        class="text-2xl font-black text-gray-900 tracking-tight"
+                                        class="text-2xl font-black text-gray-900 dark:text-slate-100 tracking-tight"
                                     >
                                         Berikan
                                         <span class="text-primary italic"
@@ -439,7 +438,7 @@
                                         >
                                     </h4>
                                     <p
-                                        class="text-gray-500 text-sm font-medium"
+                                        class="text-gray-500 dark:text-slate-400 text-sm font-medium"
                                     >
                                         Bagikan pengalaman Anda mengunjungi
                                         tempat ini kepada wisatawan lain.
@@ -460,8 +459,8 @@
                                         class="flex items-start gap-3 p-4 rounded-2xl text-sm font-bold"
                                         :class="
                                             reviewToast.type === 'success'
-                                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                                : 'bg-red-50 text-red-700 border border-red-200'
+                                                ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30'
+                                                : 'bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/30'
                                         "
                                     >
                                         <span class="text-xl flex-shrink-0">{{
@@ -475,15 +474,15 @@
 
                                 <div
                                     v-if="!$page.props.auth.user"
-                                    class="p-6 bg-white rounded-2xl border border-gray-100 text-center space-y-4"
+                                    class="p-6 bg-white dark:bg-slate-950 rounded-2xl border border-gray-100 dark:border-slate-800 text-center space-y-4"
                                 >
-                                    <p class="text-gray-600 font-bold">
+                                    <p class="text-gray-600 dark:text-slate-350 font-bold">
                                         Silakan login terlebih dahulu untuk
                                         memberikan ulasan.
                                     </p>
                                     <a
                                         :href="route('login')"
-                                        class="inline-flex bg-primary text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg shadow-primary/20"
+                                        class="inline-flex bg-primary text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg shadow-primary/20 cursor-pointer"
                                         >Login Sekarang</a
                                     >
                                 </div>
@@ -496,7 +495,7 @@
                                     <!-- Rating -->
                                     <div class="space-y-4">
                                         <label
-                                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2"
+                                            class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest pl-2"
                                             >Rating Anda</label
                                         >
                                         <div class="flex gap-2">
@@ -505,11 +504,11 @@
                                                 :key="i"
                                                 type="button"
                                                 @click="form.rating = i"
-                                                class="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2"
+                                                class="w-12 h-12 rounded-xl flex items-center justify-center transition-all border-2 cursor-pointer"
                                                 :class="
                                                     form.rating >= i
-                                                        ? 'bg-yellow-50 border-yellow-400 text-yellow-500 shadow-lg shadow-yellow-500/10'
-                                                        : 'bg-white border-gray-100 text-gray-200 hover:border-yellow-200'
+                                                        ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-400 text-yellow-500 shadow-lg shadow-yellow-500/10'
+                                                        : 'bg-white dark:bg-slate-950 border-gray-100 dark:border-slate-800 text-gray-200 dark:text-slate-800 hover:border-yellow-200'
                                                 "
                                             >
                                                 <svg
@@ -532,28 +531,28 @@
                                     <!-- Judul -->
                                     <div class="space-y-2">
                                         <label
-                                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2"
+                                            class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest pl-2"
                                             >Judul (Opsional)</label
                                         >
                                         <input
                                             v-model="form.judul"
                                             type="text"
                                             placeholder="Contoh: Sangat Indah!"
-                                            class="w-full bg-white border border-gray-200 rounded-2xl px-6 py-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300"
+                                            class="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-2xl px-6 py-4 text-gray-900 dark:text-slate-100 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300 dark:placeholder-slate-700"
                                         />
                                     </div>
 
                                     <!-- Komentar -->
                                     <div class="space-y-2">
                                         <label
-                                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2"
+                                            class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest pl-2"
                                             >Komentar Ulasan</label
                                         >
                                         <textarea
                                             v-model="form.komentar"
                                             rows="4"
                                             placeholder="Tuliskan detail pengalaman Anda di sini..."
-                                            class="w-full bg-white border border-gray-200 rounded-3xl px-6 py-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300"
+                                            class="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-3xl px-6 py-4 text-gray-900 dark:text-slate-100 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300 dark:placeholder-slate-700"
                                         ></textarea>
                                         <span
                                             v-if="form.errors.komentar"
@@ -565,11 +564,11 @@
                                     <!-- Upload Foto -->
                                     <div class="space-y-4">
                                         <label
-                                            class="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-2"
+                                            class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest pl-2"
                                             >Foto (Maks. 5)</label
                                         >
                                         <label
-                                            class="flex flex-col items-center justify-center gap-3 px-6 py-8 border-2 border-dashed border-gray-200 rounded-3xl bg-white hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
+                                            class="flex flex-col items-center justify-center gap-3 px-6 py-8 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-3xl bg-white dark:bg-slate-950 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/5 transition-all cursor-pointer group"
                                         >
                                             <svg
                                                 class="w-10 h-10 text-gray-300 group-hover:text-primary transition-colors"
@@ -591,7 +590,7 @@
                                                     Unggah foto
                                                 </p>
                                                 <p
-                                                    class="text-xs text-gray-400 font-medium mt-1"
+                                                    class="text-xs text-gray-400 dark:text-slate-500 font-medium mt-1"
                                                 >
                                                     PNG, JPG hingga 25MB · Maks.
                                                     5 foto
@@ -616,7 +615,7 @@
                                                     src, index
                                                 ) in reviewPreviews"
                                                 :key="index"
-                                                class="relative group aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+                                                class="relative group aspect-square rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-800 shadow-sm"
                                             >
                                                 <img
                                                     :src="src"
@@ -647,7 +646,7 @@
                                     <button
                                         type="submit"
                                         :disabled="form.processing"
-                                        class="bg-gray-900 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                        class="bg-gray-900 dark:bg-slate-100 text-white dark:text-slate-900 px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                     >
                                         {{
                                             form.processing
@@ -664,7 +663,7 @@
                     <div class="lg:col-span-4 space-y-8">
                         <!-- Quick Info Card -->
                         <div
-                            class="bg-gray-900 text-white rounded-[3rem] p-8 shadow-2xl relative overflow-hidden"
+                            class="bg-gray-900 dark:bg-slate-900 text-white rounded-[3rem] p-8 shadow-2xl relative overflow-hidden border dark:border-slate-800"
                         >
                             <div
                                 class="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] -mr-16 -mt-16"
@@ -765,7 +764,7 @@
                                         </div>
                                         <div class="space-y-1.5 pt-1">
                                             <div
-                                                class="flex justify-between items-center bg-white/5 p-2 rounded-xl"
+                                                class="flex justify-between items-center bg-white/5 dark:bg-slate-950/40 p-2 rounded-xl"
                                             >
                                                 <span
                                                     class="text-[10px] font-bold text-gray-400"
@@ -786,7 +785,7 @@
                                                 >
                                             </div>
                                             <div
-                                                class="flex justify-between items-center bg-white/5 p-2 rounded-xl"
+                                                class="flex justify-between items-center bg-white/5 dark:bg-slate-950/40 p-2 rounded-xl"
                                             >
                                                 <span
                                                     class="text-[10px] font-bold text-gray-400"
@@ -807,7 +806,7 @@
                                                 >
                                             </div>
                                             <div
-                                                class="flex justify-between items-center bg-white/5 p-2 rounded-xl"
+                                                class="flex justify-between items-center bg-white/5 dark:bg-slate-950/40 p-2 rounded-xl"
                                             >
                                                 <span
                                                     class="text-[10px] font-bold text-gray-400"
@@ -974,28 +973,7 @@
                                 </li>
                             </ul>
 
-                            <a
-                                :href="`https://www.google.com/maps?q=${objekWisata.latitude},${objekWisata.longitude}`"
-                                target="_blank"
-                                class="w-full mt-10 bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-md hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
-                            >
-                                <svg
-                                    class="w-4 h-4"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                        stroke-width="2"
-                                    />
-                                    <path
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                        stroke-width="2"
-                                    />
-                                </svg>
-                                Kunjungi Sekarang
-                            </a>
+
 
                             <div class="mt-8 border-t border-white/10 pt-8">
                                 <h4
@@ -1055,7 +1033,7 @@
 
                         <!-- Mini Map Card -->
                         <div
-                            class="bg-white rounded-[3rem] border border-gray-100 p-8 shadow-sm space-y-6"
+                            class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-slate-800 p-8 shadow-sm space-y-6"
                         >
                             <h4
                                 class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400"
@@ -1064,7 +1042,7 @@
                             </h4>
                             <div
                                 id="mini-map"
-                                class="w-full h-64 rounded-3xl overflow-hidden border border-gray-100 z-10"
+                                class="w-full h-64 rounded-3xl overflow-hidden border border-gray-100 dark:border-slate-800 z-10"
                             ></div>
                             <div class="text-center">
                                 <a
@@ -1080,7 +1058,7 @@
                         <!-- Nearby UMKM Card -->
                         <div
                             v-if="nearbyUmkms && nearbyUmkms.length > 0"
-                            class="bg-white rounded-[3rem] border border-gray-100 p-8 shadow-sm space-y-6"
+                            class="bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-100 dark:border-slate-800 p-8 shadow-sm space-y-6"
                         >
                             <div class="flex items-center gap-3">
                                 <div
@@ -1096,11 +1074,11 @@
                                 <div
                                     v-for="umkm in nearbyUmkms"
                                     :key="umkm.id"
-                                    class="flex items-center gap-4 p-4 rounded-2xl bg-amber-50/60 hover:bg-amber-50 border border-amber-100/60 hover:border-amber-200 transition-all group"
+                                    class="flex items-center gap-4 p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/10 hover:bg-amber-50 dark:hover:bg-amber-950/20 border border-amber-100/60 dark:border-amber-900/20 hover:border-amber-200 dark:hover:border-amber-800/40 transition-all group"
                                 >
                                     <!-- Photo / Emoji -->
                                     <div
-                                        class="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-100 flex items-center justify-center shadow-inner"
+                                        class="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center shadow-inner"
                                     >
                                         <img
                                             v-if="
@@ -1122,12 +1100,12 @@
                                             class="flex items-center gap-2 mb-1"
                                         >
                                             <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-200 text-amber-800 text-[9px] font-black uppercase tracking-wide leading-none"
+                                                class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-200 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400 text-[9px] font-black uppercase tracking-wide leading-none"
                                                 >{{ umkm.kategori }}</span
                                             >
                                         </div>
                                         <p
-                                            class="font-black text-gray-900 text-sm truncate leading-tight group-hover:text-amber-700 transition-colors"
+                                            class="font-black text-gray-900 dark:text-slate-100 text-sm truncate leading-tight group-hover:text-amber-700 transition-colors"
                                         >
                                             {{ umkm.nama_umkm }}
                                         </p>
@@ -1150,7 +1128,7 @@
                                                 />
                                             </svg>
                                             <span
-                                                class="text-[10px] font-bold text-amber-600"
+                                                class="text-[10px] font-bold text-amber-600 dark:text-amber-500"
                                                 >{{
                                                     Number(
                                                         umkm.distance,
@@ -1218,12 +1196,12 @@
                 >
                     <div
                         v-if="isFasilitasModalOpen"
-                        class="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+                        class="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border dark:border-slate-800 overflow-hidden flex flex-col max-h-[90vh]"
                     >
                         <!-- Tombol Close -->
                         <button
                             @click="closeFasilitasModal"
-                            class="absolute top-6 right-6 z-10 w-10 h-10 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors"
+                            class="absolute top-6 right-6 z-10 w-10 h-10 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-colors cursor-pointer"
                         >
                             <svg
                                 class="w-5 h-5"
@@ -1242,7 +1220,7 @@
 
                         <!-- Header / Gambar (Opsional jika fasilitas ada gambar) -->
                         <div
-                            class="relative h-48 md:h-64 bg-slate-100 flex-shrink-0"
+                            class="relative h-48 md:h-64 bg-slate-100 dark:bg-slate-950 flex-shrink-0"
                         >
                             <!-- Background gradient pattern if no photo -->
                             <div
@@ -1279,7 +1257,7 @@
                             ></div>
 
                             <div
-                                class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-white to-transparent"
+                                class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-white dark:from-slate-900 to-transparent"
                                 v-if="!selectedFasilitas?.fotos?.length"
                             ></div>
                         </div>
@@ -1299,19 +1277,19 @@
                                         }}
                                     </div>
                                     <h3
-                                        class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight"
+                                        class="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight"
                                     >
                                         {{ selectedFasilitas?.nama_fasilitas }}
                                     </h3>
                                 </div>
 
                                 <div
-                                    class="prose prose-sm md:prose-base text-slate-600 leading-relaxed font-medium"
+                                    class="prose prose-sm md:prose-base text-slate-600 dark:text-slate-300 leading-relaxed font-medium"
                                 >
                                     <p v-if="selectedFasilitas?.deskripsi">
                                         {{ selectedFasilitas.deskripsi }}
                                     </p>
-                                    <p v-else class="italic text-slate-400">
+                                    <p v-else class="italic text-slate-400 dark:text-slate-500">
                                         Tidak ada deskripsi rinci untuk
                                         fasilitas ini.
                                     </p>
@@ -1319,10 +1297,10 @@
 
                                 <div
                                     v-if="selectedFasilitas?.fotos?.length > 1"
-                                    class="pt-6 border-t border-slate-100"
+                                    class="pt-6 border-t border-slate-100 dark:border-slate-800"
                                 >
                                     <h4
-                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4"
+                                        class="text-[10px] font-black text-slate-400 dark:text-slate-550 uppercase tracking-widest mb-4"
                                     >
                                         Galeri Fasilitas
                                     </h4>
@@ -1336,7 +1314,7 @@
                                             :key="foto.id"
                                             :href="'/storage/' + foto.path"
                                             target="_blank"
-                                            class="aspect-square sm:aspect-video rounded-xl overflow-hidden border border-slate-100 shadow-sm relative group block"
+                                            class="aspect-square sm:aspect-video rounded-xl overflow-hidden border border-slate-100 dark:border-slate-850 shadow-sm relative group block"
                                         >
                                             <img
                                                 :src="'/storage/' + foto.path"
@@ -1363,11 +1341,11 @@
                                 </div>
 
                                 <div
-                                    class="pt-6 border-t border-slate-100 flex justify-end"
+                                    class="pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-end"
                                 >
                                     <button
                                         @click="closeFasilitasModal"
-                                        class="px-8 py-3 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-primary transition-colors"
+                                        class="px-8 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-primary transition-colors cursor-pointer"
                                     >
                                         Tutup
                                     </button>
@@ -1421,6 +1399,7 @@ import {
     Camera,
     TreePine,
     MapPin,
+    Landmark,
 } from "lucide-vue-next";
 
 const props = defineProps({
@@ -1456,49 +1435,29 @@ const closeFasilitasModal = () => {
     }, 300);
 };
 
-const getFasilitasIcon = (kategoriFasilitas) => {
+const getFasilitasIcon = (kategoriFasilitas, namaFasilitas) => {
     const defaultIcon = MapPin;
-    if (!kategoriFasilitas) return defaultIcon;
+    const kat = (kategoriFasilitas || '').toLowerCase();
+    const nm = (namaFasilitas || '').toLowerCase();
 
-    const kat = kategoriFasilitas.toLowerCase();
+    // Check name keywords first for specific matches
+    if (nm.includes("parkir")) return Car;
+    if (nm.includes("toilet") || nm.includes("kamar mandi") || nm.includes("wc") || nm.includes("toilet/wc")) return Bath;
+    if (nm.includes("mushola") || nm.includes("mesjid") || nm.includes("masjid") || nm.includes("ibadah") || nm.includes("gereja") || nm.includes("vihara") || nm.includes("pura")) return Landmark;
+    if (nm.includes("wifi") || nm.includes("internet")) return Wifi;
+    if (nm.includes("keamanan") || nm.includes("pos security") || nm.includes("pos satpam") || nm.includes("pos polisi")) return ShieldCheck;
+    if (nm.includes("foto") || nm.includes("spot") || nm.includes("selfie")) return Camera;
+    if (nm.includes("toko") || nm.includes("warung") || nm.includes("souvenir") || nm.includes("oleh-oleh") || nm.includes("kios") || nm.includes("belanja")) return ShoppingBag;
+    if (nm.includes("makan") || nm.includes("restoran") || nm.includes("cafe") || nm.includes("kuliner") || nm.includes("kopi") || nm.includes("food")) return Utensils;
+    if (nm.includes("hotel") || nm.includes("penginapan") || nm.includes("villa") || nm.includes("resort") || nm.includes("homestay") || nm.includes("akomodasi")) return Bed;
+    if (nm.includes("taman") || nm.includes("camping") || nm.includes("outbound") || nm.includes("alam") || nm.includes("kebun")) return TreePine;
+    if (nm.includes("informasi") || nm.includes("info center") || nm.includes("pusat informasi") || nm.includes("guide")) return Info;
 
-    if (kat.includes("parkir")) return Car;
-    if (
-        kat.includes("makan") ||
-        kat.includes("restoran") ||
-        kat.includes("kuliner")
-    )
-        return Utensils;
-    if (kat.includes("minum") || kat.includes("cafe") || kat.includes("kopi"))
-        return Coffee;
-    if (kat.includes("informasi")) return Info;
-    if (
-        kat.includes("belanja") ||
-        kat.includes("oleh-oleh") ||
-        kat.includes("toko")
-    )
-        return ShoppingBag;
-    if (
-        kat.includes("toilet") ||
-        kat.includes("kamar mandi") ||
-        kat.includes("wc")
-    )
-        return Bath;
-    if (kat.includes("keamanan") || kat.includes("pos")) return ShieldCheck;
-    if (
-        kat.includes("penginapan") ||
-        kat.includes("hotel") ||
-        kat.includes("villa")
-    )
-        return Bed;
-    if (kat.includes("foto") || kat.includes("spot")) return Camera;
-    if (
-        kat.includes("alam") ||
-        kat.includes("taman") ||
-        kat.includes("camping")
-    )
-        return TreePine;
-    if (kat.includes("wifi") || kat.includes("internet")) return Wifi;
+    // Check category fallback keywords
+    if (kat.includes("akomodasi")) return Bed;
+    if (kat.includes("kuliner")) return Utensils;
+    if (kat.includes("transportasi")) return Car;
+    if (kat.includes("umum")) return MapPin;
 
     return defaultIcon;
 };

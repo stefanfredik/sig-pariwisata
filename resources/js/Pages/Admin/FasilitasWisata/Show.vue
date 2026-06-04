@@ -10,7 +10,17 @@ import {
     Pencil,
     LayoutGrid,
     Info,
-    Image as ImageIcon
+    Image as ImageIcon,
+    Wifi,
+    Car,
+    Utensils,
+    ShoppingBag,
+    Bath,
+    ShieldCheck,
+    Bed,
+    Camera,
+    TreePine,
+    Landmark
 } from 'lucide-vue-next'
 import { ref } from 'vue'
 import ImageLightbox from "@/Components/ImageLightbox.vue"
@@ -37,6 +47,32 @@ const formatDate = (dateString: string) => {
         year: 'numeric'
     })
 }
+const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
+    const defaultIcon = MapPin;
+    const kat = (kategoriFasilitas || '').toLowerCase();
+    const nm = (namaFasilitas || '').toLowerCase();
+
+    // Check name keywords first for specific matches
+    if (nm.includes("parkir")) return Car;
+    if (nm.includes("toilet") || nm.includes("kamar mandi") || nm.includes("wc") || nm.includes("toilet/wc")) return Bath;
+    if (nm.includes("mushola") || nm.includes("mesjid") || nm.includes("masjid") || nm.includes("ibadah") || nm.includes("gereja") || nm.includes("vihara") || nm.includes("pura")) return Landmark;
+    if (nm.includes("wifi") || nm.includes("internet")) return Wifi;
+    if (nm.includes("keamanan") || nm.includes("pos security") || nm.includes("pos satpam") || nm.includes("pos polisi")) return ShieldCheck;
+    if (nm.includes("foto") || nm.includes("spot") || nm.includes("selfie")) return Camera;
+    if (nm.includes("toko") || nm.includes("warung") || nm.includes("souvenir") || nm.includes("oleh-oleh") || nm.includes("kios") || nm.includes("belanja")) return ShoppingBag;
+    if (nm.includes("makan") || nm.includes("restoran") || nm.includes("cafe") || nm.includes("kuliner") || nm.includes("kopi") || nm.includes("food")) return Utensils;
+    if (nm.includes("hotel") || nm.includes("penginapan") || nm.includes("villa") || nm.includes("resort") || nm.includes("homestay") || nm.includes("akomodasi")) return Bed;
+    if (nm.includes("taman") || nm.includes("camping") || nm.includes("outbound") || nm.includes("alam") || nm.includes("kebun")) return TreePine;
+    if (nm.includes("informasi") || nm.includes("info center") || nm.includes("pusat informasi") || nm.includes("guide")) return Info;
+
+    // Check category fallback keywords
+    if (kat.includes("akomodasi")) return Bed;
+    if (kat.includes("kuliner")) return Utensils;
+    if (kat.includes("transportasi")) return Car;
+    if (kat.includes("umum")) return MapPin;
+
+    return defaultIcon;
+};
 </script>
 
 <template>
@@ -52,8 +88,8 @@ const formatDate = (dateString: string) => {
                         </Link>
                     </Button>
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-2xl shadow-sm">
-                            {{ fasilitas.icon || '📍' }}
+                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+                            <component :is="getFasilitasIcon(fasilitas.kategori_fasilitas, fasilitas.nama_fasilitas)" class="w-6 h-6 text-primary" />
                         </div>
                         <div>
                             <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{{ fasilitas.nama_fasilitas }}</h1>

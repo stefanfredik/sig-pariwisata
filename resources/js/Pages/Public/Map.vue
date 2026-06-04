@@ -276,7 +276,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, onUnmounted, ref, computed, watch } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import L from 'leaflet';
@@ -486,7 +486,31 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     return (R * c).toFixed(1);
 };
 
+let observer;
+
+onUnmounted(() => {
+    if (observer) {
+        observer.disconnect();
+    }
+});
+
 onMounted(() => {
+    // Determine initial map theme layer based on html class
+    if (document.documentElement.classList.contains('dark')) {
+        activeLayer.value = 'dark';
+    }
+
+    // Set up MutationObserver to switch map theme dynamically when user toggles dark mode
+    observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const isDark = document.documentElement.classList.contains('dark');
+                activeLayer.value = isDark ? 'dark' : 'street';
+            }
+        });
+    });
+    observer.observe(document.documentElement, { attributes: true });
+
     // Initial map focus on Manggarai Barat / Labuan Bajo
     map.value = L.map('main-map', {
         zoomControl: false,
@@ -552,7 +576,7 @@ onMounted(() => {
 
             const getPopupContent = () => {
                 const distanceStr = userLocation.value
-                    ? `<div class="flex items-center gap-1 text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
+                    ? `<div class="flex items-center gap-1 text-[10px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-1 rounded-lg">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-width="3"/></svg>
                         ${calculateDistance(userLocation.value.lat, userLocation.value.lng, objek.latitude, objek.longitude)} KM
                        </div>`
@@ -565,15 +589,15 @@ onMounted(() => {
                 ].filter(p => p !== null && p !== undefined);
                 const minPrice = prices.length > 0 ? Math.min(...prices) : null;
                 const priceStr = minPrice 
-                    ? `<div class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">Rp ${minPrice.toLocaleString('id-ID')}</div>`
-                    : '<div class="text-[10px] font-black text-slate-400 bg-slate-50 px-2 py-1 rounded-lg">Gratis</div>';
+                    ? `<div class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded-lg">Rp ${minPrice.toLocaleString('id-ID')}</div>`
+                    : '<div class="text-[10px] font-black text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/40 px-2 py-1 rounded-lg">Gratis</div>';
 
                 let aksesTransportasiHtml = '';
                 if (objek.akses_transportasi && objek.akses_transportasi.length > 0) {
                     aksesTransportasiHtml = `
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                        <div class="bg-slate-50 dark:bg-slate-950/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/80">
                             <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1">Akses Transportasi</div>
-                            <ul class="text-[10px] text-slate-600 font-bold space-y-1">
+                            <ul class="text-[10px] text-slate-600 dark:text-slate-300 font-bold space-y-1">
                                 ${objek.akses_transportasi.map(akses => `
                                     <li class="flex items-start gap-1">
                                         <svg class="w-3.5 h-3.5 text-emerald-500 mt-[-1px] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
@@ -587,11 +611,11 @@ onMounted(() => {
 
                 const description = objek.daya_tarik_utama 
                     ? `<div class="text-[10px] font-black text-primary uppercase tracking-wider mb-1">Daya Tarik Utama</div>
-                       <p class="text-xs text-slate-700 italic font-bold leading-relaxed mb-1">${objek.daya_tarik_utama}</p>`
-                    : `<p class="text-xs text-slate-500 line-clamp-2 font-medium leading-relaxed">${objek.keterangan || 'Jelajahi keindahan alam yang memukau di destinasi ini.'}</p>`;
+                       <p class="text-xs text-slate-700 dark:text-slate-300 italic font-bold leading-relaxed mb-1">${objek.daya_tarik_utama}</p>`
+                    : `<p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 font-medium leading-relaxed">${objek.keterangan || 'Jelajahi keindahan alam yang memukau di destinasi ini.'}</p>`;
 
                 return `
-                    <div class="w-72 font-sans p-0 overflow-hidden bg-white flex flex-col">
+                    <div class="w-72 font-sans p-0 overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
                         <div class="relative h-40">
                             <img src="${objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1'}" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
@@ -610,7 +634,7 @@ onMounted(() => {
                             ${description}
                             ${aksesTransportasiHtml}
                             <div class="grid grid-cols-2 gap-3">
-                                <a href="/destinasi/${objek.slug}" class="flex items-center justify-center gap-2 bg-slate-900 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all text-center no-underline">
+                                <a href="/destinasi/${objek.slug}" class="flex items-center justify-center gap-2 bg-slate-900 dark:bg-slate-800 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all text-center no-underline">
                                     <span>Detail</span>
                                 </a>
                                 <button onclick="window.startRouting(${objek.id})" class="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
@@ -699,13 +723,13 @@ onMounted(() => {
             const marker = L.marker([umkm.latitude, umkm.longitude], { icon });
 
             const popupContent = `
-                <div class="w-72 font-sans p-0 overflow-hidden bg-white flex flex-col">
+                <div class="w-72 font-sans p-0 overflow-hidden bg-white dark:bg-slate-900 flex flex-col">
                     ${imgSrc ? `<div class="relative h-32"><img src="${imgSrc}" class="w-full h-full object-cover"><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div><div class="absolute bottom-3 left-4"><div class="text-[9px] font-black text-amber-400 uppercase tracking-widest mb-0.5">UMKM</div><h3 class="font-black text-white text-base leading-tight">${umkm.nama_umkm}</h3></div></div>` : ''}
                     <div class="p-5 space-y-3">
-                        ${!imgSrc ? `<h3 class="font-black text-slate-900 text-base">${umkm.nama_umkm}</h3>` : ''}
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-[10px] font-black uppercase tracking-wider">${umkm.kategori}</div>
-                        <p class="text-xs text-slate-500 line-clamp-2 font-medium leading-relaxed">${umkm.alamat || ''}</p>
-                        ${umkm.keterangan ? `<p class="text-xs text-slate-400 line-clamp-2">${umkm.keterangan}</p>` : ''}
+                        ${!imgSrc ? `<h3 class="font-black text-slate-900 dark:text-white text-base">${umkm.nama_umkm}</h3>` : ''}
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">${umkm.kategori}</div>
+                        <p class="text-xs text-slate-500 dark:text-slate-300 line-clamp-2 font-medium leading-relaxed">${umkm.alamat || ''}</p>
+                        ${umkm.keterangan ? `<p class="text-xs text-slate-400 dark:text-slate-400 line-clamp-2">${umkm.keterangan}</p>` : ''}
                     </div>
                 </div>
             `;

@@ -13,23 +13,23 @@
         <!-- Sticky Header Background -->
         <div class="bg-gray-900"></div>
 
-        <section class="py-12 bg-white">
+        <section class="py-12 bg-white dark:bg-slate-950 transition-colors duration-300">
             <div class="max-w-7xl mx-auto px-4">
                 <!-- Breadcrumbs & Title -->
                 <div class="mb-10 space-y-4">
-                    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-500">
                         <a :href="route('home')" class="hover:text-primary">Home</a>
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2" stroke="currentColor" /></svg>
                         <a :href="route('public.events.index')" class="hover:text-primary">Events</a>
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="2" stroke="currentColor" /></svg>
-                        <span class="text-gray-900">{{ event.nama_event }}</span>
+                        <span class="text-gray-900 dark:text-slate-100">{{ event.nama_event }}</span>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div class="space-y-2">
                              <div class="text-xs font-black text-primary uppercase tracking-[0.2em] italic">
                                 {{ event.objek_wisata ? event.objek_wisata.nama_objek : 'Lokasi Umum' }}, Manggarai Barat
                             </div>
-                            <h1 class="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter">{{ event.nama_event }}</h1>
+                            <h1 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-slate-100 tracking-tighter">{{ event.nama_event }}</h1>
                         </div>
                         <div class="flex items-center gap-4">
                              <span 
@@ -51,7 +51,7 @@
                     <div class="lg:col-span-8 space-y-12">
                         <!-- Image Gallery -->
                         <div class="relative group">
-                            <div class="aspect-[16/9] rounded-[3rem] overflow-hidden bg-gray-100 shadow-2xl relative">
+                            <div class="aspect-[16/9] rounded-[3rem] overflow-hidden bg-gray-100 dark:bg-slate-900 shadow-2xl relative">
                                 <img 
                                     :src="mainPhoto" 
                                     class="w-full h-full object-cover"
@@ -75,9 +75,9 @@
                         <div class="space-y-6">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-1 bg-primary rounded-full"></div>
-                                <h3 class="text-sm font-black text-gray-900 uppercase tracking-[0.2em]">Tentang Event</h3>
+                                <h3 class="text-sm font-black text-gray-900 dark:text-slate-100 uppercase tracking-[0.2em]">Tentang Event</h3>
                             </div>
-                            <div class="prose prose-lg max-w-none text-gray-600 font-medium leading-relaxed">
+                            <div class="prose prose-lg max-w-none text-gray-600 dark:text-slate-300 font-medium leading-relaxed whitespace-pre-line">
                                 {{ event.keterangan }}
                             </div>
                         </div>
@@ -86,7 +86,7 @@
                     <!-- Right Side: Sidebar Info -->
                     <div class="lg:col-span-4 space-y-8">
                         <!-- Quick Info Card -->
-                        <div class="bg-gray-900 text-white rounded-[3rem] p-8 shadow-2xl relative overflow-hidden">
+                        <div class="bg-gray-900 dark:bg-slate-900 border border-transparent dark:border-slate-800 text-white rounded-[3rem] p-8 shadow-2xl relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] -mr-16 -mt-16"></div>
                             
                             <h4 class="text-sm font-black uppercase tracking-[0.3em] text-primary/80 mb-8">Detail Acara</h4>
@@ -97,7 +97,7 @@
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 00-2 2z" stroke-width="2" stroke="currentColor" /></svg>
                                     </div>
                                     <div class="space-y-1">
-                                        <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Tanggal</div>
+                                        <div class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Tanggal</div>
                                         <div class="text-sm font-bold leading-relaxed">{{ formatDateRange(event.tanggal_mulai, event.tanggal_selesai) }}</div>
                                     </div>
                                 </li>
@@ -106,7 +106,7 @@
                                         <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2" stroke="currentColor" /></svg>
                                     </div>
                                     <div class="space-y-1">
-                                        <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest">Lokasi</div>
+                                        <div class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Lokasi</div>
                                         <div class="text-sm font-bold leading-relaxed">{{ event.objek_wisata ? event.objek_wisata.nama_objek : 'Lokasi Umum, Manggarai Barat' }}</div>
                                     </div>
                                 </li>

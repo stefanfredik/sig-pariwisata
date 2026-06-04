@@ -60,29 +60,29 @@
         </section>
 
         <!-- Stats Section -->
-        <section class="py-20 bg-white relative overflow-hidden">
+        <section class="py-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 relative overflow-hidden">
             <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
                 <div class="text-center group">
-                    <div class="text-4xl md:text-6xl font-black text-gray-900 mb-2 group-hover:text-primary transition-colors">{{ stats.objek_count }}+</div>
-                    <div class="text-xs font-black text-gray-400 uppercase tracking-widest">Destinasi Wisata</div>
+                    <div class="text-4xl md:text-6xl font-black text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary transition-colors">{{ stats.objek_count }}+</div>
+                    <div class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Destinasi Wisata</div>
                 </div>
                 <div class="text-center group">
-                    <div class="text-4xl md:text-6xl font-black text-gray-900 mb-2 group-hover:text-primary transition-colors">{{ stats.kecamatan_count }}</div>
-                    <div class="text-xs font-black text-gray-400 uppercase tracking-widest">Kecamatan</div>
+                    <div class="text-4xl md:text-6xl font-black text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary transition-colors">{{ stats.kecamatan_count }}</div>
+                    <div class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Kecamatan</div>
                 </div>
                 <div class="text-center group">
-                    <div class="text-4xl md:text-6xl font-black text-gray-900 mb-2 group-hover:text-primary transition-colors">{{ stats.event_count }}+</div>
-                    <div class="text-xs font-black text-gray-400 uppercase tracking-widest">Event Tahunan</div>
+                    <div class="text-4xl md:text-6xl font-black text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary transition-colors">{{ stats.event_count }}+</div>
+                    <div class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Event Tahunan</div>
                 </div>
                 <div class="text-center group">
-                    <div class="text-4xl md:text-6xl font-black text-gray-900 mb-2 group-hover:text-primary transition-colors">4.8</div>
-                    <div class="text-xs font-black text-gray-400 uppercase tracking-widest">Rating Rata-rata</div>
+                    <div class="text-4xl md:text-6xl font-black text-gray-900 dark:text-slate-100 mb-2 group-hover:text-primary transition-colors">4.8</div>
+                    <div class="text-xs font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Rating Rata-rata</div>
                 </div>
             </div>
         </section>
 
         <!-- Popular Destinations -->
-        <section class="py-24 bg-gray-50 overflow-hidden">
+        <section class="py-24 bg-gray-50 dark:bg-slate-950 overflow-hidden">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
                     <div class="space-y-4">
@@ -90,9 +90,9 @@
                             <div class="w-8 h-1 bg-primary rounded-full"></div>
                             <span class="text-xs font-black text-primary uppercase tracking-[0.2em]">Destinasi Pilihan</span>
                         </div>
-                        <h2 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Menjelajahi yang <span class="text-primary italic">Populer</span></h2>
+                        <h2 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-slate-100 tracking-tight">Menjelajahi yang <span class="text-primary italic">Populer</span></h2>
                     </div>
-                    <a :href="route('public.objek-wisata.index')" class="inline-flex items-center gap-2 text-sm font-black text-gray-900 hover:text-primary transition-colors group uppercase tracking-widest">
+                    <a :href="route('public.objek-wisata.index')" class="inline-flex items-center gap-2 text-sm font-black text-gray-900 dark:text-slate-200 hover:text-primary transition-colors group uppercase tracking-widest">
                         Semua Destinasi 
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -101,7 +101,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div v-for="objek in popularObjects" :key="objek.id" class="group bg-white rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 flex flex-col border border-gray-100">
+                    <div v-for="objek in popularObjects" :key="objek.id" class="group bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 hover:-translate-y-2 flex flex-col border border-gray-100 dark:border-slate-800">
                         <div class="relative aspect-[4/5] overflow-hidden">
                             <img 
                                 :src="objek.fotos.length > 0 ? '/storage/' + objek.fotos[0].path : 'https://images.unsplash.com/photo-1544911845-1f34a3eb46b1?q=80&w=1000'" 
@@ -111,11 +111,11 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
                             
                             <!-- Rating Badge -->
-                            <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md shadow-lg flex items-center gap-1.5 border border-white/20">
+                            <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-lg flex items-center gap-1.5 border border-white/20 dark:border-slate-800">
                                 <svg class="w-3.5 h-3.5 text-yellow-500 fill-current" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
-                                <span class="text-xs font-black text-gray-900">{{ objek.rating_avg ? Number(objek.rating_avg).toFixed(1) : 'NEW' }}</span>
+                                <span class="text-xs font-black text-gray-900 dark:text-slate-100">{{ objek.rating_avg ? Number(objek.rating_avg).toFixed(1) : 'NEW' }}</span>
                             </div>
 
                             <div class="absolute bottom-6 left-6 right-6 text-white space-y-1">
@@ -124,18 +124,18 @@
                             </div>
                         </div>
                         <div class="p-6 space-y-4">
-                            <p class="text-sm text-gray-500 line-clamp-3 leading-relaxed font-medium">
+                            <p class="text-sm text-gray-500 dark:text-slate-400 line-clamp-3 leading-relaxed font-medium">
                                 <span v-if="objek.daya_tarik_utama" class="text-primary font-black uppercase text-[9px] block mb-1">Daya Tarik Utama</span>
                                 {{ objek.daya_tarik_utama || objek.keterangan }}
                             </p>
-                            <div class="pt-4 border-t border-gray-50 flex items-center justify-between">
-                                <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            <div class="pt-4 border-t border-gray-50 dark:border-slate-800 flex items-center justify-between">
+                                <div class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">
                                     {{ getStartingPrice(objek) 
                                         ? 'Mulai dari Rp ' + getStartingPrice(objek).toLocaleString('id-ID') 
                                         : 'Gratis / Cek Detail' }}
                                 </div>
-                                <a :href="route('public.objek-wisata.show', objek.slug)" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-primary transition-colors">
-                                    <svg class="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <a :href="route('public.objek-wisata.show', objek.slug)" class="w-10 h-10 rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center group-hover:bg-primary transition-colors">
+                                    <svg class="w-5 h-5 text-gray-400 dark:text-slate-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                     </svg>
                                 </a>
@@ -147,7 +147,7 @@
         </section>
 
         <!-- Events Section -->
-        <section v-if="upcomingEvents.length > 0" class="py-24 bg-white relative">
+        <section v-if="upcomingEvents.length > 0" class="py-24 bg-white dark:bg-slate-900 border-t dark:border-slate-800 relative">
             <div class="max-w-7xl mx-auto px-4">
                  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
                     <div class="space-y-4">
@@ -155,9 +155,9 @@
                             <div class="w-8 h-1 bg-primary rounded-full"></div>
                             <span class="text-xs font-black text-primary uppercase tracking-[0.2em]">Agenda Seru</span>
                         </div>
-                        <h2 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Event <span class="text-primary italic">Mendatang</span></h2>
+                        <h2 class="text-4xl md:text-5xl font-black text-gray-900 dark:text-slate-100 tracking-tight">Event <span class="text-primary italic">Mendatang</span></h2>
                     </div>
-                    <a :href="route('public.events.index')" class="inline-flex items-center gap-2 text-sm font-black text-gray-900 hover:text-primary transition-colors group uppercase tracking-widest">
+                    <a :href="route('public.events.index')" class="inline-flex items-center gap-2 text-sm font-black text-gray-900 dark:text-slate-200 hover:text-primary transition-colors group uppercase tracking-widest">
                         Semua Event 
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -166,28 +166,28 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                    <a v-for="event in upcomingEvents" :key="event.id" :href="route('public.events.show', event.slug)" class="group flex flex-col bg-white rounded-[2.5rem] p-4 border border-gray-100 hover:border-primary/20 transition-all hover:shadow-2xl hover:shadow-primary/5">
+                    <a v-for="event in upcomingEvents" :key="event.id" :href="route('public.events.show', event.slug)" class="group flex flex-col bg-white dark:bg-slate-950 rounded-[2.5rem] p-4 border border-gray-100 dark:border-slate-800 hover:border-primary/20 transition-all hover:shadow-2xl hover:shadow-primary/5">
                         <div class="relative w-full aspect-video rounded-[2rem] overflow-hidden">
                              <img 
                                 :src="event.fotos.length > 0 ? '/storage/' + event.fotos[0].path : 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1000'" 
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 :alt="event.nama_event"
                             >
-                            <div class="absolute top-4 left-4 inline-flex flex-col items-center bg-white rounded-2xl p-2 px-3 shadow-xl">
+                            <div class="absolute top-4 left-4 inline-flex flex-col items-center bg-white dark:bg-slate-900 rounded-2xl p-2 px-3 shadow-xl border dark:border-slate-800">
                                 <span class="text-primary font-black text-lg leading-none">{{ new Date(event.tanggal_mulai).getDate() }}</span>
-                                <span class="text-[9px] font-black text-gray-400 uppercase tracking-tighter">{{ new Date(event.tanggal_mulai).toLocaleString('id-ID', { month: 'short' }) }}</span>
+                                <span class="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-tighter">{{ new Date(event.tanggal_mulai).toLocaleString('id-ID', { month: 'short' }) }}</span>
                             </div>
                         </div>
                         <div class="flex-1 p-6 space-y-4">
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wider">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
                                 {{ event.objek_wisata ? event.objek_wisata.nama_objek : 'Lokasi Umum' }}
                             </div>
-                            <h3 class="text-2xl font-black text-gray-900 leading-tight group-hover:text-primary transition-colors">{{ event.nama_event }}</h3>
-                            <p class="text-gray-500 text-sm font-medium line-clamp-2 leading-relaxed">
+                            <h3 class="text-2xl font-black text-gray-900 dark:text-slate-100 leading-tight group-hover:text-primary transition-colors">{{ event.nama_event }}</h3>
+                            <p class="text-gray-500 dark:text-slate-400 text-sm font-medium line-clamp-2 leading-relaxed">
                                 {{ event.keterangan }}
                             </p>
                         </div>

@@ -1,6 +1,23 @@
 <script setup lang="ts">
 import { Link, usePage, router } from '@inertiajs/vue3'
-import { computed, watch } from 'vue'
+import { computed, watch, ref, onMounted } from 'vue'
+
+const isDark = ref(false)
+
+const toggleTheme = () => {
+    isDark.value = !isDark.value
+    if (isDark.value) {
+        document.documentElement.classList.add('dark')
+        localStorage.setItem('theme', 'dark')
+    } else {
+        document.documentElement.classList.remove('dark')
+        localStorage.setItem('theme', 'light')
+    }
+}
+
+onMounted(() => {
+    isDark.value = document.documentElement.classList.contains('dark')
+})
 import { Button } from '@/Components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from '@/Components/ui/sheet'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu'
@@ -39,12 +56,6 @@ const navSections = [
       { label: 'UMKM', route: 'admin.umkm.index', icon: Store, pattern: 'admin.umkm.*' },
       { label: 'Acara & Agenda', route: 'admin.events.index', icon: Calendar, pattern: 'admin.events.*' },
       { label: 'Data Kecamatan', route: 'admin.kecamatan.index', icon: MapIcon, pattern: 'admin.kecamatan.*' },
-    ]
-  },
-  {
-    title: 'Komunitas',
-    items: [
-      { label: 'Moderasi Ulasan', route: 'admin.reviews.index', icon: MessageSquare, pattern: 'admin.reviews.*' },
     ]
   }
 ]
@@ -116,27 +127,27 @@ watch(() => page.props.errors, (errors: any) => {
                     :class="cn(
                         'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all group relative',
                         isUrl(item.pattern) 
-                            ? 'bg-primary text-white shadow-md shadow-primary/20 font-bold' 
-                            : 'text-slate-500 hover:text-primary hover:bg-slate-50 font-medium'
+                            ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 font-bold' 
+                            : 'text-slate-500 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-primary font-medium'
                     )"
                 >
-                    <component :is="item.icon" class="h-4 w-4" :class="isUrl(item.pattern) ? 'text-white' : 'group-hover:text-primary transition-colors'" />
+                    <component :is="item.icon" class="h-4 w-4" :class="isUrl(item.pattern) ? 'text-primary-foreground' : 'text-slate-500 group-hover:text-primary transition-colors'" />
                     <span class="text-sm tracking-tight">{{ item.label }}</span>
-                    <div v-if="isUrl(item.pattern)" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-white rounded-r-full"></div>
+                    <div v-if="isUrl(item.pattern)" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-4 bg-primary-foreground rounded-r-full"></div>
                 </Link>
             </div>
         </div>
       </nav>
 
-      <div class="mt-auto p-4 border-t bg-slate-50/50">
+      <div class="mt-auto p-4 border-t bg-slate-50/50 dark:bg-slate-900/50 dark:border-slate-800">
          <div class="flex items-center gap-3 px-2">
-            <Avatar class="border-2 border-white shadow-sm">
+            <Avatar class="border-2 border-white dark:border-slate-800 shadow-sm">
                 <AvatarImage :src="user.avatar_url || ''" />
-                <AvatarFallback class="bg-primary text-white font-bold">{{ user.name.charAt(0) }}</AvatarFallback>
+                <AvatarFallback class="bg-primary text-primary-foreground font-bold">{{ user.name.charAt(0) }}</AvatarFallback>
             </Avatar>
             <div class="grid gap-0.5 text-xs">
-                <span class="font-bold text-slate-900">{{ user.name }}</span>
-                <span class="text-slate-500 capitalize text-[10px] font-medium tracking-wider">{{ user.role }}</span>
+                <span class="font-bold text-slate-900 dark:text-slate-100">{{ user.name }}</span>
+                <span class="text-slate-500 dark:text-slate-400 capitalize text-[10px] font-medium tracking-wider">{{ user.role }}</span>
             </div>
          </div>
       </div>
@@ -146,7 +157,7 @@ watch(() => page.props.errors, (errors: any) => {
       <header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
         <Sheet>
           <SheetTrigger as-child>
-            <Button size="icon" variant="outline" class="sm:hidden rounded-xl border-slate-200">
+            <Button size="icon" variant="outline" class="sm:hidden rounded-xl border-slate-200 dark:border-slate-800">
               <Menu class="h-5 w-5" />
               <span class="sr-only">Toggle Menu</span>
             </Button>
@@ -170,7 +181,7 @@ watch(() => page.props.errors, (errors: any) => {
                             :href="route(item.route)"
                             :class="cn(
                                 'flex items-center gap-4 px-3 py-3 rounded-xl transition-all',
-                                isUrl(item.pattern) ? 'bg-primary text-white font-bold' : 'text-slate-600 font-medium'
+                                isUrl(item.pattern) ? 'bg-primary text-primary-foreground font-bold' : 'text-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 font-medium'
                             )"
                         >
                             <component :is="item.icon" class="h-5 w-5" />
@@ -186,6 +197,22 @@ watch(() => page.props.errors, (errors: any) => {
         <div class="relative ml-auto flex-1 md:grow-0">
            <!-- Search could go here -->
         </div>
+
+        <!-- Theme Toggle Button -->
+        <Button 
+            variant="outline" 
+            size="icon" 
+            class="rounded-xl border-slate-200 dark:border-slate-800" 
+            @click="toggleTheme"
+            title="Toggle Tema"
+        >
+            <svg v-if="isDark" class="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707-.707M12 7a5 5 0 100 10 5 5 0 000-10z" />
+            </svg>
+            <svg v-else class="w-4 h-4 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger as-child>

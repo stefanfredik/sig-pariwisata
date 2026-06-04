@@ -21,6 +21,13 @@
     <script type="text/javascript">
         const Ziggy = @json(new \Tighten\Ziggy\Ziggy);
     </script>
+    <script type="text/javascript">
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
     @inertiaHead
 </head>
