@@ -1,22 +1,20 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-full h-full" fill="none">
-    <defs>
-      <mask id="parking-mask">
-        <!-- Background of mask (white = keep) -->
-        <rect x="0" y="0" width="24" height="24" fill="white" />
-        
-        <!-- P letter (black = cutout) -->
-        <text x="12" y="11" font-family="'Inter', 'Montserrat', 'Outfit', sans-serif" font-weight="900" font-size="9.5" text-anchor="middle" fill="black">P</text>
-        
-        <!-- Divider line (black = cutout) -->
-        <line x1="2" y1="14" x2="22" y2="14" stroke="black" stroke-width="1.2" />
-        
-        <!-- PARKIR text (black = cutout) -->
-        <text x="12" y="20.5" font-family="'Inter', 'Montserrat', 'Outfit', sans-serif" font-weight="900" font-size="3.6" text-anchor="middle" letter-spacing="0.4" fill="black">PARKIR</text>
-      </mask>
-    </defs>
-    
-    <!-- The shape filled with currentColor (which changes dynamically with hover classes) -->
-    <rect x="0.5" y="0.5" width="23" height="23" rx="4.5" fill="currentColor" mask="url(#parking-mask)" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <!-- Rounded square border -->
+    <rect x="3" y="3" width="18" height="18" rx="3" />
+    <!-- P letter: vertical stroke -->
+    <line x1="9" y1="17" x2="9" y2="7" />
+    <!-- P letter: bump curve -->
+    <path d="M9 7 h3 a3.5 3.5 0 0 1 0 7 H9" />
   </svg>
 </template>
