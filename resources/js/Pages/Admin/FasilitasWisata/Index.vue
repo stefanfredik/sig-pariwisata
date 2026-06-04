@@ -27,6 +27,7 @@ import {
     Landmark
 } from 'lucide-vue-next'
 import { debounce } from 'lodash'
+import ParkingIcon from "@/Components/Icons/ParkingIcon.vue";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,7 +146,7 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
     const nm = (namaFasilitas || '').toLowerCase();
 
     // Check name keywords first for specific matches
-    if (nm.includes("parkir")) return Car;
+    if (nm.includes("parkir")) return ParkingIcon;
     if (nm.includes("toilet") || nm.includes("kamar mandi") || nm.includes("wc") || nm.includes("toilet/wc")) return Bath;
     if (nm.includes("mushola") || nm.includes("mesjid") || nm.includes("masjid") || nm.includes("ibadah") || nm.includes("gereja") || nm.includes("vihara") || nm.includes("pura")) return Landmark;
     if (nm.includes("wifi") || nm.includes("internet")) return Wifi;
@@ -156,11 +157,13 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
     if (nm.includes("hotel") || nm.includes("penginapan") || nm.includes("villa") || nm.includes("resort") || nm.includes("homestay") || nm.includes("akomodasi")) return Bed;
     if (nm.includes("taman") || nm.includes("camping") || nm.includes("outbound") || nm.includes("alam") || nm.includes("kebun")) return TreePine;
     if (nm.includes("informasi") || nm.includes("info center") || nm.includes("pusat informasi") || nm.includes("guide")) return Info;
+    if (nm.includes("sampah") || nm.includes("trash") || nm.includes("bin")) return Trash2;
 
     // Check category fallback keywords
     if (kat.includes("akomodasi")) return Bed;
     if (kat.includes("kuliner")) return Utensils;
     if (kat.includes("transportasi")) return Car;
+    if (kat.includes("sampah")) return Trash2;
     if (kat.includes("umum")) return MapPin;
 
     return defaultIcon;
@@ -230,7 +233,9 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
                                             <SelectItem value="Akomodasi">Akomodasi</SelectItem>
                                             <SelectItem value="Kuliner">Kuliner</SelectItem>
                                             <SelectItem value="Transportasi">Transportasi</SelectItem>
+                                            <SelectItem value="Parkir">Parkir</SelectItem>
                                             <SelectItem value="Toilet">Toilet</SelectItem>
+                                            <SelectItem value="Tempat Sampah">Tempat Sampah</SelectItem>
                                             <SelectItem value="Umum">Umum</SelectItem>
                                             <SelectItem value="Lainnya">Lainnya</SelectItem>
                                         </SelectGroup>

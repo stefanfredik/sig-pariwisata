@@ -271,6 +271,7 @@
                                         :is="
                                             getFasilitasIcon(
                                                 fas.kategori_fasilitas,
+                                                fas.nama_fasilitas,
                                             )
                                         "
                                         class="w-8 h-8 text-primary group-hover:text-white mx-auto transition-transform group-hover:scale-110"
@@ -1235,6 +1236,7 @@
                                     :is="
                                         getFasilitasIcon(
                                             selectedFasilitas?.kategori_fasilitas,
+                                            selectedFasilitas?.nama_fasilitas,
                                         )
                                     "
                                     class="w-20 h-20"
@@ -1371,6 +1373,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import { useForm, Head, usePage, router } from "@inertiajs/vue3";
 import PublicLayout from "@/Layouts/PublicLayout.vue";
 import ImageLightbox from "@/Components/ImageLightbox.vue";
+import ParkingIcon from "@/Components/Icons/ParkingIcon.vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -1400,6 +1403,7 @@ import {
     TreePine,
     MapPin,
     Landmark,
+    Trash2
 } from "lucide-vue-next";
 
 const props = defineProps({
@@ -1441,7 +1445,7 @@ const getFasilitasIcon = (kategoriFasilitas, namaFasilitas) => {
     const nm = (namaFasilitas || '').toLowerCase();
 
     // Check name keywords first for specific matches
-    if (nm.includes("parkir")) return Car;
+    if (nm.includes("parkir")) return ParkingIcon;
     if (nm.includes("toilet") || nm.includes("kamar mandi") || nm.includes("wc") || nm.includes("toilet/wc")) return Bath;
     if (nm.includes("mushola") || nm.includes("mesjid") || nm.includes("masjid") || nm.includes("ibadah") || nm.includes("gereja") || nm.includes("vihara") || nm.includes("pura")) return Landmark;
     if (nm.includes("wifi") || nm.includes("internet")) return Wifi;
@@ -1452,11 +1456,14 @@ const getFasilitasIcon = (kategoriFasilitas, namaFasilitas) => {
     if (nm.includes("hotel") || nm.includes("penginapan") || nm.includes("villa") || nm.includes("resort") || nm.includes("homestay") || nm.includes("akomodasi")) return Bed;
     if (nm.includes("taman") || nm.includes("camping") || nm.includes("outbound") || nm.includes("alam") || nm.includes("kebun")) return TreePine;
     if (nm.includes("informasi") || nm.includes("info center") || nm.includes("pusat informasi") || nm.includes("guide")) return Info;
+    if (nm.includes("sampah") || nm.includes("trash") || nm.includes("bin")) return Trash2;
 
     // Check category fallback keywords
     if (kat.includes("akomodasi")) return Bed;
     if (kat.includes("kuliner")) return Utensils;
     if (kat.includes("transportasi")) return Car;
+    if (kat.includes("parkir")) return ParkingIcon;
+    if (kat.includes("sampah")) return Trash2;
     if (kat.includes("umum")) return MapPin;
 
     return defaultIcon;

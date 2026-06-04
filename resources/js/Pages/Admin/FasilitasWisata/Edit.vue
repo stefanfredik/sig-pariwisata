@@ -108,7 +108,9 @@ const submit = () => {
                                     <SelectItem value="Akomodasi">Akomodasi</SelectItem>
                                     <SelectItem value="Kuliner">Kuliner</SelectItem>
                                     <SelectItem value="Transportasi">Transportasi</SelectItem>
+                                    <SelectItem value="Parkir">Parkir</SelectItem>
                                     <SelectItem value="Toilet">Toilet</SelectItem>
+                                    <SelectItem value="Tempat Sampah">Tempat Sampah</SelectItem>
                                     <SelectItem value="Umum">Umum</SelectItem>
                                     <SelectItem value="Lainnya">Lainnya</SelectItem>
                                 </SelectGroup>
