@@ -163,6 +163,7 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
     if (kat.includes("akomodasi")) return Bed;
     if (kat.includes("kuliner")) return Utensils;
     if (kat.includes("transportasi")) return Car;
+    if (kat.includes("parkir")) return ParkingIcon;
     if (kat.includes("sampah")) return Trash2;
     if (kat.includes("umum")) return MapPin;
 
