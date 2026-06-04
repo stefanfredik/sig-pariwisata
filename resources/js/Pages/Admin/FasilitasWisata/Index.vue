@@ -28,6 +28,7 @@ import {
 } from 'lucide-vue-next'
 import { debounce } from 'lodash'
 import ParkingIcon from "@/Components/Icons/ParkingIcon.vue";
+import HelmetIcon from "@/Components/Icons/HelmetIcon.vue";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -158,6 +159,7 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
     if (nm.includes("taman") || nm.includes("camping") || nm.includes("outbound") || nm.includes("alam") || nm.includes("kebun")) return TreePine;
     if (nm.includes("informasi") || nm.includes("info center") || nm.includes("pusat informasi") || nm.includes("guide")) return Info;
     if (nm.includes("sampah") || nm.includes("trash") || nm.includes("bin")) return Trash2;
+    if (nm.includes("helm") || nm.includes("pelindung") || nm.includes("safety")) return HelmetIcon;
 
     // Check category fallback keywords
     if (kat.includes("akomodasi")) return Bed;
@@ -165,6 +167,7 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
     if (kat.includes("transportasi")) return Car;
     if (kat.includes("parkir")) return ParkingIcon;
     if (kat.includes("sampah")) return Trash2;
+    if (kat.includes("helm")) return HelmetIcon;
     if (kat.includes("umum")) return MapPin;
 
     return defaultIcon;
@@ -238,6 +241,7 @@ const getFasilitasIcon = (kategoriFasilitas: string, namaFasilitas: string) => {
                                             <SelectItem value="Toilet">Toilet</SelectItem>
                                             <SelectItem value="Tempat Sampah">Tempat Sampah</SelectItem>
                                             <SelectItem value="Umum">Umum</SelectItem>
+                                            <SelectItem value="Helm Pelindung">Helm Pelindung</SelectItem>
                                             <SelectItem value="Lainnya">Lainnya</SelectItem>
                                         </SelectGroup>
                                     </SelectContent>
