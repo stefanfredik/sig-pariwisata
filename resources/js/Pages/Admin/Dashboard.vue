@@ -294,7 +294,7 @@ defineProps<{
                          <div class="space-y-4">
                             <div v-for="review in recentReviews" :key="review.id" class="flex items-start gap-4 text-sm border-b pb-4 last:border-0 last:pb-0">
                                 <div class="grid gap-1">
-                                    <div class="font-semibold">{{ review.user.name }}</div>
+                                    <div class="font-semibold">{{ review.user?.name || review.nama || 'Anonim' }}</div>
                                     <div class="text-xs text-muted-foreground">{{ review.objek_wisata.nama_objek }}</div>
                                     <div class="line-clamp-2 text-muted-foreground italic">"{{ review.komentar }}"</div>
                                 </div>

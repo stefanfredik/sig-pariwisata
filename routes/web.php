@@ -32,9 +32,10 @@ Route::get('/peta', [PublicObjekWisataController::class, 'map'])->name('public.m
 Route::get('/api/search-suggest', [PublicSearchController::class, 'suggest'])->name('public.search.suggest');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
+Route::post('/reviews', [PublicReviewController::class, 'store'])->name('public.reviews.store');
+
 // Authenticated public routes
 Route::middleware('auth')->group(function () {
-    Route::post('/reviews', [PublicReviewController::class, 'store'])->name('public.reviews.store');
     Route::get('/profil', [PublicProfileController::class, 'show'])->name('public.profile');
     Route::put('/profil', [PublicProfileController::class, 'update'])->name('public.profile.update');
 

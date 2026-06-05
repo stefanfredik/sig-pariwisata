@@ -37,7 +37,14 @@ class ObjekWisataController extends Controller
 
     public function show($slug)
     {
-        $objekWisata = ObjekWisata::with(['fotos', 'kecamatan', 'fasilitas.fotos', 'reviews.user', 'reviews.fotos'])
+        $objekWisata = ObjekWisata::with([
+            'fotos',
+            'kecamatan',
+            'fasilitas.fotos',
+            'reviews' => function ($q) {
+                $q->where('status', 'approved')->with(['user', 'fotos']);
+            }
+        ])
             ->withAvg('reviews as rating_avg', 'rating')
             ->where('slug', $slug)
             ->firstOrFail();

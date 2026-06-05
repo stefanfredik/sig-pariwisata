@@ -204,11 +204,15 @@ const handleConfirm = () => {
                                 <td class="px-6 py-4">
                                      <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm uppercase">
-                                            {{ review.user?.name?.charAt(0) || 'U' }}
+                                            {{ review.user?.name?.charAt(0) || review.nama?.charAt(0) || 'G' }}
                                         </div>
                                         <div>
-                                            <div class="font-semibold text-slate-900 dark:text-white text-sm">{{ review.user?.name || 'Anonim' }}</div>
-                                            <div class="text-xs text-slate-400">{{ review.user?.email }}</div>
+                                            <div class="font-semibold text-slate-900 dark:text-white text-sm">{{ review.user?.name || review.nama || 'Anonim' }}</div>
+                                            <div class="text-xs text-slate-400">
+                                                <span v-if="review.user?.email">{{ review.user?.email }}</span>
+                                                <span v-else-if="review.email" class="italic text-slate-400">{{ review.email }} (Tamu)</span>
+                                                <span v-else class="italic text-slate-400">Tamu</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>

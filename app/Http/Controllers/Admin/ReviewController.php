@@ -18,10 +18,13 @@ class ReviewController extends Controller
         $query = Review::with(['user', 'objekWisata', 'fotos']);
 
         if ($request->search) {
-            $query->where('komentar', 'like', "%{$request->search}%")
-                ->orWhereHas('user', function ($q) use ($request) {
-                    $q->where('name', 'like', "%{$request->search}%");
-                });
+            $query->where(function ($q) use ($request) {
+                $q->where('komentar', 'like', "%{$request->search}%")
+                    ->orWhere('nama', 'like', "%{$request->search}%")
+                    ->orWhereHas('user', function ($uq) use ($request) {
+                        $uq->where('name', 'like', "%{$request->search}%");
+                    });
+            });
         }
 
         if ($request->status) {

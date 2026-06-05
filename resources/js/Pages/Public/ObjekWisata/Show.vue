@@ -323,13 +323,13 @@
                                             <div
                                                 class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black"
                                             >
-                                                {{ review.user.name.charAt(0) }}
+                                                {{ review.user?.name?.charAt(0) || review.nama?.charAt(0) || 'A' }}
                                             </div>
                                             <div>
                                                 <div
                                                     class="font-black text-gray-900 dark:text-slate-100"
                                                 >
-                                                    {{ review.user.name }}
+                                                    {{ review.user?.name || review.nama || 'Anonim' }}
                                                 </div>
                                                 <div
                                                     class="text-[10px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-widest"
@@ -473,26 +473,48 @@
                                     </div>
                                 </transition>
 
-                                <div
-                                    v-if="!$page.props.auth.user"
-                                    class="p-6 bg-white dark:bg-slate-950 rounded-2xl border border-gray-100 dark:border-slate-800 text-center space-y-4"
-                                >
-                                    <p class="text-gray-600 dark:text-slate-350 font-bold">
-                                        Silakan login terlebih dahulu untuk
-                                        memberikan ulasan.
-                                    </p>
-                                    <a
-                                        :href="route('login')"
-                                        class="inline-flex bg-primary text-white px-8 py-3 rounded-xl font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-lg shadow-primary/20 cursor-pointer"
-                                        >Login Sekarang</a
-                                    >
-                                </div>
-
                                 <form
-                                    v-else
-                                    @submit.prevent="submitReview"
-                                    class="space-y-6"
-                                >
+                                                                    @submit.prevent="submitReview"
+                                                                    class="space-y-6"
+                                                                >
+                                                                    <!-- Guest Fields -->
+                                                                    <div v-if="!$page.props.auth.user" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                                        <div class="space-y-2">
+                                                                            <label
+                                                                                class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest pl-2"
+                                                                                >Nama Anda <span class="text-red-500">*</span></label
+                                                                            >
+                                                                            <input
+                                                                                v-model="form.nama"
+                                                                                type="text"
+                                                                                placeholder="Contoh: John Doe"
+                                                                                required
+                                                                                class="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-2xl px-6 py-4 text-gray-900 dark:text-slate-100 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300 dark:placeholder-slate-700"
+                                                                            />
+                                                                            <span
+                                                                                v-if="form.errors.nama"
+                                                                                class="text-xs text-red-500 font-bold ml-2"
+                                                                                >{{ form.errors.nama }}</span
+                                                                            >
+                                                                        </div>
+                                                                        <div class="space-y-2">
+                                                                            <label
+                                                                                class="text-[10px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest pl-2"
+                                                                                >Email Anda (Opsional)</label
+                                                                            >
+                                                                            <input
+                                                                                v-model="form.email"
+                                                                                type="email"
+                                                                                placeholder="Contoh: johndoe@example.com"
+                                                                                class="w-full bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-2xl px-6 py-4 text-gray-900 dark:text-slate-100 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all font-bold placeholder-gray-300 dark:placeholder-slate-700"
+                                                                            />
+                                                                            <span
+                                                                                v-if="form.errors.email"
+                                                                                class="text-xs text-red-500 font-bold ml-2"
+                                                                                >{{ form.errors.email }}</span
+                                                                            >
+                                                                        </div>
+                                                                    </div>
                                     <!-- Rating -->
                                     <div class="space-y-4">
                                         <label
@@ -1524,6 +1546,8 @@ const jsonLd = computed(() => {
 
 const form = useForm({
     id_objek: props.objekWisata.id,
+    nama: "",
+    email: "",
     rating: 5,
     judul: "",
     komentar: "",
@@ -1567,10 +1591,10 @@ const submitReview = () => {
         forceFormData: true,
         preserveScroll: true,
         onSuccess: () => {
-            form.reset("rating", "judul", "komentar", "fotos");
+            form.reset("nama", "email", "rating", "judul", "komentar", "fotos");
             reviewPreviews.value = [];
             showReviewToast(
-                "Terima kasih! Ulasan Anda telah dikirim dan menunggu moderasi admin.",
+                "Terima kasih! Ulasan Anda telah berhasil dikirim.",
                 "success",
             );
         },

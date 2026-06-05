@@ -22,34 +22,46 @@ class ReviewController extends Controller
         ]);
 
         try {
-            $validated = $request->validate([
+            $rules = [
                 'id_objek' => 'required|exists:objek_wisatas,id',
                 'rating' => 'required|integer|min:1|max:5',
                 'judul' => 'nullable|string|max:100',
                 'komentar' => 'required|string|max:1000',
                 'fotos' => 'nullable|array|max:5',
                 'fotos.*' => 'image|mimes:jpg,jpeg,png,webp,heic,heif|max:25600',
-            ]);
+            ];
+
+            // Add guest validation if not authenticated
+            if (!Auth::check()) {
+                $rules['nama'] = 'required|string|max:100';
+                $rules['email'] = 'nullable|email|max:100';
+            }
+
+            $validated = $request->validate($rules);
 
             \Log::info('Validation passed');
 
-            // Check if user already reviewed this object
-            $existingReview = Review::where('id_user', Auth::id())
-                ->where('id_objek', $request->id_objek)
-                ->first();
+            // Check if logged-in user already reviewed this object
+            if (Auth::check()) {
+                $existingReview = Review::where('id_user', Auth::id())
+                    ->where('id_objek', $request->id_objek)
+                    ->first();
 
-            if ($existingReview) {
-                \Log::info('Review already exists', ['review_id' => $existingReview->id]);
-                return back()->with('error', 'Anda sudah memberikan review untuk objek wisata ini.');
+                if ($existingReview) {
+                    \Log::info('Review already exists', ['review_id' => $existingReview->id]);
+                    return back()->with('error', 'Anda sudah memberikan review untuk objek wisata ini.');
+                }
             }
 
             $review = Review::create([
                 'id_user' => Auth::id(),
+                'nama' => Auth::check() ? null : $validated['nama'],
+                'email' => Auth::check() ? null : ($validated['email'] ?? null),
                 'id_objek' => $request->id_objek,
                 'rating' => $request->rating,
                 'judul' => $request->judul,
                 'komentar' => $request->komentar,
-                'status' => 'pending',
+                'status' => 'approved',
             ]);
 
             \Log::info('Review created', ['review_id' => $review->id]);
@@ -63,7 +75,7 @@ class ReviewController extends Controller
                 \Log::info('Photos saved');
             }
 
-            return back()->with('message', 'Terima kasih! Review Anda telah dikirim dan menunggu moderasi admin.');
+            return back()->with('message', 'Terima kasih! Ulasan Anda telah berhasil dikirim.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::warning('Validation failed', ['errors' => $e->errors()]);

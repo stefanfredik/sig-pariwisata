@@ -11,6 +11,8 @@ class Review extends Model
 
     protected $fillable = [
         'id_user',
+        'nama',
+        'email',
         'id_objek',
         'rating',
         'judul',
@@ -32,6 +34,13 @@ class Review extends Model
     protected static function boot()
     {
         parent::boot();
+
+        // Recalculate rating when review is created as approved
+        static::created(function ($review) {
+            if ($review->status === 'approved') {
+                $review->objekWisata->recalculateRating();
+            }
+        });
 
         // Recalculate objek wisata rating when review is approved
         static::updated(function ($review) {

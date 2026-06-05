@@ -167,11 +167,15 @@ const handleConfirm = () => {
                             <CardContent class="space-y-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xl uppercase">
-                                        {{ review.user?.name?.charAt(0) || 'U' }}
+                                        {{ review.user?.name?.charAt(0) || review.nama?.charAt(0) || 'G' }}
                                     </div>
                                     <div>
-                                        <div class="font-bold text-slate-900 dark:text-white">{{ review.user?.name || 'Unknown' }}</div>
-                                        <div class="text-xs text-slate-500">{{ review.user?.email }}</div>
+                                        <div class="font-bold text-slate-900 dark:text-white">{{ review.user?.name || review.nama || 'Anonim' }}</div>
+                                        <div class="text-xs text-slate-500">
+                                            <span v-if="review.user?.email">{{ review.user?.email }}</span>
+                                            <span v-else-if="review.email" class="italic text-slate-400">{{ review.email }} (Tamu)</span>
+                                            <span v-else class="italic text-slate-400">Tamu</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="pt-4 border-t space-y-2">
